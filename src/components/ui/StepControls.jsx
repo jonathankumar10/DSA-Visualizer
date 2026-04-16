@@ -1,0 +1,79 @@
+/**
+ * Shared playback controls used by all visualizers.
+ */
+export default function StepControls({ runner }) {
+  const { index, total, playing, play, stop, next, prev, reset } = runner
+
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-5 py-3">
+      {/* Step counter */}
+      <span className="text-xs text-slate-500 tabular-nums">
+        Step {index + 1} / {total}
+      </span>
+
+      {/* Controls */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={reset}
+          title="Reset"
+          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+        >
+          <ResetIcon />
+        </button>
+        <button
+          onClick={prev}
+          disabled={index === 0}
+          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
+        >
+          <PrevIcon />
+        </button>
+        <button
+          onClick={playing ? stop : play}
+          className="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-violet-500 transition-colors"
+        >
+          {playing ? 'Pause' : index === total - 1 ? 'Replay' : 'Play'}
+        </button>
+        <button
+          onClick={next}
+          disabled={index === total - 1}
+          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
+        >
+          <NextIcon />
+        </button>
+      </div>
+
+      {/* Progress bar */}
+      <div className="flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-violet-500 transition-all duration-300"
+          style={{ width: `${((index + 1) / total) * 100}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function ResetIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M1 4v6h6M23 20v-6h-6"/>
+      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+    </svg>
+  )
+}
+
+function PrevIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
+    </svg>
+  )
+}
+
+function NextIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>
+    </svg>
+  )
+}

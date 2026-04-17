@@ -46,7 +46,7 @@ export default function AlgorithmPage() {
 
       {/* Title + badges */}
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <h1 className="text-2xl font-bold text-white">{algo.title}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-white">{algo.title}</h1>
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`rounded-full px-3 py-1 text-xs font-medium ${DIFFICULTY_COLOR[algo.difficulty]}`}>
             {algo.difficulty}
@@ -99,7 +99,7 @@ export default function AlgorithmPage() {
       {/* Split layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-5 items-start">
         {/* Left — Visualizer */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3 sm:p-5">
           <Suspense fallback={
             <div className="py-20 text-center text-slate-500 text-sm">Loading visualizer…</div>
           }>

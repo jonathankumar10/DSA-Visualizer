@@ -80,7 +80,12 @@ export default {
     }
     return arr.stream().mapToInt(Integer::intValue).toArray();
 }`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'check')    return [3, 4, 5]
+            if (step.type === 'found')    return [5, 6, 7]
+            if (step.type === 'notfound') return [11]
+            return []
+          },
         },
         python: {
           code: `def twoSum(nums, target):
@@ -89,7 +94,12 @@ export default {
             if nums[i] + nums[j] == target:
                 return [i, j]
     return []`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'check')    return [2, 3, 4]
+            if (step.type === 'found')    return [4, 5]
+            if (step.type === 'notfound') return [6]
+            return []
+          },
         },
       },
     ],

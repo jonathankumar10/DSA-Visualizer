@@ -19,10 +19,7 @@ export default {
         complexity: { time: 'O(n)', space: 'O(n)' },
         java: {
           code: `public boolean containsDuplicate2(int[] nums) {
-    // Step 1: Create set for tracking
     final Set<Integer> set = new HashSet<>();
-
-    // Step 2: Find if number is in set, else add it
     for (int i = 0; i < nums.length; i++) {
         if (set.contains(nums[i])) {
             return true;
@@ -32,31 +29,28 @@ export default {
     return false;
 }`,
           getHighlightLines(step) {
-            if (step.type === 'init')      return [3]
-            if (step.type === 'check')     return [6, 7]
-            if (step.type === 'duplicate') return [8]
-            if (step.type === 'add')       return [10]
-            if (step.type === 'done')      return [12]
+            if (step.type === 'init')      return [2]
+            if (step.type === 'check')     return [3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'add')       return [7]
+            if (step.type === 'done')      return [9]
             return []
           },
         },
         python: {
           code: `def hasDuplicate2(self, nums: List[int]) -> bool:
-    # Step 1: Create set for tracking
     seen = set()
-
-    # Step 2: Find if number is in set, else add it
     for num in nums:
         if num in seen:
             return True
         seen.add(num)
     return False`,
           getHighlightLines(step) {
-            if (step.type === 'init')      return [3]
-            if (step.type === 'check')     return [6, 7]
-            if (step.type === 'duplicate') return [8]
-            if (step.type === 'add')       return [9]
-            if (step.type === 'done')      return [10]
+            if (step.type === 'init')      return [2]
+            if (step.type === 'check')     return [3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'add')       return [6]
+            if (step.type === 'done')      return [7]
             return []
           },
         },
@@ -67,11 +61,7 @@ export default {
         complexity: { time: 'O(n log n)', space: 'O(1)' },
         java: {
           code: `public boolean containsDuplicate3(int[] nums) {
-
-    // Step 1: Sort list
     Arrays.sort(nums);
-
-    // Step 2: Check if duplicate is present in the list
     for (int i = 1; i < nums.length; i++) {
         if (nums[i] == nums[i - 1]) {
             return true;
@@ -79,19 +69,28 @@ export default {
     }
     return false;
 }`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'init')      return [2]
+            if (step.type === 'check')     return [3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'done')      return [8]
+            return []
+          },
         },
         python: {
           code: `def hasDuplicate(self, nums: List[int]) -> bool:
-    # Step 1: Sort the list
     nums.sort()
-
-    # Step 2: Check if duplicate is present in the list
     for i in range(1, len(nums)):
         if(nums[i] == nums[i-1]):
             return True
     return False`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'init')      return [2]
+            if (step.type === 'check')     return [3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'done')      return [6]
+            return []
+          },
         },
       },
       {
@@ -109,7 +108,12 @@ export default {
     }
     return false;
 }`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'check')     return [2, 3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'done')      return [9]
+            return []
+          },
         },
         python: {
           code: `def containsDuplicate(nums):
@@ -118,7 +122,12 @@ export default {
             if nums[i] == nums[j]:
                 return True
     return False`,
-          getHighlightLines(_step) { return [] },
+          getHighlightLines(step) {
+            if (step.type === 'check')     return [2, 3, 4]
+            if (step.type === 'duplicate') return [5]
+            if (step.type === 'done')      return [6]
+            return []
+          },
         },
       },
     ],

@@ -95,7 +95,7 @@ function CodeLine({ tokens, lineNum, highlighted, isCurrent }) {
       {isCurrent && (
         <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-violet-400 rounded-r" />
       )}
-      <span className="select-none w-10 shrink-0 text-right pr-4 text-slate-600">
+      <span className="select-none w-7 sm:w-10 shrink-0 text-right pr-2 sm:pr-4 text-slate-600">
         {lineNum}
       </span>
       <span className="flex-1 pr-4 whitespace-pre">
@@ -212,7 +212,7 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
       </div>
 
       {/* Code body */}
-      <div ref={scrollRef} className="overflow-auto py-3" style={{ maxHeight: 'calc(100vh - 230px)', minHeight: 180 }}>
+      <div ref={scrollRef} className="overflow-auto py-3" style={{ maxHeight: 'min(60vh, calc(100vh - 230px))', minHeight: 160 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={`${activeId}-${currentLang}`}

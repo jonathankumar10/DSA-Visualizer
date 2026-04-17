@@ -69,7 +69,7 @@ export default function AlgorithmsIndex() {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Algorithms</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Algorithms</h1>
         <p className="mt-2 text-slate-400">
           {ALGORITHMS.length} visualizer{ALGORITHMS.length !== 1 ? 's' : ''} — step through each one at your own pace.
         </p>
@@ -78,7 +78,7 @@ export default function AlgorithmsIndex() {
       {/* Filter bar */}
       <div className="space-y-3">
         {/* Search input */}
-        <div className="relative max-w-sm">
+        <div className="relative w-full sm:max-w-sm">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
             width="15" height="15" viewBox="0 0 24 24" fill="none"

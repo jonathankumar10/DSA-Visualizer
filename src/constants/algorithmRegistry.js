@@ -5,6 +5,7 @@ import containsDuplicate     from '../content/algorithms/contains-duplicate/inde
 import maxConsecutiveOnes    from '../content/algorithms/max-consecutive-ones/index.js'
 import removeElement         from '../content/algorithms/remove-element/index.js'
 import replaceElements       from '../content/algorithms/replace-elements/index.js'
+import concatenationOfArray  from '../content/algorithms/concatenation-of-array/index.js'
 
 // Ordered list — add new algorithms here, one import + one array entry.
 export const ALGORITHMS = [
@@ -15,6 +16,7 @@ export const ALGORITHMS = [
   maxConsecutiveOnes,
   removeElement,
   replaceElements,
+  concatenationOfArray,
 ]
 
 export const DIFFICULTY_COLOR = {

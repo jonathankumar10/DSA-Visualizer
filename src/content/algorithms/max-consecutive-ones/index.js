@@ -19,12 +19,8 @@ export default {
         complexity: { time: 'O(n)', space: 'O(1)' },
         java: {
           code: `public int findMaxConsecutiveOnes(int[] nums) {
-    // Step 1: Initialize count and maxCount
     int count = 0;
     int maxCount = 0;
-
-    // Step 2: Iterate through the list and count 1s. If 0 is found, reset the count
-    // to 0 while we keep maxCount
     for (int i = 0; i < nums.length; i++) {
         if (nums[i] == 1) {
             count++;
@@ -37,10 +33,10 @@ export default {
     return maxCount;
 }`,
           getHighlightLines(step) {
-            if (step.type === 'init')      return [3, 4]
-            if (step.type === 'increment') return [9, 10, 15]
-            if (step.type === 'reset')     return [12, 13, 15]
-            if (step.type === 'done')      return [17]
+            if (step.type === 'init')      return [2, 3]
+            if (step.type === 'increment') return [5, 6, 11]
+            if (step.type === 'reset')     return [8, 9, 11]
+            if (step.type === 'done')      return [13]
             return []
           },
         },

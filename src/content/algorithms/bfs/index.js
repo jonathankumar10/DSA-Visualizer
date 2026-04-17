@@ -19,14 +19,10 @@ export default {
         complexity: { time: 'O(V + E)', space: 'O(V)' },
         java: {
           code: `public int numIslands(char[][] grid) {
-
-    // Step 1: Get rows, columns and visited arrays
     int ROWS = grid.length;
     int COLS = grid[0].length;
     int numOfIslands = 0;
     boolean[][] visited = new boolean[ROWS][COLS];
-
-    // Step 2: Iterate through each node and perform bfs
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             if (grid[i][j] == '1' && !visited[i][j]) {
@@ -41,7 +37,6 @@ export default {
 private final int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
 private void bfs(char[][] grid, int rows, int cols, boolean[][] visited) {
-    // Step 3: Initialize queue for BFS and set the initial node traversed to true
     LinkedList<int[]> queue = new LinkedList<>();
     queue.add(new int[] { rows, cols });
     visited[rows][cols] = true;
@@ -51,8 +46,6 @@ private void bfs(char[][] grid, int rows, int cols, boolean[][] visited) {
         int row = node[0];
         int col = node[1];
 
-        // Step 4: Traverse each direction by one, check for node with value 1
-        // and not visited and add to queue and set visited to true
         for (int[] dir : directions) {
             int nr = row + dir[0];
             int nc = col + dir[1];
@@ -72,10 +65,10 @@ private void bfs(char[][] grid, int rows, int cols, boolean[][] visited) {
             const isVisiting = step.current != null && !step.enqueuing
             const isEnqueue  = step.current != null && step.enqueuing != null
 
-            if (isInit)     return [25, 26, 27]
-            if (isComplete) return [29]
-            if (isVisiting) return [29, 30, 31, 32]
-            if (isEnqueue)  return [35, 38, 39, 40, 41]
+            if (isInit)     return [19, 20, 21]
+            if (isComplete) return [23]
+            if (isVisiting) return [23, 24, 25, 26]
+            if (isEnqueue)  return [28, 31, 32, 33, 34, 35]
             return []
           },
         },
@@ -85,13 +78,13 @@ private void bfs(char[][] grid, int rows, int cols, boolean[][] visited) {
     queue = deque([start])
 
     while queue:
-        node = queue.popleft()  # dequeue
-        process(node)           # ← visit
+        node = queue.popleft()
+        process(node)
 
         for neighbor in node.neighbors:
             if neighbor not in visited:
                 visited.add(neighbor)
-                queue.append(neighbor)  # enqueue`,
+                queue.append(neighbor)`,
           getHighlightLines(step) {
             const isInit     = step.current == null && step.queue?.length > 0
             const isComplete = step.current == null && step.queue?.length === 0

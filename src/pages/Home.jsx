@@ -63,9 +63,9 @@ const FEATURES = [
 
 function Stat({ value, label }) {
   return (
-    <div className="flex flex-col items-center gap-1 px-8 py-5 rounded-2xl border border-white/8 bg-white/[0.03]">
-      <span className="text-3xl font-extrabold text-white font-mono tracking-tight">{value}</span>
-      <span className="text-xs text-slate-500 uppercase tracking-wider">{label}</span>
+    <div className="h-full flex flex-col items-center justify-center gap-1 px-4 py-5 rounded-2xl border border-white/8 bg-white/[0.03]">
+      <span className="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">{value}</span>
+      <span className="text-xs text-slate-500 uppercase tracking-wider text-center whitespace-nowrap">{label}</span>
     </div>
   )
 }
@@ -103,7 +103,7 @@ export default function Home() {
           Visual · Interactive · Metaphor-driven
         </motion.div>
 
-        <motion.h1 {...fadeUp(0.08)} className="text-5xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mb-5">
+        <motion.h1 {...fadeUp(0.08)} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mb-5">
           Algorithms you can{' '}
           <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
             see and feel
@@ -138,11 +138,11 @@ export default function Home() {
       {/* ── Stats ────────────────────────────────────────────────────────────── */}
       <motion.section
         variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
-        className="grid grid-cols-3 gap-4 max-w-lg mx-auto"
+        className="grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto"
       >
         <motion.div variants={staggerItem}><Stat value={ALGORITHMS.length} label="Visualizers" /></motion.div>
         <motion.div variants={staggerItem}><Stat value={uniqueCategories} label="Categories" /></motion.div>
-        <motion.div variants={staggerItem}><Stat value="150" label="NC Target" /></motion.div>
+        <motion.div variants={staggerItem}><Stat value={ALGORITHMS.length} label="Problems Solved" /></motion.div>
       </motion.section>
 
       {/* ── Features ─────────────────────────────────────────────────────────── */}

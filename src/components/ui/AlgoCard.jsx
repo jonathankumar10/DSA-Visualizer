@@ -10,7 +10,7 @@ export default function AlgoCard({ algo }) {
     >
       <Link
         to={algo.path}
-        className="block rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors"
+        className="block rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors"
       >
         <div className="mb-3 flex items-start justify-between gap-3">
           <h3 className="font-semibold text-white">{algo.title}</h3>

@@ -5,7 +5,7 @@ export default function StepControls({ runner }) {
   const { index, total, playing, play, stop, next, prev, reset } = runner
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-5 py-3">
+    <div className="flex items-center justify-between gap-2 sm:gap-4 rounded-xl border border-white/10 bg-white/5 px-3 sm:px-5 py-2.5 sm:py-3">
       {/* Step counter */}
       <span className="text-xs text-slate-500 tabular-nums">
         Step {index + 1} / {total}
@@ -43,7 +43,7 @@ export default function StepControls({ runner }) {
       </div>
 
       {/* Progress bar */}
-      <div className="flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
+      <div className="hidden sm:flex flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
         <div
           className="h-full rounded-full bg-violet-500 transition-all duration-300"
           style={{ width: `${((index + 1) / total) * 100}%` }}

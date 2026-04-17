@@ -6,6 +6,7 @@ import maxConsecutiveOnes    from '../content/algorithms/max-consecutive-ones/in
 import removeElement         from '../content/algorithms/remove-element/index.js'
 import replaceElements       from '../content/algorithms/replace-elements/index.js'
 import concatenationOfArray  from '../content/algorithms/concatenation-of-array/index.js'
+import baseballGame          from '../content/algorithms/baseball-game/index.js'
 
 // Ordered list — add new algorithms here, one import + one array entry.
 export const ALGORITHMS = [
@@ -17,6 +18,7 @@ export const ALGORITHMS = [
   removeElement,
   replaceElements,
   concatenationOfArray,
+  baseballGame,
 ]
 
 export const DIFFICULTY_COLOR = {

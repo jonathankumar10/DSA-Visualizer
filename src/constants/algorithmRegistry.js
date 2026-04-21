@@ -8,6 +8,7 @@ import replaceElements       from '../content/algorithms/replace-elements/index.
 import concatenationOfArray  from '../content/algorithms/concatenation-of-array/index.js'
 import baseballGame          from '../content/algorithms/baseball-game/index.js'
 import validParentheses      from '../content/algorithms/valid-parentheses/index.js'
+import minStack              from '../content/algorithms/min-stack/index.js'
 
 // Ordered list — add new algorithms here, one import + one array entry.
 export const ALGORITHMS = [
@@ -21,6 +22,7 @@ export const ALGORITHMS = [
   concatenationOfArray,
   baseballGame,
   validParentheses,
+  minStack,
 ]
 
 export const DIFFICULTY_COLOR = {

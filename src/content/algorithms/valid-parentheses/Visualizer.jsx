@@ -459,27 +459,38 @@ export default function ValidParenthesesVisualizer({ onStepChange }) {
       <AnimatePresence>
         {(isValid || isInvalid) && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.88, y: 10 }}
+            initial={{ opacity: 0, scale: 0.85, y: 14 }}
             animate={{ opacity: 1, scale: 1,    y: 0  }}
             exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-            className={`rounded-xl border px-5 py-4 flex items-center gap-4
+            transition={{ type: 'spring', stiffness: 420, damping: 24 }}
+            className={`relative overflow-hidden rounded-xl border px-5 py-4 flex items-center gap-4
               ${isValid
-                ? 'border-emerald-500/30 bg-emerald-500/10'
-                : 'border-rose-500/30    bg-rose-500/10'
+                ? 'border-emerald-500/40 bg-emerald-500/10'
+                : 'border-rose-500/40    bg-rose-500/10'
               }`}
           >
+            {/* Celebration ripples on valid */}
+            {isValid && [0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="absolute inset-0 rounded-xl border-2 border-emerald-400/50 pointer-events-none"
+                initial={{ scale: 0.85, opacity: 0.7 }}
+                animate={{ scale: 1.8 + i * 0.3, opacity: 0 }}
+                transition={{ duration: 1.0, delay: i * 0.28, ease: 'easeOut' }}
+              />
+            ))}
+
             <motion.span
-              initial={{ scale: 0.3, rotate: isValid ? -30 : 30 }}
-              animate={{ scale: [0.3, 1.3, 1], rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 520, damping: 20 }}
-              className={`text-3xl font-black ${isValid ? 'text-emerald-300' : 'text-rose-300'}`}
+              initial={{ scale: 0.2, rotate: isValid ? -40 : 40 }}
+              animate={{ scale: [0.2, 1.4, 1], rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 520, damping: 18 }}
+              className={`text-4xl font-black relative z-10 ${isValid ? 'text-emerald-300' : 'text-rose-300'}`}
             >
               {isValid ? '✓' : '✗'}
             </motion.span>
-            <div>
+            <div className="relative z-10">
               <p className={`text-sm font-bold ${isValid ? 'text-emerald-300' : 'text-rose-300'}`}>
-                {isValid ? 'Valid' : 'Invalid'}
+                {isValid ? 'Valid — all gates cleared!' : 'Invalid'}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">{step.message}</p>
             </div>

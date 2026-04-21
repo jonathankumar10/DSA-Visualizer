@@ -43,15 +43,16 @@ const CELL_CLS = {
 function TrackCell({ value, state, isLeaping, isLanding }) {
   return (
     <div className="relative flex-shrink-0" style={{ width: CELL_W, height: CELL_W }}>
-      {/* Leap glow — expands and fades as the runner clears the tile */}
-      {isLeaping && (
+      {/* Leap burst — expands and fades as the runner clears the tile */}
+      {isLeaping && [0, 1].map((i) => (
         <motion.div
-          initial={{ opacity: 0.7, scale: 1 }}
-          animate={{ opacity: 0, scale: 2.2 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0 rounded-xl bg-rose-500/30 pointer-events-none"
+          key={i}
+          initial={{ opacity: 0.75, scale: 0.9 }}
+          animate={{ opacity: 0, scale: 2.6 + i * 0.6 }}
+          transition={{ duration: 0.42, delay: i * 0.12 }}
+          className="absolute inset-0 rounded-xl bg-rose-500/35 pointer-events-none"
         />
-      )}
+      ))}
 
       {/* Land impact shadow — spreads under the tile as it touches down */}
       {isLanding && (
@@ -66,18 +67,18 @@ function TrackCell({ value, state, isLeaping, isLanding }) {
       {/* The tile itself */}
       <motion.div
         initial={
-          isLanding ? { y: -24, scale: 0.45, opacity: 0.4 } :
-          isLeaping ? { y: 0, scale: 1 } :
+          isLanding ? { y: -32, scale: 0.4, opacity: 0.3 } :
+          isLeaping ? { y: 0, scale: 1, rotate: 0 } :
           false
         }
         animate={
-          isLeaping ? { y: [0, -20, 0], scale: [1, 0.78, 1] } :
+          isLeaping ? { y: [0, -52, 0], scale: [1, 0.72, 1], rotate: [0, 18, 0] } :
           isLanding ? { y: 0, scale: 1, opacity: 1 } :
-          { y: 0, scale: 1 }
+          { y: 0, scale: 1, rotate: 0 }
         }
         transition={
-          isLeaping ? { duration: 0.46, ease: 'easeInOut' } :
-          isLanding ? { type: 'spring', stiffness: 430, damping: 22 } :
+          isLeaping ? { duration: 0.52, ease: [0.36, 0, 0.66, 1] } :
+          isLanding ? { type: 'spring', stiffness: 480, damping: 20 } :
           { type: 'spring', stiffness: 340, damping: 28 }
         }
         className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center
@@ -93,19 +94,33 @@ function TrackCell({ value, state, isLeaping, isLanding }) {
 // ─── Runner marker ────────────────────────────────────────────────────────────
 
 function RunnerMarker({ label, color, pos, topOffset }) {
+  const isReader = label === 'i'
   return (
     <motion.div
-      className="absolute flex flex-col items-center gap-px pointer-events-none"
+      className="absolute flex flex-col items-center gap-0.5 pointer-events-none"
       animate={{ x: pos * STRIDE + MARKER_OFFSET }}
-      transition={{ type: 'spring', stiffness: 170, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 190, damping: 22 }}
       style={{ width: MARKER_W, top: topOffset }}
     >
-      <span className="text-[9px] font-bold leading-none" style={{ color }}>
+      {/* Badge pill */}
+      <div
+        className="rounded-full px-2 py-0.5 text-[9px] font-black leading-none"
+        style={{ backgroundColor: `${color}25`, border: `1px solid ${color}70`, color }}
+      >
         {label}
-      </span>
-      {/* downward triangle */}
-      <svg width="10" height="7" viewBox="0 0 10 7" fill={color}>
-        <polygon points="5,7 0,0 10,0" />
+      </div>
+      {/* Pulsing dot */}
+      <motion.div
+        animate={isReader
+          ? { scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }
+          : { opacity: [0.7, 1, 0.7] }
+        }
+        transition={{ duration: isReader ? 0.7 : 1.1, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: color }}
+      />
+      {/* Arrow */}
+      <svg width="8" height="6" viewBox="0 0 8 6" fill={color}>
+        <polygon points="4,6 0,0 8,0" />
       </svg>
     </motion.div>
   )

@@ -63,16 +63,16 @@ function ResultCell({ value, state, cellKey }) {
 
   return (
     <div className="relative flex-shrink-0" style={{ width: CELL_W, height: CELL_W }}>
-      {/* Impact ripple when the value lands */}
-      {isStamp && (
+      {/* Ink splat rings when the stamp lands */}
+      {isStamp && [0, 1].map((i) => (
         <motion.div
-          key={`ripple-${cellKey}`}
-          initial={{ opacity: 0.7, scale: 0.5 }}
-          animate={{ opacity: 0, scale: 2.2 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0 rounded-xl bg-violet-500/30 pointer-events-none"
+          key={`ripple-${cellKey}-${i}`}
+          initial={{ opacity: 0.8, scale: 0.4 }}
+          animate={{ opacity: 0, scale: 2.4 + i * 0.5 }}
+          transition={{ duration: 0.48, delay: i * 0.1 }}
+          className="absolute inset-0 rounded-xl bg-violet-500/35 pointer-events-none"
         />
-      )}
+      ))}
       <motion.div
         key={cellKey}
         initial={isStamp ? { y: -26, opacity: 0, scale: 0.5 } : false}
@@ -105,22 +105,36 @@ function StampMarker({ pos, pressing, stepKey }) {
       <motion.div
         key={`stamp-${stepKey}`}
         animate={pressing
-          ? { y: [0, 14, 0], scaleY: [1, 0.8, 1] }
-          : { y: 0, scaleY: 1 }
+          ? { y: [0, 18, 0], scaleY: [1, 0.72, 1], scaleX: [1, 1.15, 1] }
+          : { y: 0, scaleY: 1, scaleX: 1 }
         }
         transition={pressing
-          ? { duration: 0.38, ease: 'easeInOut' }
+          ? { duration: 0.36, ease: [0.36, 0, 0.66, -0.56] }
           : { duration: 0.2 }
         }
         className="flex flex-col items-center"
       >
         {/* Handle */}
-        <div className="w-3 h-2 rounded-t-sm bg-amber-500/80" />
-        {/* Stamp pad */}
-        <div className="w-6 h-3 rounded-sm bg-amber-400 flex items-center justify-center">
-          <div className="w-4 h-1.5 rounded-sm bg-amber-600/60" />
+        <div className="w-4 h-3 rounded-t bg-amber-600 border-t border-x border-amber-500/60" />
+        {/* Body */}
+        <div className="w-7 h-2 bg-amber-500 border-x border-amber-400/60" />
+        {/* Ink pad */}
+        <div className="w-7 h-3.5 rounded-b bg-amber-400 flex items-center justify-center shadow-md"
+          style={{ boxShadow: pressing ? '0 4px 12px rgba(245,158,11,0.7)' : 'none' }}>
+          <div className="w-5 h-1 rounded-sm bg-amber-600/50" />
         </div>
       </motion.div>
+
+      {/* Ink glow when pressing */}
+      {pressing && (
+        <motion.div
+          key={`ink-${stepKey}`}
+          initial={{ opacity: 0.8, scaleY: 0.3 }}
+          animate={{ opacity: 0, scaleY: 1.5, scaleX: 1.8 }}
+          transition={{ duration: 0.35 }}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-4 bg-amber-400/60 rounded-full blur-md pointer-events-none"
+        />
+      )}
       {/* Arrow pointing down */}
       <svg width="10" height="7" viewBox="0 0 10 7" fill="#f59e0b" className="mt-0.5">
         <polygon points="5,7 0,0 10,0" />
@@ -297,11 +311,13 @@ export default function ConcatenationVisualizer({ onStepChange }) {
                   {isFilling && (i === step.index || i === step.index + n) ? (
                     <motion.svg
                       key={`arr-${i}-${runner.index}`}
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      width="14" height="16" viewBox="0 0 14 16" fill="none"
+                      initial={{ opacity: 0, y: -6, scaleY: 0.5 }}
+                      animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                      width="14" height="18" viewBox="0 0 14 18" fill="none"
+                      style={{ filter: 'drop-shadow(0 0 4px rgba(139,92,246,0.7))' }}
                     >
-                      <path d="M7 1v10M2 8l5 6 5-6" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7 1v12M2 10l5 6 5-6" stroke="#a78bfa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </motion.svg>
                   ) : (
                     <div className="h-4" />

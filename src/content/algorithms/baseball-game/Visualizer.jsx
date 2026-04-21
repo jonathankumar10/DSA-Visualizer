@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { buildBaseballGameSteps } from './steps'
 import { useStepRunner } from '../../../hooks/useStepRunner'
@@ -6,7 +6,7 @@ import StepControls from '../../../components/ui/StepControls'
 
 const DEFAULT_OPS = ['5', '2', 'C', 'D', '+']
 
-// ── Card source styles (light cards on dark panel = visual pop) ───────────────
+// ── Card source styles ────────────────────────────────────────────────────────
 
 const SOURCE = {
   num: {
@@ -55,24 +55,24 @@ function OpChip({ op, active, done }) {
     active: 'border-violet-400 text-white bg-violet-500/60',
     ring:   'border-violet-400/50',
   }
-
   return (
     <motion.div
       animate={
         active && op === 'C'
-          ? { x: [0, -5, 5, -4, 4, -2, 2, 0], transition: { duration: 0.4 } }
+          ? { x: [0, -7, 7, -5, 5, -3, 3, 0], transition: { duration: 0.45 } }
+          : active && op === '+'
+          ? { scale: [1, 1.18, 1.08], y: [0, -3, 0], transition: { duration: 0.35 } }
           : active
-          ? { scale: [1, 1.12, 1.08], transition: { duration: 0.25 } }
+          ? { scale: [1, 1.12, 1.08], transition: { duration: 0.28 } }
           : {}
       }
       className={`relative rounded-xl border-2 min-w-[46px] px-3.5 py-2.5
         text-center text-sm font-bold font-mono select-none transition-colors duration-200
         ${active ? s.active : done ? 'border-slate-700/30 text-slate-600 bg-slate-800/20' : s.base}`}
     >
-      {/* Pulsing glow ring when active */}
       {active && (
         <motion.div
-          animate={{ scale: [1, 1.7], opacity: [0.6, 0] }}
+          animate={{ scale: [1, 1.75], opacity: [0.6, 0] }}
           transition={{ duration: 0.9, repeat: Infinity, ease: 'easeOut' }}
           className={`absolute inset-0 rounded-xl border-2 pointer-events-none ${s.ring}`}
         />
@@ -83,41 +83,36 @@ function OpChip({ op, active, done }) {
 }
 
 // ── Physical scorecard ────────────────────────────────────────────────────────
-// Light card on dark panel. Drops from high up with squash on landing.
-// Cancel: crumples — shrinks + rotates + flies off.
+// Drop-in (squash-bounce), crumple-off on cancel, light card on dark panel.
 
 function StackCard({ item, isTop, runnerIndex }) {
   const src = SOURCE[item.source] ?? SOURCE.num
-
   return (
     <motion.div
       layout
-      // Drop-in: falls from y:-110, slight tilt, underdamped scaleY for squash bounce
       initial={{ y: -110, scaleY: 0.7, scaleX: 0.85, rotate: -6, opacity: 0 }}
       animate={{ y: 0,    scaleY: 1,   scaleX: 1,    rotate: 0,  opacity: 1 }}
       exit={{
-        // Crumple off: shrink + tilt + fly up
-        scaleX: 0.1, scaleY: 0.1,
-        rotate: 40, x: 24, y: -50,
+        scaleX: 0.08, scaleY: 0.08,
+        rotate: 45, x: 28, y: -60,
         opacity: 0,
-        transition: { duration: 0.3, ease: [0.5, 0, 1, 0.6] },
+        transition: { duration: 0.32, ease: [0.5, 0, 1, 0.6] },
       }}
       transition={{
         y:      { type: 'spring', stiffness: 520, damping: 28 },
-        scaleY: { type: 'spring', stiffness: 420, damping: 14 },  // underdamped → squash
+        scaleY: { type: 'spring', stiffness: 420, damping: 14 },
         scaleX: { type: 'spring', stiffness: 420, damping: 22 },
         rotate: { type: 'spring', stiffness: 400, damping: 22 },
         opacity:{ duration: 0.1 },
       }}
-      className={`relative rounded-2xl border-2 px-5 py-3.5 select-none
-        ${src.card} shadow-xl`}
+      className={`relative rounded-2xl border-2 px-5 py-3.5 select-none ${src.card} shadow-xl`}
       style={{
         boxShadow: isTop
           ? `0 12px 36px -8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 28px -4px ${src.glow}`
           : '0 4px 12px -4px rgba(0,0,0,0.4)',
       }}
     >
-      {/* Landing impact ripple — only for the newly placed top card */}
+      {/* Landing impact ripple */}
       {isTop && (
         <motion.div
           key={`${item.id}-${runnerIndex}-impact`}
@@ -130,20 +125,13 @@ function StackCard({ item, isTop, runnerIndex }) {
       )}
 
       <div className="flex items-center justify-between gap-6">
-        {/* Left — label + value */}
         <div>
-          <p className={`text-[10px] font-bold uppercase tracking-widest mb-0.5 ${src.labelCls}`}>
-            {src.label}
-          </p>
+          <p className={`text-[10px] font-bold uppercase tracking-widest mb-0.5 ${src.labelCls}`}>{src.label}</p>
           <p className={`text-3xl font-black leading-none ${src.text}`}>{item.value}</p>
         </div>
-
-        {/* Right — top indicator */}
         {isTop && (
           <div className="flex flex-col items-center gap-1.5">
-            <span className={`text-[9px] font-bold uppercase tracking-widest ${src.labelCls}`}>
-              TOP
-            </span>
+            <span className={`text-[9px] font-bold uppercase tracking-widest ${src.labelCls}`}>TOP</span>
             <motion.div
               animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
               transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
@@ -156,29 +144,57 @@ function StackCard({ item, isTop, runnerIndex }) {
   )
 }
 
-// ── Floating operation badge (appears, drifts up, fades) ──────────────────────
+// ── Floating badge (delta or cancel amount) ───────────────────────────────────
 
 function FloatingBadge({ step, runnerIndex }) {
-  const isPush = step.type === 'num' || step.type === 'double' || step.type === 'plus'
+  const isPush   = step.type === 'num' || step.type === 'double' || step.type === 'plus'
   const isCancel = step.type === 'cancel'
   if (!isPush && !isCancel) return null
 
-  const src = isPush ? (SOURCE[step.type] ?? SOURCE.num) : null
-  const cls  = isPush   ? src.badge : 'bg-rose-600 text-white'
-  const text = isPush   ? src.badgeTxt(step.newValue)
-             : `− ${step.removedValue}`
+  const src  = isPush ? (SOURCE[step.type] ?? SOURCE.num) : null
+  const cls  = isPush ? src.badge : 'bg-rose-600 text-white'
+  const text = isPush ? src.badgeTxt(step.newValue) : `− ${step.removedValue}`
 
   return (
     <AnimatePresence>
       <motion.div
         key={runnerIndex}
         initial={{ opacity: 1, y: 0, scale: 0.8 }}
-        animate={{ opacity: 0, y: -44, scale: 1.05 }}
-        transition={{ duration: 0.85, ease: 'easeOut' }}
+        animate={{ opacity: 0, y: -48, scale: 1.05 }}
+        transition={{ duration: 0.9, ease: 'easeOut' }}
         className={`absolute top-0 left-1/2 -translate-x-1/2 z-10
           rounded-full px-3 py-1 text-xs font-bold shadow-lg pointer-events-none ${cls}`}
       >
         {text}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+// ── Plus equation badge — floats briefly above the stack on "+" steps ─────────
+// Shows "A + B = C" from the two cards that were combined.
+
+function PlusBadge({ step, runnerIndex }) {
+  if (step.type !== 'plus') return null
+  const stack = step.stack
+  // After push: new card at top (length-1), addends at length-2 and length-3
+  const addendA = stack[stack.length - 2]?.value
+  const addendB = stack[stack.length - 3]?.value
+  if (addendA === undefined || addendB === undefined) return null
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key={`plus-${runnerIndex}`}
+        initial={{ opacity: 0, y: 12, scale: 0.75 }}
+        animate={{ opacity: [0, 1, 1, 0], y: [12, 0, 0, -28], scale: [0.75, 1, 1, 0.9] }}
+        transition={{ duration: 0.95, times: [0, 0.2, 0.65, 1] }}
+        className="absolute -top-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+      >
+        <div className="bg-emerald-700/90 border border-emerald-400/60 text-emerald-100
+          text-[11px] font-bold px-3 py-1 rounded-full shadow-lg whitespace-nowrap">
+          {addendB} + {addendA} = {step.newValue}
+        </div>
       </motion.div>
     </AnimatePresence>
   )
@@ -190,32 +206,41 @@ function DepthGhosts({ count }) {
   if (count < 2) return null
   return (
     <>
-      {count >= 2 && (
-        <div className="absolute inset-x-4 top-2 bottom-0 rounded-2xl
-          bg-white/8 border border-white/8 -z-10" />
-      )}
+      <div className="absolute inset-x-4 top-2 bottom-0 rounded-2xl bg-white/8 border border-white/8 -z-10" />
       {count >= 3 && (
-        <div className="absolute inset-x-8 top-4 bottom-0 rounded-2xl
-          bg-white/5 border border-white/5 -z-20" />
+        <div className="absolute inset-x-8 top-4 bottom-0 rounded-2xl bg-white/5 border border-white/5 -z-20" />
       )}
     </>
   )
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
+// ── Count-up hook ──────────────────────────────────────────────────────────────
 
-function ExampleBtn({ label, onClick }) {
-  return (
-    <button
-      className="text-slate-400 hover:text-white underline underline-offset-2 transition-colors"
-      onClick={onClick}
-    >
-      {label}
-    </button>
-  )
+function useCountUp(target, active) {
+  const [display, setDisplay] = useState(0)
+  const rafRef = useRef(null)
+
+  useEffect(() => {
+    if (!active) { setDisplay(0); return }
+    let startTime = null
+    const duration = Math.min(900, Math.max(300, Math.abs(target) * 30))
+
+    function tick(ts) {
+      if (!startTime) startTime = ts
+      const t = Math.min((ts - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setDisplay(Math.round(target * eased))
+      if (t < 1) rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [target, active])
+
+  return display
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Main component ─────────────────────────────────────────────────────────────
 
 export default function BaseballGameVisualizer({ onStepChange }) {
   const [ops,      setOps]      = useState(DEFAULT_OPS)
@@ -230,9 +255,7 @@ export default function BaseballGameVisualizer({ onStepChange }) {
 
   function handleRun() {
     const parts = draftOps.split(',').map((s) => s.trim()).filter(Boolean)
-    if (parts.length === 0 || parts.length > 12) {
-      setError('Enter 1–12 operations.'); return
-    }
+    if (parts.length === 0 || parts.length > 12) { setError('Enter 1–12 operations.'); return }
     for (const p of parts) {
       if (p !== '+' && p !== 'C' && p !== 'D' && !/^-?\d+$/.test(p)) {
         setError(`"${p}" is not valid. Use integers, "+", "C", or "D".`); return
@@ -247,9 +270,10 @@ export default function BaseballGameVisualizer({ onStepChange }) {
   const stack   = step.stack
   const allDone = isSum
 
+  const displayTotal = useCountUp(step.total ?? 0, isSum)
+
   return (
     <div className="space-y-4">
-
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-white">Baseball Game</h2>
@@ -271,7 +295,8 @@ export default function BaseballGameVisualizer({ onStepChange }) {
               onChange={(e) => setDraftOps(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 5, 2, C, D, +"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono
+                text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
@@ -287,9 +312,9 @@ export default function BaseballGameVisualizer({ onStepChange }) {
         {error && <p className="text-[11px] text-red-400">{error}</p>}
         <p className="text-[11px] text-slate-600">
           Examples —{' '}
-          <ExampleBtn label="5,2,C,D,+"         onClick={() => { setDraftOps('5, 2, C, D, +');         setError(null) }} />{' · '}
-          <ExampleBtn label="5,-2,4,C,D,9,+,+"  onClick={() => { setDraftOps('5, -2, 4, C, D, 9, +, +'); setError(null) }} />{' · '}
-          <ExampleBtn label="1,C"               onClick={() => { setDraftOps('1, C');                   setError(null) }} />
+          <ExBtn label="5,2,C,D,+"        onClick={() => { setDraftOps('5, 2, C, D, +');          setError(null) }} />{' · '}
+          <ExBtn label="5,-2,4,C,D,9,+,+" onClick={() => { setDraftOps('5, -2, 4, C, D, 9, +, +'); setError(null) }} />{' · '}
+          <ExBtn label="1,C"              onClick={() => { setDraftOps('1, C');                    setError(null) }} />
         </p>
       </div>
 
@@ -324,9 +349,9 @@ export default function BaseballGameVisualizer({ onStepChange }) {
             </span>
           </div>
 
-          {/* Relative container so FloatingBadge can anchor to top */}
           <div className="relative">
             <FloatingBadge step={step} runnerIndex={runnerIndex} />
+            <PlusBadge step={step} runnerIndex={runnerIndex} />
 
             <div className="relative flex flex-col gap-2 min-h-[72px]">
               {stack.length === 0 ? (
@@ -353,7 +378,7 @@ export default function BaseballGameVisualizer({ onStepChange }) {
         </div>
       </div>
 
-      {/* Total banner */}
+      {/* Total banner with count-up */}
       <AnimatePresence>
         {isSum && (
           <motion.div
@@ -363,15 +388,20 @@ export default function BaseballGameVisualizer({ onStepChange }) {
             transition={{ type: 'spring', stiffness: 400, damping: 26 }}
             className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 flex items-center gap-4"
           >
-            <motion.span
-              initial={{ scale: 0.5 }}
-              animate={{ scale: [0.5, 1.15, 1] }}
-              transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-              className="text-3xl font-black font-mono text-emerald-300"
-            >
-              {step.total}
-            </motion.span>
-            <span className="text-sm text-slate-400">total score</span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-1">Final Score</p>
+              <motion.span
+                className="text-4xl font-black font-mono text-emerald-200 tabular-nums"
+                initial={{ scale: 0.5 }}
+                animate={{ scale: [0.5, 1.12, 1] }}
+                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+              >
+                {displayTotal}
+              </motion.span>
+            </div>
+            <div className="text-xs font-mono text-slate-500">
+              {stack.map((s) => s.value).join(' + ')} = {step.total}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -391,5 +421,13 @@ export default function BaseballGameVisualizer({ onStepChange }) {
 
       <StepControls runner={runner} />
     </div>
+  )
+}
+
+function ExBtn({ label, onClick }) {
+  return (
+    <button className="text-slate-400 hover:text-white underline underline-offset-2 transition-colors" onClick={onClick}>
+      {label}
+    </button>
   )
 }

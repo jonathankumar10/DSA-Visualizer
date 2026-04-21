@@ -1,12 +1,17 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 
+const BASE_INTERVAL = 900 // ms at 1×
+
 /**
  * Drives step-by-step playback for any algorithm visualizer.
  * Returns controls and the current step object.
+ *
+ * speed — one of 0.25 | 0.5 | 1 | 1.25 | 2
  */
 export function useStepRunner(steps) {
-  const [index, setIndex] = useState(0)
+  const [index,   setIndex]   = useState(0)
   const [playing, setPlaying] = useState(false)
+  const [speed,   setSpeed]   = useState(1)
   const intervalRef = useRef(null)
 
   const stop = useCallback(() => {
@@ -35,8 +40,10 @@ export function useStepRunner(steps) {
     setPlaying(true)
   }, [index, steps.length])
 
+  // Restart the interval whenever playing state or speed changes
   useEffect(() => {
     if (playing) {
+      const delay = Math.round(BASE_INTERVAL / speed)
       intervalRef.current = setInterval(() => {
         setIndex((i) => {
           if (i >= steps.length - 1) {
@@ -46,16 +53,18 @@ export function useStepRunner(steps) {
           }
           return i + 1
         })
-      }, 900)
+      }, delay)
     }
     return () => clearInterval(intervalRef.current)
-  }, [playing, steps.length])
+  }, [playing, steps.length, speed])
 
   return {
     step: steps[index] ?? steps[0],
     index,
     total: steps.length,
     playing,
+    speed,
+    setSpeed,
     play,
     stop,
     next,

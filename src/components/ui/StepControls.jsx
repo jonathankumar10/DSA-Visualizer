@@ -1,53 +1,78 @@
 /**
  * Shared playback controls used by all visualizers.
+ * Includes play/pause, step navigation, reset, progress bar, and speed selector.
  */
+const SPEEDS = [0.25, 0.5, 1, 1.25, 2]
+
 export default function StepControls({ runner }) {
-  const { index, total, playing, play, stop, next, prev, reset } = runner
+  const { index, total, playing, play, stop, next, prev, reset, speed, setSpeed } = runner
 
   return (
-    <div className="flex items-center justify-between gap-2 sm:gap-4 rounded-xl border border-white/10 bg-white/5 px-3 sm:px-5 py-2.5 sm:py-3">
-      {/* Step counter */}
-      <span className="text-xs text-slate-500 tabular-nums">
-        Step {index + 1} / {total}
-      </span>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 rounded-xl border border-white/10 bg-white/5 px-3 sm:px-5 py-2.5 sm:py-3">
+        {/* Step counter */}
+        <span className="text-xs text-slate-500 tabular-nums whitespace-nowrap">
+          Step {index + 1} / {total}
+        </span>
 
-      {/* Controls */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={reset}
-          title="Reset"
-          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
-        >
-          <ResetIcon />
-        </button>
-        <button
-          onClick={prev}
-          disabled={index === 0}
-          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
-        >
-          <PrevIcon />
-        </button>
-        <button
-          onClick={playing ? stop : play}
-          className="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-violet-500 transition-colors"
-        >
-          {playing ? 'Pause' : index === total - 1 ? 'Replay' : 'Play'}
-        </button>
-        <button
-          onClick={next}
-          disabled={index === total - 1}
-          className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
-        >
-          <NextIcon />
-        </button>
+        {/* Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={reset}
+            title="Reset"
+            className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <ResetIcon />
+          </button>
+          <button
+            onClick={prev}
+            disabled={index === 0}
+            className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
+          >
+            <PrevIcon />
+          </button>
+          <button
+            onClick={playing ? stop : play}
+            className="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-violet-500 transition-colors"
+          >
+            {playing ? 'Pause' : index === total - 1 ? 'Replay' : 'Play'}
+          </button>
+          <button
+            onClick={next}
+            disabled={index === total - 1}
+            className="rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30"
+          >
+            <NextIcon />
+          </button>
+        </div>
+
+        {/* Progress bar */}
+        <div className="hidden sm:flex flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-violet-500 transition-all duration-300"
+            style={{ width: `${((index + 1) / total) * 100}%` }}
+          />
+        </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="hidden sm:flex flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-violet-500 transition-all duration-300"
-          style={{ width: `${((index + 1) / total) * 100}%` }}
-        />
+      {/* Speed selector */}
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap">Speed</span>
+        <div className="flex gap-1">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSpeed(s)}
+              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                speed === s
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10'
+              }`}
+            >
+              {s === 1 ? '1×' : `${s}×`}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

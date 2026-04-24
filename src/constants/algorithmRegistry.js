@@ -11,6 +11,8 @@ import validParentheses      from '../content/algorithms/valid-parentheses/index
 import minStack              from '../content/algorithms/min-stack/index.js'
 import searchMatrix          from '../content/algorithms/search-matrix/index.js'
 import binarySearch          from '../content/algorithms/binary-search/index.js'
+import reverseLinkedList     from '../content/algorithms/reverse-linked-list/index.js'
+import mergeSortedLists      from '../content/algorithms/merge-sorted-lists/index.js'
 
 // Ordered list — add new algorithms here, one import + one array entry.
 export const ALGORITHMS = [
@@ -27,6 +29,8 @@ export const ALGORITHMS = [
   minStack,
   searchMatrix,
   binarySearch,
+  reverseLinkedList,
+  mergeSortedLists,
 ]
 
 export const DIFFICULTY_COLOR = {

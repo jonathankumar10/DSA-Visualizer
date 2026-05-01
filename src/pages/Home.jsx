@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import AlgoCard from '../components/ui/AlgoCard'
 import { ALGORITHMS } from '../constants/algorithmRegistry'
+import { PATTERNS, PATTERN_COLORS } from '../constants/patternsRegistry'
 
 // ── Animation variants ────────────────────────────────────────────────────────
 
@@ -120,7 +121,16 @@ export default function Home() {
             to="/algorithms"
             className="inline-flex items-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-6 py-3 text-sm font-semibold text-white transition-colors shadow-lg shadow-violet-500/20"
           >
-            Explore algorithms
+            Explore Algorithms
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </Link>
+          <Link
+            to="/patterns"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+          >
+            Explore Patterns
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
             </svg>
@@ -129,8 +139,10 @@ export default function Home() {
             to="/system-design"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-medium text-slate-300 hover:text-white transition-colors"
           >
-            System Design
-            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-400">soon</span>
+            Explore System Design
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
           </Link>
         </motion.div>
       </section>
@@ -170,6 +182,51 @@ export default function Home() {
               <p className="text-sm text-slate-400 leading-relaxed">{f.body}</p>
             </motion.div>
           ))}
+        </motion.div>
+      </section>
+
+      {/* ── Patterns preview ──────────────────────────────────────────────────── */}
+      <section>
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">Patterns</h2>
+            <p className="mt-1 text-sm text-slate-500">The building blocks behind every problem</p>
+          </div>
+          <Link
+            to="/patterns"
+            className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+          >
+            View all {PATTERNS.length}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </Link>
+        </div>
+
+        <motion.div
+          variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+          className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+        >
+          {PATTERNS.map((p) => {
+            const c = PATTERN_COLORS[p.color]
+            return (
+              <motion.div key={p.id} variants={staggerItem}>
+                <Link
+                  to={`/patterns/${p.id}`}
+                  className="group flex flex-col rounded-xl border border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04] transition-all overflow-hidden"
+                >
+                  <div className={`h-[3px] w-full ${c.dot}`} />
+                  <div className="p-3 sm:p-4 space-y-1">
+                    <p className="text-sm font-bold text-white group-hover:text-white">{p.title}</p>
+                    <p className={`text-[11px] font-medium ${c.text} leading-tight`}>{p.tagline}</p>
+                    <p className="text-[11px] text-slate-600 pt-0.5">
+                      {p.algorithms.length} problem{p.algorithms.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
+            )
+          })}
         </motion.div>
       </section>
 

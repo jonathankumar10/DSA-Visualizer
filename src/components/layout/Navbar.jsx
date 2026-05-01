@@ -2,8 +2,9 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const NAV_LINKS = [
-  { label: 'Home',       to: '/' },
-  { label: 'Algorithms', to: '/algorithms' },
+  { label: 'Home',          to: '/' },
+  { label: 'Algorithms',    to: '/algorithms' },
+  { label: 'Patterns',      to: '/patterns' },
   { label: 'System Design', to: '/system-design' },
 ]
 

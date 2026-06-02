@@ -36,7 +36,7 @@ export default function AnimationControls({ isPlaying, speed, onToggle, onSpeed 
             onClick={() => onSpeed(s)}
             className={`px-2 py-0.5 rounded text-xs font-mono font-semibold transition-colors ${
               speed === s
-                ? 'bg-violet-600 text-white'
+                ? 'bg-blue-600 text-white'
                 : 'bg-white/5 border border-white/10 text-slate-500 hover:text-slate-200 hover:border-white/20'
             }`}
           >

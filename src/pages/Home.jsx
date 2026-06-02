@@ -89,24 +89,24 @@ export default function Home() {
         <div
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
-            backgroundImage: 'radial-gradient(rgba(139,92,246,0.12) 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(rgba(59,130,246,0.12) 1px, transparent 1px)',
             backgroundSize: '28px 28px',
           }}
         />
         {/* Radial glow behind headline */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%)', filter: 'blur(40px)' }}
+          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)', filter: 'blur(40px)' }}
         />
 
-        <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-sm text-violet-300 mb-6">
-          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
+        <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-sm text-blue-300 mb-6">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
           Visual · Interactive · Metaphor-driven
         </motion.div>
 
         <motion.h1 {...fadeUp(0.08)} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight mb-5">
           Algorithms you can{' '}
-          <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-white via-blue-300 to-blue-500 bg-clip-text text-transparent">
             see and feel
           </span>
         </motion.h1>
@@ -119,7 +119,7 @@ export default function Home() {
         <motion.div {...fadeUp(0.22)} className="flex items-center justify-center gap-4 flex-wrap">
           <Link
             to="/algorithms"
-            className="inline-flex items-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-6 py-3 text-sm font-semibold text-white transition-colors shadow-lg shadow-violet-500/20"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition-colors shadow-lg shadow-blue-500/20"
           >
             Explore Algorithms
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -173,9 +173,9 @@ export default function Home() {
             <motion.div
               key={f.title}
               variants={staggerItem}
-              className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 space-y-3"
+              className="glow-card rounded-2xl border border-white/8 bg-white/[0.03] p-6 space-y-3"
             >
-              <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center text-violet-400">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400">
                 {f.icon}
               </div>
               <h3 className="font-semibold text-white">{f.title}</h3>
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
           <Link
             to="/patterns"
-            className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
           >
             View all {PATTERNS.length}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -239,7 +239,7 @@ export default function Home() {
           </div>
           <Link
             to="/algorithms"
-            className="flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
           >
             View all {ALGORITHMS.length}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

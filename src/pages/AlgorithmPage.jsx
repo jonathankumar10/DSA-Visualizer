@@ -51,7 +51,7 @@ export default function AlgorithmPage() {
           <span className={`rounded-full px-3 py-1 text-xs font-medium ${DIFFICULTY_COLOR[algo.difficulty]}`}>
             {algo.difficulty}
           </span>
-          <span className="rounded-md bg-violet-500/15 px-3 py-1 text-xs text-violet-300">
+          <span className="rounded-md bg-blue-500/15 px-3 py-1 text-xs text-blue-300">
             {algo.pattern}
           </span>
           {algo.problemUrl && (
@@ -84,10 +84,10 @@ export default function AlgorithmPage() {
 
         {/* Metaphor bridge */}
         {algo.metaphor && (
-          <div className="flex gap-3 rounded-xl border border-violet-500/20 bg-violet-500/[0.05] px-5 py-4">
-            <div className="mt-0.5 w-0.5 shrink-0 self-stretch rounded-full bg-violet-500/50" />
+          <div className="flex gap-3 rounded-xl border border-blue-500/20 bg-blue-500/[0.05] px-5 py-4">
+            <div className="mt-0.5 w-0.5 shrink-0 self-stretch rounded-full bg-blue-500/50" />
             <div className="space-y-1">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-violet-400">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-400">
                 How we visualize it
               </p>
               <p className="text-sm text-slate-300 leading-relaxed">{algo.metaphor}</p>

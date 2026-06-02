@@ -33,7 +33,7 @@ export default function StepControls({ runner }) {
           </button>
           <button
             onClick={playing ? stop : play}
-            className="rounded-lg bg-violet-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-violet-500 transition-colors"
+            className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
           >
             {playing ? 'Pause' : index === total - 1 ? 'Replay' : 'Play'}
           </button>
@@ -49,30 +49,49 @@ export default function StepControls({ runner }) {
         {/* Progress bar */}
         <div className="hidden sm:flex flex-1 max-w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
           <div
-            className="h-full rounded-full bg-violet-500 transition-all duration-300"
+            className="h-full rounded-full bg-blue-500 transition-all duration-300"
             style={{ width: `${((index + 1) / total) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* Speed selector */}
-      <div className="flex items-center gap-2 px-1">
-        <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap">Speed</span>
-        <div className="flex gap-1">
-          {SPEEDS.map((s) => (
-            <button
-              key={s}
-              onClick={() => setSpeed(s)}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors ${
-                speed === s
-                  ? 'bg-violet-600 text-white'
-                  : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10'
-              }`}
-            >
-              {s === 1 ? '1×' : `${s}×`}
-            </button>
-          ))}
+      {/* Speed selector + TTS toggle */}
+      <div className="flex items-center justify-between gap-2 px-1 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap">Speed</span>
+          <div className="flex gap-1">
+            {SPEEDS.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSpeed(s)}
+                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                  speed === s
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/10'
+                }`}
+              >
+                {s === 1 ? '1×' : `${s}×`}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {runner.tts && (
+          <button
+            onClick={runner.tts.toggle}
+            title={runner.tts.enabled ? 'Disable narration' : 'Enable narration'}
+            className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all"
+            style={{
+              borderColor:     runner.tts.enabled ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)',
+              backgroundColor: runner.tts.enabled ? 'rgba(59,130,246,0.1)' : 'transparent',
+              color:           runner.tts.enabled ? '#93c5fd' : '#475569',
+              boxShadow:       runner.tts.enabled ? '0 0 10px -2px rgba(59,130,246,0.4)' : 'none',
+            }}
+          >
+            <span className="leading-none">{runner.tts.enabled ? '🔊' : '🔇'}</span>
+            <span>{runner.tts.enabled ? 'Narration on' : 'Narration off'}</span>
+          </button>
+        )}
       </div>
     </div>
   )

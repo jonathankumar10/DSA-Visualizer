@@ -55,7 +55,7 @@ function MatrixCell({ value, state, animKey }) {
           key={`halo-${animKey}`}
           animate={{ opacity: [0.6, 0.15, 0.6], scale: [1, 1.65, 1] }}
           transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 rounded-2xl bg-violet-500/40 pointer-events-none"
+          className="absolute inset-0 rounded-2xl bg-blue-500/40 pointer-events-none"
         />
       )}
 
@@ -73,7 +73,7 @@ function MatrixCell({ value, state, animKey }) {
         }
         className={`absolute inset-0 rounded-2xl border-2 overflow-hidden ${
           isFound ? 'border-emerald-300 bg-emerald-600/30 shadow-[0_0_24px_6px_rgba(16,185,129,0.6)]' :
-          isOpen  ? 'border-violet-300 bg-[#070d1f] shadow-[0_0_16px_4px_rgba(139,92,246,0.55)]' :
+          isOpen  ? 'border-blue-300 bg-[#070d1f] shadow-[0_0_16px_4px_rgba(59,130,246,0.55)]' :
           isElim  ? 'border-slate-700/30 bg-slate-800/20' :
           'border-slate-600 bg-slate-700/70'
         }`}
@@ -132,7 +132,7 @@ function Crosshair({ midRow, midCol, cellSize, gap }) {
         animate={{ scaleX: 1, opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute rounded-xl bg-violet-500/15 pointer-events-none"
+        className="absolute rounded-xl bg-blue-500/15 pointer-events-none"
         style={{
           top:    midRow * stride,
           left:   0,
@@ -147,7 +147,7 @@ function Crosshair({ midRow, midCol, cellSize, gap }) {
         animate={{ scaleY: 1, opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute rounded-xl bg-violet-500/15 pointer-events-none"
+        className="absolute rounded-xl bg-blue-500/15 pointer-events-none"
         style={{
           left:   midCol * stride,
           top:    0,
@@ -177,7 +177,7 @@ function RibbonStrip({ step }) {
     const isActive = !isLeft && !isRight
 
     let bg = ''
-    if (isMid)         bg = 'bg-violet-500 border-violet-300 text-white shadow-[0_0_10px_3px_rgba(139,92,246,0.6)]'
+    if (isMid)         bg = 'bg-blue-500 border-blue-300 text-white shadow-[0_0_10px_3px_rgba(59,130,246,0.6)]'
     else if (isActive) bg = 'bg-slate-700/80 border-slate-600 text-slate-300'
     else               bg = 'bg-slate-800/30 border-slate-700/20 text-slate-700 opacity-30'
 
@@ -197,7 +197,7 @@ function RibbonStrip({ step }) {
           {/* Active range bracket — moves like a jaw closing */}
           {type !== 'init' && type !== 'not-found' && (
             <motion.div
-              className="absolute -top-1 -bottom-1 rounded-xl border border-violet-500/40 bg-violet-500/8 pointer-events-none"
+              className="absolute -top-1 -bottom-1 rounded-xl border border-blue-500/40 bg-blue-500/8 pointer-events-none"
               animate={{
                 left:  `${(left / (total - 1 || 1)) * 100}%`,
                 right: `${((total - 1 - right) / (total - 1 || 1)) * 100}%`,
@@ -215,7 +215,7 @@ function RibbonStrip({ step }) {
                   initial={{ opacity: 0.8, scale: 0.8 }}
                   animate={{ opacity: 0, scale: 2.4 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 rounded-lg bg-violet-400/40 pointer-events-none"
+                  className="absolute inset-0 rounded-lg bg-blue-400/40 pointer-events-none"
                 />
               )}
 
@@ -232,13 +232,13 @@ function RibbonStrip({ step }) {
                 <motion.div
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-violet-300"
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-blue-300"
                 >
                   M
                 </motion.div>
               )}
               {i === left && !isMid && type !== 'init' && (
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-violet-400 opacity-60">L</div>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-blue-400 opacity-60">L</div>
               )}
               {i === right && i !== left && !isMid && type !== 'init' && (
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-pink-400 opacity-60">R</div>
@@ -264,7 +264,7 @@ function FormulaPanel({ step, animKey }) {
     'text-white'
 
   const parts = [
-    { label: 'mid',  val: String(mid),    note: `${left} + (${right}−${left})÷2`, color: 'text-violet-300' },
+    { label: 'mid',  val: String(mid),    note: `${left} + (${right}−${left})÷2`, color: 'text-blue-300' },
     { label: 'row',  val: String(midRow), note: `${mid} ÷ ${cols}`,               color: 'text-amber-300' },
     { label: 'col',  val: String(midCol), note: `${mid} % ${cols}`,               color: 'text-sky-300' },
     { label: 'val',  val: String(midVal), note: `matrix[${midRow}][${midCol}]`,   color: valColor },
@@ -402,7 +402,7 @@ export default function SearchMatrixVisualizer({ onStepChange }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-[11px] text-slate-400">
-          <Legend color="#8b5cf6" label="Pinched mid" />
+          <Legend color="#3b82f6" label="Pinched mid" />
           <Legend color="#475569" label="Active range" />
           <Legend color="#1e293b" label="Folded away" />
           <Legend color="#10b981" label="Found!" />
@@ -422,7 +422,7 @@ export default function SearchMatrixVisualizer({ onStepChange }) {
               onChange={(e) => setDraftFlat(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex gap-2">
@@ -433,7 +433,7 @@ export default function SearchMatrixVisualizer({ onStepChange }) {
                   value={val}
                   onChange={(e) => set(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleRun()}
-                  className="rounded-md bg-slate-800 border border-white/10 px-2 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+                  className="rounded-md bg-slate-800 border border-white/10 px-2 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
                 />
               </div>
             ))}
@@ -441,7 +441,7 @@ export default function SearchMatrixVisualizer({ onStepChange }) {
               <label className="text-[11px] text-transparent select-none">Run</label>
               <button
                 onClick={handleRun}
-                className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+                className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
               >
                 Run
               </button>
@@ -563,7 +563,7 @@ export default function SearchMatrixVisualizer({ onStepChange }) {
       {type !== 'init' && (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 flex flex-wrap gap-6 text-xs font-mono items-center">
           {[
-            { label: 'L', val: step.left,  color: 'text-violet-300' },
+            { label: 'L', val: step.left,  color: 'text-blue-300' },
             { label: 'R', val: step.right, color: 'text-pink-300' },
             ...(step.mid >= 0 ? [{ label: 'M', val: step.mid, color: 'text-white' }] : []),
           ].map(({ label, val, color }) => (

@@ -105,7 +105,7 @@ function Road({ from, to, nodeMap, step }) {
       {isDiscovering && (
         <motion.line
           x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-          stroke="#a78bfa" strokeWidth={5} strokeLinecap="round"
+          stroke="#93c5fd" strokeWidth={5} strokeLinecap="round"
           animate={{ opacity: [1, 0.2, 1] }}
           transition={{ duration: 0.65, repeat: Infinity }}
         />
@@ -152,7 +152,7 @@ function District({ node, step }) {
       )}
       {isQueued && !isVisited && !isCurrent && (
         <circle cx={node.x} cy={node.y} r={27}
-          fill="none" stroke="#7c3aed" strokeWidth={1.5} strokeDasharray="5 4" />
+          fill="none" stroke="#2563eb" strokeWidth={1.5} strokeDasharray="5 4" />
       )}
       <motion.circle cx={node.x} cy={node.y} r={24}
         animate={{ fill: circleFill }}
@@ -266,19 +266,19 @@ export default function BFSVisualizer({ onStepChange }) {
             <label className="text-[11px] text-slate-500">Edges (comma-separated, use A-B format)</label>
             <input value={draftEdges} onChange={(e) => setDraftEdges(e.target.value)} onKeyDown={handleKeyDown}
               placeholder="A-B, A-C, B-D, ..."
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full" />
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full" />
           </div>
           <div className="flex flex-col gap-1 w-24">
             <label className="text-[11px] text-slate-500">Start node</label>
             <input value={draftStart} onChange={(e) => setDraftStart(e.target.value)} onKeyDown={handleKeyDown}
               placeholder="A"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full" />
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full" />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Go</label>
             <div className="flex gap-1.5">
               <button onClick={handleApply}
-                className="rounded-md bg-violet-600 hover:bg-violet-500 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
+                className="rounded-md bg-blue-600 hover:bg-blue-500 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
                 Apply
               </button>
               <button onClick={handleReset}
@@ -350,7 +350,7 @@ export default function BFSVisualizer({ onStepChange }) {
               <motion.span key={`${id}-${i}`}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="rounded-md bg-violet-500/20 px-3 py-1 text-sm font-mono text-violet-300">
+                className="rounded-md bg-blue-500/20 px-3 py-1 text-sm font-mono text-blue-300">
                 {id}
               </motion.span>
             ))
@@ -360,9 +360,9 @@ export default function BFSVisualizer({ onStepChange }) {
 
       <div className="flex flex-wrap gap-4 text-xs text-slate-400">
         <Legend color="#f59e0b" label="Current"     />
-        <Legend color="#a78bfa" label="Discovering" />
+        <Legend color="#93c5fd" label="Discovering" />
         <Legend color="#10b981" label="Visited"     />
-        <Legend color="#7c3aed" label="In queue"    />
+        <Legend color="#2563eb" label="In queue"    />
       </div>
 
       <AnimatePresence mode="wait">

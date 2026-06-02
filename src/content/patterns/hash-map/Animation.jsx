@@ -14,14 +14,14 @@ const DURATIONS = [900, 800, 800, 800, 900, 1100, 1200]
 const ROW_COLORS = {
   sky:    { text: 'text-sky-300'    },
   amber:  { text: 'text-amber-300'  },
-  violet: { text: 'text-violet-300' },
+  violet: { text: 'text-blue-300' },
 }
 
 const OP_LABELS = [
   <span className="text-slate-600">map = {'{}'}</span>,
   <span className="text-sky-300">{'map.set("cat", 5)'}</span>,
   <span className="text-amber-300">{'map.set("dog", 3)'}</span>,
-  <span className="text-violet-300">{'map.set("fox", 8)'}</span>,
+  <span className="text-blue-300">{'map.set("fox", 8)'}</span>,
   <span className="text-white">{'map.get("dog") → ?'}</span>,
   <span className="text-emerald-300">{'map.get("dog") → '}<span className="font-black">3</span></span>,
   <span className="text-slate-600">Resetting…</span>,

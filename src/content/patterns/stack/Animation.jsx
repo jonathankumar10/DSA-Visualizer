@@ -3,7 +3,7 @@ import { usePatternAnimation } from '../../../hooks/usePatternAnimation'
 import AnimationControls from '../../../components/ui/AnimationControls'
 
 const ITEMS = [
-  { id: 'a', label: 'A', color: '#8b5cf6' },
+  { id: 'a', label: 'A', color: '#3b82f6' },
   { id: 'b', label: 'B', color: '#ec4899' },
   { id: 'c', label: 'C', color: '#f59e0b' },
 ]
@@ -33,7 +33,7 @@ export default function StackAnimation() {
       >
         {op && op !== '—' ? (
           <span className={`px-3 py-1 rounded-lg font-bold ${
-            op.startsWith('push') ? 'text-violet-300 bg-violet-500/10 border border-violet-500/20' :
+            op.startsWith('push') ? 'text-blue-300 bg-blue-500/10 border border-blue-500/20' :
                                     'text-amber-300  bg-amber-500/10  border border-amber-500/20'
           }`}>
             {op}

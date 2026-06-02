@@ -146,7 +146,7 @@ export default function PatternPage() {
                 {a.description && (
                   <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{a.description}</p>
                 )}
-                <div className="flex items-center gap-1 text-xs text-slate-600 group-hover:text-violet-400 transition-colors">
+                <div className="flex items-center gap-1 text-xs text-slate-600 group-hover:text-blue-400 transition-colors">
                   View visualizer
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />

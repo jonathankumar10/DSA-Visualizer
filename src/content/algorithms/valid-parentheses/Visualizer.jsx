@@ -32,15 +32,15 @@ const BRACKET = {
     ring:     'border-amber-400/60',
   },
   '{': {
-    strip:    'bg-violet-400',
-    bg:       'bg-violet-50/98',
-    border:   'border-violet-300/70',
-    text:     'text-violet-900',
-    dot:      'bg-violet-500',
-    glow:     'rgba(139,92,246,0.45)',
-    chipBase: 'bg-violet-500/10 border-violet-500/40 text-violet-300',
-    chipGlow: 'bg-violet-500/55 border-violet-400   text-white',
-    ring:     'border-violet-400/60',
+    strip:    'bg-blue-400',
+    bg:       'bg-blue-50/98',
+    border:   'border-blue-300/70',
+    text:     'text-blue-900',
+    dot:      'bg-blue-500',
+    glow:     'rgba(59,130,246,0.45)',
+    chipBase: 'bg-blue-500/10 border-blue-500/40 text-blue-300',
+    chipGlow: 'bg-blue-500/55 border-blue-400   text-white',
+    ring:     'border-blue-400/60',
   },
 }
 const CLOSE_MAP = { ')': '(', ']': '[', '}': '{' }
@@ -368,13 +368,13 @@ export default function ValidParenthesesVisualizer({ onStepChange }) {
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. ()[]{}"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
               Run
             </button>
           </div>

@@ -12,12 +12,13 @@ export default function AlgoCard({ algo }) {
 
   return (
     <motion.div
+      className="glow-card rounded-2xl"
       whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Link
         to={algo.path}
-        className="block rounded-2xl border border-white/10 bg-white/5 hover:border-violet-500/50 hover:bg-violet-500/5 transition-colors overflow-hidden"
+        className="block rounded-2xl border border-white/10 bg-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 transition-colors overflow-hidden"
       >
         {/* Pattern colour bar */}
         {glows.length > 0 && (
@@ -37,7 +38,7 @@ export default function AlgoCard({ algo }) {
           </p>
 
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-md bg-violet-500/15 px-2 py-0.5 text-xs text-violet-300">
+            <span className="rounded-md bg-blue-500/15 px-2 py-0.5 text-xs text-blue-300">
               {algo.pattern}
             </span>
             {algo.tags.map((tag) => (

@@ -10,7 +10,7 @@ const DEFAULT_TARGET = 9
 const STATUS_COLORS = {
   idle:       { liquid: '#4f46e5', wave: '#818cf8', cap: '#312e81', border: 'rgba(99,102,241,0.35)',  glow: null       },
   stored:     { liquid: '#2563eb', wave: '#60a5fa', cap: '#1e3a8a', border: 'rgba(59,130,246,0.5)',   glow: '#3b82f6'  },
-  active:     { liquid: '#8b5cf6', wave: '#c4b5fd', cap: '#4c1d95', border: 'rgba(139,92,246,1)',     glow: '#8b5cf6'  },
+  active:     { liquid: '#3b82f6', wave: '#c4b5fd', cap: '#4c1d95', border: 'rgba(59,130,246,1)',     glow: '#3b82f6'  },
   complement: { liquid: '#f97316', wave: '#fcd34d', cap: '#7c2d12', border: 'rgba(249,115,22,1)',     glow: '#f97316'  },
   found:      { liquid: '#22c55e', wave: '#86efac', cap: '#14532d', border: 'rgba(34,197,94,1)',      glow: '#22c55e'  },
 }
@@ -105,8 +105,8 @@ function Bottle({ value, maxVal, status, idx, target }) {
           animate={{ y: [0, -4, 0], opacity: [1, 0.6, 1] }}
           transition={{ duration: 0.7, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <div className="w-2.5 h-2.5 rounded-full bg-violet-400 shadow-lg shadow-violet-400/70" />
-          <div style={{ width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #8b5cf6' }} />
+          <div className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-lg shadow-blue-400/70" />
+          <div style={{ width: 0, height: 0, borderLeft: '4px solid transparent', borderRight: '4px solid transparent', borderTop: '5px solid #3b82f6' }} />
         </motion.div>
       )}
 
@@ -133,7 +133,7 @@ function Bottle({ value, maxVal, status, idx, target }) {
             style={{ whiteSpace: 'nowrap' }}
           >
             <p className="text-[10px] font-mono text-slate-300">val: <span className="text-white font-bold">{value}</span></p>
-            <p className="text-[10px] font-mono text-slate-300">need: <span className="text-violet-300 font-bold">{complement}</span></p>
+            <p className="text-[10px] font-mono text-slate-300">need: <span className="text-blue-300 font-bold">{complement}</span></p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -285,12 +285,12 @@ export default function TwoSumVisualizer({ onStepChange }) {
         <div>
           <h2 className="text-lg font-semibold text-white">Two Sum</h2>
           <p className="text-sm text-slate-400">
-            Target: <span className="font-mono text-violet-400 font-bold">{target}</span>
+            Target: <span className="font-mono text-blue-400 font-bold">{target}</span>
             <span className="text-slate-600 ml-2 text-xs">— hover a bottle to see what it needs</span>
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-400">
-          <Legend color="#8b5cf6" label="Checking"   />
+          <Legend color="#3b82f6" label="Checking"   />
           <Legend color="#f97316" label="Complement" />
           <Legend color="#3b82f6" label="In table"   />
           <Legend color="#22c55e" label="Found!"     />
@@ -308,7 +308,7 @@ export default function TwoSumVisualizer({ onStepChange }) {
               onChange={(e) => setDraftNums(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 2, 7, 11, 15"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 w-24">
@@ -318,14 +318,14 @@ export default function TwoSumVisualizer({ onStepChange }) {
               onChange={(e) => setDraftTarget(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 9"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>

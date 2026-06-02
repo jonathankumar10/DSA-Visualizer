@@ -52,9 +52,9 @@ function InputCell({ value, state, pressing }) {
 
 const RESULT_STYLES = {
   empty:   'bg-slate-800/60  border-slate-700/40 text-slate-600',
-  stamped: 'bg-violet-500    border-violet-300    text-white',
-  filled:  'bg-violet-600/50 border-violet-500    text-violet-200',
-  done:    'bg-violet-700/40 border-violet-600    text-violet-300',
+  stamped: 'bg-blue-500    border-blue-300    text-white',
+  filled:  'bg-blue-600/50 border-blue-500    text-blue-200',
+  done:    'bg-blue-700/40 border-blue-600    text-blue-300',
 }
 
 function ResultCell({ value, state, cellKey }) {
@@ -70,7 +70,7 @@ function ResultCell({ value, state, cellKey }) {
           initial={{ opacity: 0.8, scale: 0.4 }}
           animate={{ opacity: 0, scale: 2.4 + i * 0.5 }}
           transition={{ duration: 0.48, delay: i * 0.1 }}
-          className="absolute inset-0 rounded-xl bg-violet-500/35 pointer-events-none"
+          className="absolute inset-0 rounded-xl bg-blue-500/35 pointer-events-none"
         />
       ))}
       <motion.div
@@ -205,12 +205,12 @@ export default function ConcatenationVisualizer({ onStepChange }) {
           <h2 className="text-lg font-semibold text-white">Concatenation of Array</h2>
           <p className="text-sm text-slate-400">
             The stamp presses each value into{' '}
-            <span className="text-violet-400">both halves</span> at once.
+            <span className="text-blue-400">both halves</span> at once.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-400">
           <Legend color="#f59e0b" label="Current" />
-          <Legend color="#8b5cf6" label="Just stamped" />
+          <Legend color="#3b82f6" label="Just stamped" />
           <Legend color="#5b21b6" label="Filled" />
         </div>
       </div>
@@ -229,14 +229,14 @@ export default function ConcatenationVisualizer({ onStepChange }) {
               onChange={(e) => setDraftArr(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 1, 2, 1"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>
@@ -315,9 +315,9 @@ export default function ConcatenationVisualizer({ onStepChange }) {
                       animate={{ opacity: 1, y: 0, scaleY: 1 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                       width="14" height="18" viewBox="0 0 14 18" fill="none"
-                      style={{ filter: 'drop-shadow(0 0 4px rgba(139,92,246,0.7))' }}
+                      style={{ filter: 'drop-shadow(0 0 4px rgba(59,130,246,0.7))' }}
                     >
-                      <path d="M7 1v12M2 10l5 6 5-6" stroke="#a78bfa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7 1v12M2 10l5 6 5-6" stroke="#93c5fd" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </motion.svg>
                   ) : (
                     <div className="h-4" />
@@ -385,8 +385,8 @@ export default function ConcatenationVisualizer({ onStepChange }) {
               <p className="text-2xl font-black font-mono text-amber-300">{step.value}</p>
             </div>
             <div className="text-right text-xs font-mono text-slate-400 space-y-1">
-              <p>result[<span className="text-violet-300">{step.index}</span>] = {step.value}</p>
-              <p>result[<span className="text-violet-300">{step.index + n}</span>] = {step.value}</p>
+              <p>result[<span className="text-blue-300">{step.index}</span>] = {step.value}</p>
+              <p>result[<span className="text-blue-300">{step.index + n}</span>] = {step.value}</p>
             </div>
           </motion.div>
         )}
@@ -399,12 +399,12 @@ export default function ConcatenationVisualizer({ onStepChange }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-5 py-3 flex items-center gap-3"
+            className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-5 py-3 flex items-center gap-3"
           >
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 shrink-0">
               Result
             </span>
-            <span className="text-sm font-mono text-violet-300">
+            <span className="text-sm font-mono text-blue-300">
               [{step.result.join(', ')}]
             </span>
           </motion.div>

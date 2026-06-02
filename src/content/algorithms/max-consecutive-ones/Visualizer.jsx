@@ -75,9 +75,9 @@ function Cell({ value, state, runnerIndex }) {
 
 function StatBox({ label, value, max, accent, flash }) {
   const pct    = max > 0 ? Math.min((value / max) * 100, 100) : 0
-  const base   = accent ? 'border-violet-500/30 bg-violet-500/5' : 'border-white/10 bg-white/[0.03]'
-  const numCls = accent ? 'text-violet-300' : 'text-white'
-  const barCls = accent ? 'bg-violet-500' : 'bg-blue-500'
+  const base   = accent ? 'border-blue-500/30 bg-blue-500/5' : 'border-white/10 bg-white/[0.03]'
+  const numCls = accent ? 'text-blue-300' : 'text-white'
+  const barCls = accent ? 'bg-blue-500' : 'bg-blue-500'
 
   return (
     <motion.div
@@ -89,7 +89,7 @@ function StatBox({ label, value, max, accent, flash }) {
       {flash && (
         <motion.div
           key={`flash-${value}`}
-          className="absolute inset-0 bg-violet-400/20 pointer-events-none"
+          className="absolute inset-0 bg-blue-400/20 pointer-events-none"
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
@@ -115,7 +115,7 @@ function StatBox({ label, value, max, accent, flash }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ type: 'spring', stiffness: 520, damping: 18 }}
-            className="text-[10px] font-bold text-violet-400 mt-1.5 text-center"
+            className="text-[10px] font-bold text-blue-400 mt-1.5 text-center"
           >
             ✦ NEW BEST
           </motion.p>
@@ -202,14 +202,14 @@ export default function MaxConsecutiveOnesVisualizer({ onStepChange }) {
               onChange={(e) => setDraftNums(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 1, 1, 0, 1, 1, 1"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>
@@ -289,12 +289,12 @@ export default function MaxConsecutiveOnesVisualizer({ onStepChange }) {
             animate={{ opacity: 1, scale: 1,   y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 24 }}
-            className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-5 py-4 flex items-center gap-4"
+            className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-5 py-4 flex items-center gap-4"
           >
             <motion.span
               initial={{ scale: 0.3 }} animate={{ scale: [0.3, 1.2, 1] }}
               transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-              className="text-3xl font-black font-mono text-violet-300"
+              className="text-3xl font-black font-mono text-blue-300"
             >
               {step.maxCount}
             </motion.span>

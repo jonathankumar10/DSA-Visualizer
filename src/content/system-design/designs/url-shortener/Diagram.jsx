@@ -25,13 +25,13 @@ function VerticalArrow({ isActive, direction = 'down', stepKey, delayMs = 0 }) {
   return (
     <div className="relative flex flex-col items-center h-8 w-6 shrink-0">
       {/* Static line */}
-      <div className={`w-px flex-1 transition-colors duration-300 ${isActive ? 'bg-violet-500' : 'bg-slate-700'}`} />
+      <div className={`w-px flex-1 transition-colors duration-300 ${isActive ? 'bg-blue-500' : 'bg-slate-700'}`} />
 
       {/* Arrow head */}
       <svg
         className={`shrink-0 ${isDown ? '' : 'rotate-180'}`}
         width="10" height="6" viewBox="0 0 10 6"
-        fill={isActive ? '#7c3aed' : '#334155'}
+        fill={isActive ? '#2563eb' : '#334155'}
       >
         <polygon points="0,0 10,0 5,6" />
       </svg>
@@ -40,7 +40,7 @@ function VerticalArrow({ isActive, direction = 'down', stepKey, delayMs = 0 }) {
       {isActive && (
         <motion.div
           key={`${stepKey}-vert-${delayMs}`}
-          className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-violet-400 shadow-lg shadow-violet-400/70 pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-400 shadow-lg shadow-blue-400/70 pointer-events-none"
           style={{ top: isDown ? 0 : 'calc(100% - 10px)' }}
           animate={{ y: isDown ? [0, 28] : [0, -28] }}
           transition={{
@@ -62,11 +62,11 @@ function HorizArrow({ isActive, direction = 'right', stepKey }) {
   const isRight = direction === 'right'
   return (
     <div className="relative flex items-center w-10 h-6 shrink-0">
-      <div className={`w-full h-px transition-colors duration-300 ${isActive ? 'bg-violet-500' : 'bg-slate-700'}`} />
+      <div className={`w-full h-px transition-colors duration-300 ${isActive ? 'bg-blue-500' : 'bg-slate-700'}`} />
       <svg
         className={`absolute ${isRight ? 'right-0' : 'left-0 rotate-180'}`}
         width="6" height="10" viewBox="0 0 6 10"
-        fill={isActive ? '#7c3aed' : '#334155'}
+        fill={isActive ? '#2563eb' : '#334155'}
       >
         <polygon points="0,0 0,10 6,5" />
       </svg>
@@ -74,7 +74,7 @@ function HorizArrow({ isActive, direction = 'right', stepKey }) {
       {isActive && (
         <motion.div
           key={`${stepKey}-horiz`}
-          className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-violet-400 shadow-lg shadow-violet-400/70 pointer-events-none"
+          className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-400 shadow-lg shadow-blue-400/70 pointer-events-none"
           style={{ left: 0 }}
           animate={{ x: isRight ? [0, 34] : [34, 0] }}
           transition={{
@@ -98,12 +98,12 @@ function NodeCard({ id, isActive, shortCode }) {
   return (
     <motion.div
       animate={{
-        borderColor: isActive ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.08)',
+        borderColor: isActive ? 'rgba(59,130,246,0.65)' : 'rgba(255,255,255,0.08)',
       }}
       transition={{ duration: 0.25 }}
       className="relative flex flex-col items-center gap-1.5 rounded-2xl border bg-slate-900 px-3 py-3 select-none"
       style={{
-        boxShadow: isActive ? '0 0 22px -4px rgba(139,92,246,0.55)' : 'none',
+        boxShadow: isActive ? '0 0 22px -4px rgba(59,130,246,0.55)' : 'none',
         width: isStorage ? '5.5rem' : '7.5rem',
       }}
     >
@@ -118,7 +118,7 @@ function NodeCard({ id, isActive, shortCode }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ type: 'spring', stiffness: 360, damping: 22 }}
-            className="text-[9px] font-mono text-violet-300 bg-violet-500/15 border border-violet-500/30 rounded px-1.5 py-0.5"
+            className="text-[9px] font-mono text-blue-300 bg-blue-500/15 border border-blue-500/30 rounded px-1.5 py-0.5"
           >
             {shortCode}
           </motion.span>
@@ -131,7 +131,7 @@ function NodeCard({ id, isActive, shortCode }) {
       {/* Active ring */}
       {isActive && (
         <motion.div
-          className="absolute inset-0 rounded-2xl border-2 border-violet-400/50 pointer-events-none"
+          className="absolute inset-0 rounded-2xl border-2 border-blue-400/50 pointer-events-none"
           animate={{ scale: [1, 1.05, 1], opacity: [1, 0.5, 1] }}
           transition={{ repeat: Infinity, duration: 1.4 }}
         />
@@ -265,13 +265,13 @@ export default function UrlShortenerDiagram({ onStepChange }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-              className="mt-5 flex items-center gap-3 rounded-xl border border-violet-500/30 bg-violet-500/[0.07] px-4 py-2.5"
+              className="mt-5 flex items-center gap-3 rounded-xl border border-blue-500/30 bg-blue-500/[0.07] px-4 py-2.5"
             >
-              <span className="text-violet-400 text-lg">🎫</span>
+              <span className="text-blue-400 text-lg">🎫</span>
               <div>
-                <p className="text-[11px] font-semibold text-violet-400 uppercase tracking-wider">Short URL</p>
+                <p className="text-[11px] font-semibold text-blue-400 uppercase tracking-wider">Short URL</p>
                 <p className="text-sm font-mono text-white">
-                  short.ly/<span className="text-violet-300 font-bold">{shortCode}</span>
+                  short.ly/<span className="text-blue-300 font-bold">{shortCode}</span>
                 </p>
               </div>
             </motion.div>

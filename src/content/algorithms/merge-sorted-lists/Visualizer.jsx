@@ -17,13 +17,13 @@ const THEME = {
   'l1-consumed':  { bg: 'bg-slate-900/40', border: 'border-slate-700/40',text: 'text-slate-600'   },
   'l1-picked':    { bg: 'bg-sky-700/80',   border: 'border-sky-300',     text: 'text-white'       },
   // List2 nodes
-  'l2-active':    { bg: 'bg-violet-900/40',border: 'border-violet-600/50',text: 'text-violet-200' },
-  'l2-pointer':   { bg: 'bg-violet-800/70',border: 'border-violet-400',  text: 'text-violet-50'   },
+  'l2-active':    { bg: 'bg-blue-900/40',border: 'border-blue-600/50',text: 'text-blue-200' },
+  'l2-pointer':   { bg: 'bg-blue-800/70',border: 'border-blue-400',  text: 'text-white'   },
   'l2-consumed':  { bg: 'bg-slate-900/40', border: 'border-slate-700/40',text: 'text-slate-600'   },
-  'l2-picked':    { bg: 'bg-violet-700/80',border: 'border-violet-300',  text: 'text-white'       },
+  'l2-picked':    { bg: 'bg-blue-700/80',border: 'border-blue-300',  text: 'text-white'       },
   // Merged nodes
   'merged-l1':    { bg: 'bg-sky-900/50',   border: 'border-sky-500',     text: 'text-sky-100'     },
-  'merged-l2':    { bg: 'bg-violet-900/50',border: 'border-violet-500',  text: 'text-violet-100'  },
+  'merged-l2':    { bg: 'bg-blue-900/50',border: 'border-blue-500',  text: 'text-blue-100'  },
   'merged-drain': { bg: 'bg-emerald-900/50',border:'border-emerald-500', text: 'text-emerald-100' },
   'done':         { bg: 'bg-emerald-900/30',border:'border-emerald-600', text: 'text-emerald-200' },
 }
@@ -64,8 +64,8 @@ function ChainArrow({ color = 'text-slate-600' }) {
 
 function ListRow({ nodes, pointer, chosen, stepType, list, drainFrom }) {
   const prefix = list === 1 ? 'l1' : 'l2'
-  const ptrColor = list === 1 ? 'text-sky-400' : 'text-violet-400'
-  const arrowColor = list === 1 ? 'text-sky-800' : 'text-violet-800'
+  const ptrColor = list === 1 ? 'text-sky-400' : 'text-blue-400'
+  const arrowColor = list === 1 ? 'text-sky-800' : 'text-blue-800'
   const label = list === 1 ? 'list1' : 'list2'
   const exhausted = pointer >= nodes.length
   const isDrained = stepType === 'drain' && drainFrom === list
@@ -152,7 +152,7 @@ function ComparisonBadge({ step }) {
     ? { bg: 'bg-slate-500/15', border: 'border-slate-500/40', text: 'text-slate-300', sym: 'text-white' }
     : chosen === 1
     ? { bg: 'bg-sky-500/15',     border: 'border-sky-500/40',     text: 'text-sky-300',     sym: 'text-sky-200'     }
-    : { bg: 'bg-violet-500/15', border: 'border-violet-500/40', text: 'text-violet-300', sym: 'text-violet-200' }
+    : { bg: 'bg-blue-500/15', border: 'border-blue-500/40', text: 'text-blue-300', sym: 'text-blue-200' }
 
   return (
     <motion.div
@@ -328,14 +328,14 @@ export default function MergeSortedListsVisualizer({ onStepChange }) {
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 1, 3, 4"
               className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono
-                text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+                text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700
                 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
@@ -358,7 +358,7 @@ export default function MergeSortedListsVisualizer({ onStepChange }) {
         <div className="flex flex-wrap gap-x-4 gap-y-1">
           {[
             { color: 'bg-sky-700',      label: 'list1 node' },
-            { color: 'bg-violet-700',   label: 'list2 node' },
+            { color: 'bg-blue-700',   label: 'list2 node' },
             { color: 'bg-emerald-700',  label: 'merged'     },
             { color: 'bg-slate-700/50', label: 'consumed'   },
           ].map(({ color, label }) => (

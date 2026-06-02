@@ -86,8 +86,8 @@ function TreeNodeSVG({ nodeId, pos, step }) {
       )}
       <motion.circle cx={pos.x} cy={pos.y} r={22}
         animate={{
-          fill: isCurrent ? '#7c3aed' : isVisited ? '#065f46' : '#1e293b',
-          stroke: isCurrent ? '#a78bfa' : isVisited ? '#10b981' : '#334155',
+          fill: isCurrent ? '#2563eb' : isVisited ? '#065f46' : '#1e293b',
+          stroke: isCurrent ? '#93c5fd' : isVisited ? '#10b981' : '#334155',
         }}
         strokeWidth={2} transition={{ duration: 0.3 }}
       />
@@ -172,7 +172,7 @@ export default function TreeTraversalVisualizer({ onStepChange, onOrderChange })
           {ORDERS.map((o) => (
             <button key={o} onClick={() => handleOrderChange(o)}
               className={`px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                order === o ? 'bg-violet-600 text-white' : 'bg-white/5 text-slate-400 hover:text-white'
+                order === o ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400 hover:text-white'
               }`}>
               {o}
             </button>
@@ -202,13 +202,13 @@ export default function TreeTraversalVisualizer({ onStepChange, onOrderChange })
             <input value={draftInput} onChange={(e) => setDraftInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleApply()}
               placeholder="e.g. 4, 2, 6, 1, 3, 5, 7"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full" />
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full" />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Apply</label>
             <div className="flex gap-1.5">
               <button onClick={handleApply}
-                className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
+                className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors">
                 Apply
               </button>
               <button onClick={handleReset}

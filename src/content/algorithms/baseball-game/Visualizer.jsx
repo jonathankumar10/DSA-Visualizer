@@ -14,9 +14,9 @@ const SOURCE = {
     text:     'text-slate-800',
     label:    'Score',
     labelCls: 'text-slate-400',
-    dot:      'bg-violet-500',
-    glow:     'rgba(139,92,246,0.35)',
-    badge:    'bg-violet-600 text-white',
+    dot:      'bg-blue-500',
+    glow:     'rgba(59,130,246,0.35)',
+    badge:    'bg-blue-600 text-white',
     badgeTxt: (v) => `+${v}`,
   },
   double: {
@@ -52,8 +52,8 @@ const OP_STYLE = {
 function OpChip({ op, active, done }) {
   const s = OP_STYLE[op] ?? {
     base:   'border-slate-600 text-slate-400 bg-slate-700/40',
-    active: 'border-violet-400 text-white bg-violet-500/60',
-    ring:   'border-violet-400/50',
+    active: 'border-blue-400 text-white bg-blue-500/60',
+    ring:   'border-blue-400/50',
   }
   return (
     <motion.div
@@ -296,14 +296,14 @@ export default function BaseballGameVisualizer({ onStepChange }) {
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 5, 2, C, D, +"
               className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono
-                text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+                text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>

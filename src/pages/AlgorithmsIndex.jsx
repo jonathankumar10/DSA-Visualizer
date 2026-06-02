@@ -90,7 +90,7 @@ export default function AlgorithmsIndex() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, pattern or tag…"
-            className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-9 pr-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none focus:border-violet-500/60 transition-colors"
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-9 pr-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none focus:border-blue-500/60 transition-colors"
           />
           {query && (
             <button
@@ -115,7 +115,7 @@ export default function AlgorithmsIndex() {
                 onClick={() => setCategory(cat)}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   active
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:border-white/20'
                 }`}
               >
@@ -167,7 +167,7 @@ export default function AlgorithmsIndex() {
               Try a different search or{' '}
               <button
                 onClick={() => { setQuery(''); setCategory('all') }}
-                className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors"
+                className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
               >
                 clear all filters
               </button>

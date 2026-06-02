@@ -324,14 +324,14 @@ export default function ReverseLinkedListVisualizer({ onStepChange }) {
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 1, 2, 3, 4, 5"
               className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono
-                text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+                text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700
                 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run

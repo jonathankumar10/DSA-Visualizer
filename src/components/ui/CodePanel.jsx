@@ -73,7 +73,7 @@ function tokenize(line, language) {
 }
 
 const TOKEN_COLOR = {
-  kw: 'text-violet-400',
+  kw: 'text-blue-400',
   ty: 'text-sky-300',
   cm: 'text-slate-500 italic',
   st: 'text-emerald-400',
@@ -88,12 +88,12 @@ function CodeLine({ tokens, lineNum, highlighted, isCurrent }) {
   return (
     <div
       className={`relative flex text-xs leading-6 font-mono transition-colors duration-200 ${
-        isCurrent   ? 'bg-violet-500/20' :
+        isCurrent   ? 'bg-blue-500/20' :
         highlighted ? 'bg-amber-400/10'  : ''
       }`}
     >
       {isCurrent && (
-        <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-violet-400 rounded-r" />
+        <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-400 rounded-r" />
       )}
       <span className="select-none w-7 sm:w-10 shrink-0 text-right pr-2 sm:pr-4 text-slate-600">
         {lineNum}
@@ -168,7 +168,7 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
               onClick={() => !syncedApproachId && setActiveId(a.id)}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                 a.id === activeId
-                  ? 'bg-violet-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               } ${syncedApproachId ? 'cursor-default' : 'cursor-pointer'}`}
             >
@@ -252,7 +252,7 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
               className="text-xs text-slate-400"
             >
               Executing line{highlightedLines.length > 1 ? 's' : ''}{' '}
-              <span className="font-mono text-violet-400">
+              <span className="font-mono text-blue-400">
                 {highlightedLines.join(', ')}
               </span>
             </motion.p>

@@ -10,7 +10,7 @@ html {
 
 body {
   margin: 0;
-  background: #020617; /* slate-950 */
+  background: #09090b;
   color: #f1f5f9;
   font-family: system-ui, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -24,3 +24,56 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+/* ── Cursor ambient glow ──────────────────────────────────────────────────── */
+.cursor-glow {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 65%);
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  will-change: transform;
+}
+
+/* ── Card glow effect ─────────────────────────────────────────────────────── */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes glow-spin {
+  to { --glow-angle: 360deg; }
+}
+
+.glow-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--glow-angle) at 50% 50%,
+    transparent 0%,
+    rgba(59, 130, 246, 0.55) 10%,
+    transparent 20%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(5px);
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+  animation: glow-spin 3s linear infinite;
+}

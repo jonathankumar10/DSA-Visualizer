@@ -8,7 +8,7 @@ import StepControls from '../../../../components/ui/StepControls'
 
 const COLORS = {
   browser:  { hex: '#0ea5e9', glow: 'rgba(14,165,233,0.6)',   strip: 'bg-sky-500',      label: '#38bdf8' },
-  resolver: { hex: '#8b5cf6', glow: 'rgba(139,92,246,0.6)',   strip: 'bg-violet-500',   label: '#a78bfa' },
+  resolver: { hex: '#3b82f6', glow: 'rgba(59,130,246,0.6)',   strip: 'bg-blue-500',   label: '#93c5fd' },
   root:     { hex: '#f59e0b', glow: 'rgba(245,158,11,0.6)',   strip: 'bg-amber-500',    label: '#fbbf24' },
   tld:      { hex: '#f43f5e', glow: 'rgba(244,63,94,0.6)',    strip: 'bg-rose-500',     label: '#fb7185' },
   auth:     { hex: '#10b981', glow: 'rgba(16,185,129,0.6)',   strip: 'bg-emerald-500',  label: '#34d399' },
@@ -16,7 +16,7 @@ const COLORS = {
 
 // Query = violet (forward), Response = emerald (backward)
 const DIR = {
-  forward:  { hex: '#8b5cf6', glow: 'rgba(139,92,246,0.75)' },
+  forward:  { hex: '#3b82f6', glow: 'rgba(59,130,246,0.75)' },
   backward: { hex: '#10b981', glow: 'rgba(16,185,129,0.75)' },
 }
 
@@ -285,7 +285,7 @@ export default function DnsDiagram({ onStepChange }) {
         <h2 className="text-lg font-semibold text-white">DNS Resolution</h2>
         <p className="text-sm text-slate-400">
           Trace a query for{' '}
-          <span className="font-mono text-violet-300">google.com</span>{' '}
+          <span className="font-mono text-blue-300">google.com</span>{' '}
           from browser to authoritative nameserver and back.
         </p>
       </div>

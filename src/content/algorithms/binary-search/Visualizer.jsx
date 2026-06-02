@@ -55,7 +55,7 @@ function LockerCell({ value, state, animKey }) {
           key={`halo-${animKey}`}
           animate={{ opacity: [0.6, 0.15, 0.6], scale: [1, 1.6, 1] }}
           transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0 rounded-2xl bg-violet-500/40 pointer-events-none"
+          className="absolute inset-0 rounded-2xl bg-blue-500/40 pointer-events-none"
         />
       )}
 
@@ -73,7 +73,7 @@ function LockerCell({ value, state, animKey }) {
         }
         className={`absolute inset-0 rounded-2xl border-2 overflow-hidden ${
           isFound ? 'border-emerald-300 bg-emerald-600/30 shadow-[0_0_26px_6px_rgba(16,185,129,0.6)]' :
-          isOpen  ? 'border-violet-300 bg-[#070d1f] shadow-[0_0_18px_4px_rgba(139,92,246,0.55)]' :
+          isOpen  ? 'border-blue-300 bg-[#070d1f] shadow-[0_0_18px_4px_rgba(59,130,246,0.55)]' :
           isElim  ? 'border-slate-700/30 bg-slate-800/20' :
           'border-slate-600 bg-slate-700/70'
         }`}
@@ -310,12 +310,12 @@ export default function BinarySearchVisualizer({ onStepChange }) {
           <h2 className="text-lg font-semibold text-white">Binary Search</h2>
           <p className="text-sm text-slate-400">
             A row of lockers, sorted. Two walls squeeze inward — crack open the{' '}
-            <span className="text-violet-400 font-mono">mid</span> locker each round.
+            <span className="text-blue-400 font-mono">mid</span> locker each round.
             Wrong half? That wall jumps past it and the lockers go dark.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-[11px] text-slate-400">
-          <Legend color="#8b5cf6" label="Opened (mid)" />
+          <Legend color="#3b82f6" label="Opened (mid)" />
           <Legend color="#475569" label="Active" />
           <Legend color="#1e293b" label="Eliminated" />
           <Legend color="#10b981" label="Found!" />
@@ -335,7 +335,7 @@ export default function BinarySearchVisualizer({ onStepChange }) {
               onChange={(e) => setDraftNums(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="-1, 0, 3, 5, 9, 12"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 w-20">
@@ -344,14 +344,14 @@ export default function BinarySearchVisualizer({ onStepChange }) {
               value={draftTgt}
               onChange={(e) => setDraftTgt(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>
@@ -401,7 +401,7 @@ export default function BinarySearchVisualizer({ onStepChange }) {
             {type !== 'init' && (
               <div className="flex gap-3">
                 {[
-                  { lbl: 'L', val: left,  color: 'text-violet-400' },
+                  { lbl: 'L', val: left,  color: 'text-blue-400' },
                   { lbl: 'R', val: right, color: 'text-pink-400' },
                   ...(showM ? [{ lbl: 'M', val: mid, color: 'text-white' }] : []),
                 ].map(({ lbl, val, color }) => (
@@ -430,7 +430,7 @@ export default function BinarySearchVisualizer({ onStepChange }) {
             {/* Wall markers layer */}
             <div className="relative" style={{ height: CELL_H, width: trackWidth }}>
               {showL && (
-                <WallMarker key="L" label="L" pos={left}  color="#8b5cf6" totalCells={nums.length} />
+                <WallMarker key="L" label="L" pos={left}  color="#3b82f6" totalCells={nums.length} />
               )}
               {showR && (
                 <WallMarker key="R" label="R" pos={right} color="#ec4899" totalCells={nums.length} />

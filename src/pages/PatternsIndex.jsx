@@ -30,7 +30,7 @@ export default function PatternsIndex() {
         {PATTERNS.map((p) => {
           const c = PATTERN_COLORS[p.color]
           return (
-            <motion.div key={p.id} variants={card}>
+            <motion.div key={p.id} variants={card} className="glow-card rounded-2xl">
               <Link
                 to={`/patterns/${p.id}`}
                 className="group block rounded-2xl border border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04] transition-all duration-200 overflow-hidden"

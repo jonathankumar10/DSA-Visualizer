@@ -51,8 +51,8 @@ export default function BinarySearchAnimation() {
                 className="absolute top-0 pointer-events-none"
                 style={{ width: 0 }}
               >
-                <div className="text-[9px] font-black text-violet-400 absolute -translate-x-1/2" style={{ top: -22 }}>L</div>
-                <div className="w-0.5 rounded bg-violet-500 shadow-[0_0_8px_2px_rgba(139,92,246,0.5)]" style={{ height: CELL }} />
+                <div className="text-[9px] font-black text-blue-400 absolute -translate-x-1/2" style={{ top: -22 }}>L</div>
+                <div className="w-0.5 rounded bg-blue-500 shadow-[0_0_8px_2px_rgba(59,130,246,0.5)]" style={{ height: CELL }} />
               </motion.div>
             )}
 
@@ -97,7 +97,7 @@ export default function BinarySearchAnimation() {
                     animate={{
                       backgroundColor:
                         state === 'found'  ? 'rgba(16,185,129,0.22)' :
-                        state === 'open'   ? 'rgba(139,92,246,0.16)' :
+                        state === 'open'   ? 'rgba(59,130,246,0.16)' :
                         state === 'elim'   ? 'rgba(15,23,42,0.5)'    :
                         'rgba(51,65,85,0.5)',
                       borderColor:

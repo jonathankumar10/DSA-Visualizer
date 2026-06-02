@@ -9,7 +9,7 @@ const DEFAULT_OPS = ['push -2', 'push 0', 'push -3', 'getMin', 'pop', 'top', 'ge
 // ── Op chip styles ────────────────────────────────────────────────────────────
 
 const OP_STYLE = {
-  push:   { base: 'border-violet-500/40 text-violet-300 bg-violet-500/10', active: 'border-violet-400 text-white bg-violet-500/55', ring: 'border-violet-400/50' },
+  push:   { base: 'border-blue-500/40 text-blue-300 bg-blue-500/10', active: 'border-blue-400 text-white bg-blue-500/55', ring: 'border-blue-400/50' },
   pop:    { base: 'border-rose-500/40   text-rose-300   bg-rose-500/10',   active: 'border-rose-400   text-white bg-rose-500/55',   ring: 'border-rose-400/50'   },
   top:    { base: 'border-sky-500/40    text-sky-300    bg-sky-500/10',    active: 'border-sky-400    text-white bg-sky-500/55',    ring: 'border-sky-400/50'    },
   getmin: { base: 'border-teal-500/40  text-teal-300  bg-teal-500/10',   active: 'border-teal-400  text-white bg-teal-500/55',   ring: 'border-teal-400/50'   },
@@ -70,11 +70,11 @@ function OpChip({ op, active, done }) {
 
 const BOX = {
   main: {
-    bg: 'bg-[#18102a]', strip: 'bg-violet-500',
-    border: 'border-violet-700/50', borderTop: 'border-violet-500/70', borderQuery: 'border-violet-400',
-    text: 'text-violet-50', sublabel: 'text-violet-500',
-    glow: 'rgba(139,92,246,0.6)', dot: 'bg-violet-400',
-    ringCls: 'border-violet-400',
+    bg: 'bg-[#18102a]', strip: 'bg-blue-500',
+    border: 'border-blue-700/50', borderTop: 'border-blue-500/70', borderQuery: 'border-blue-400',
+    text: 'text-white', sublabel: 'text-blue-500',
+    glow: 'rgba(59,130,246,0.6)', dot: 'bg-blue-400',
+    ringCls: 'border-blue-400',
   },
   min: {
     bg: 'bg-[#091c1c]', strip: 'bg-teal-500',
@@ -247,8 +247,8 @@ function MinUnchangedBadge({ step, runnerIndex }) {
 
 function DepthGhosts({ count, variant }) {
   if (count < 2) return null
-  const g1 = variant === 'main' ? 'bg-violet-900/15 border-violet-700/15' : 'bg-teal-900/15 border-teal-700/15'
-  const g2 = variant === 'main' ? 'bg-violet-900/8  border-violet-700/8'  : 'bg-teal-900/8  border-teal-700/8'
+  const g1 = variant === 'main' ? 'bg-blue-900/15 border-blue-700/15' : 'bg-teal-900/15 border-teal-700/15'
+  const g2 = variant === 'main' ? 'bg-blue-900/8  border-blue-700/8'  : 'bg-teal-900/8  border-teal-700/8'
   return (
     <>
       <div className={`absolute inset-x-3 top-2 bottom-0 rounded-2xl border -z-10 ${g1}`} />
@@ -274,10 +274,10 @@ function StackColumn({ label, sublabel, items, step, variant, runnerIndex }) {
     return 'normal'
   }
 
-  const headerColor = isMain ? 'text-violet-400' : 'text-teal-400'
-  const countColor  = isMain ? 'text-violet-700' : 'text-teal-800'
+  const headerColor = isMain ? 'text-blue-400' : 'text-teal-400'
+  const countColor  = isMain ? 'text-blue-700' : 'text-teal-800'
   const emptyBorder = isMain
-    ? 'border-violet-800/30 text-violet-800'
+    ? 'border-blue-800/30 text-blue-800'
     : 'border-teal-800/30 text-teal-900'
 
   return (
@@ -295,7 +295,7 @@ function StackColumn({ label, sublabel, items, step, variant, runnerIndex }) {
       </div>
 
       {/* Shelf surface */}
-      <div className={`w-full h-px mb-1.5 ${isMain ? 'bg-violet-800/40' : 'bg-teal-800/40'}`} />
+      <div className={`w-full h-px mb-1.5 ${isMain ? 'bg-blue-800/40' : 'bg-teal-800/40'}`} />
 
       <div className="relative flex flex-col gap-1.5 min-h-[76px]">
         {/* Min-unchanged badge floats above the min column */}
@@ -407,14 +407,14 @@ export default function MinStackVisualizer({ onStepChange }) {
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. push -2, push 0, push -3, getMin, pop, top, getMin"
               className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono
-                text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+                text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700
                 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run

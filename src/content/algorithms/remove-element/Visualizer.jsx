@@ -170,7 +170,7 @@ export default function RemoveElementVisualizer({ onStepChange }) {
           <p className="text-sm text-slate-400">
             Reader <span className="text-amber-400 font-mono">i</span> sprints ahead —
             leaps over <span className="text-rose-400">val</span> tiles, hands the rest
-            to writer <span className="text-violet-400 font-mono">k</span>.
+            to writer <span className="text-blue-400 font-mono">k</span>.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-400">
@@ -195,7 +195,7 @@ export default function RemoveElementVisualizer({ onStepChange }) {
               onChange={(e) => setDraftNums(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 3, 2, 2, 3"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 w-16">
@@ -205,14 +205,14 @@ export default function RemoveElementVisualizer({ onStepChange }) {
               onChange={(e) => setDraftVal(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="3"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>
@@ -245,7 +245,7 @@ export default function RemoveElementVisualizer({ onStepChange }) {
           {showRunners && (
             <div className="flex gap-4 text-[11px] font-mono">
               <span className="text-amber-400">i = {step.i}</span>
-              <span className="text-violet-400">k = {step.k}</span>
+              <span className="text-blue-400">k = {step.k}</span>
             </div>
           )}
         </div>
@@ -259,7 +259,7 @@ export default function RemoveElementVisualizer({ onStepChange }) {
               {showRunners && (
                 <>
                   <RunnerMarker label="i" color="#f59e0b" pos={step.i} topOffset={0}  />
-                  <RunnerMarker label="k" color="#8b5cf6" pos={step.k} topOffset={20} />
+                  <RunnerMarker label="k" color="#3b82f6" pos={step.k} topOffset={20} />
                 </>
               )}
             </div>
@@ -309,7 +309,7 @@ export default function RemoveElementVisualizer({ onStepChange }) {
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">
             Writer k
           </p>
-          <p className="text-2xl font-black font-mono text-violet-300">{step.k}</p>
+          <p className="text-2xl font-black font-mono text-blue-300">{step.k}</p>
         </div>
         <div className="text-right">
           <p className="text-[11px] text-slate-500 mb-0.5">Result region</p>

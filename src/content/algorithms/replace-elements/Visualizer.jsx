@@ -44,9 +44,9 @@ function PodiumCell({ value, state }) {
 
 const RESULT_STYLES = {
   empty:  'bg-slate-800/60  border-slate-700/40 text-slate-600',
-  placed: 'bg-violet-500    border-violet-300    text-white',
-  filled: 'bg-violet-600/50 border-violet-500    text-violet-200',
-  done:   'bg-violet-700/40 border-violet-600    text-violet-300',
+  placed: 'bg-blue-500    border-blue-300    text-white',
+  filled: 'bg-blue-600/50 border-blue-500    text-blue-200',
+  done:   'bg-blue-700/40 border-blue-600    text-blue-300',
 }
 
 function ResultCell({ value, state, cellKey }) {
@@ -62,7 +62,7 @@ function ResultCell({ value, state, cellKey }) {
           initial={{ opacity: 0.7, scale: 0.6 }}
           animate={{ opacity: 0, scale: 2.2 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 rounded-xl bg-violet-500/30 pointer-events-none"
+          className="absolute inset-0 rounded-xl bg-blue-500/30 pointer-events-none"
         />
       )}
 
@@ -225,7 +225,7 @@ export default function ReplaceElementsVisualizer({ onStepChange }) {
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-400">
           <Legend color="#f59e0b" label="Current podium" />
-          <Legend color="#8b5cf6" label="Result placed"  />
+          <Legend color="#3b82f6" label="Result placed"  />
           <Legend color="#475569" label="Visited"        />
         </div>
       </div>
@@ -244,14 +244,14 @@ export default function ReplaceElementsVisualizer({ onStepChange }) {
               onChange={(e) => setDraftArr(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
               placeholder="e.g. 17, 18, 5, 4, 6, 1"
-              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-violet-500 transition-colors w-full"
+              className="rounded-md bg-slate-800 border border-white/10 px-3 py-1.5 text-xs font-mono text-slate-100 outline-none focus:border-blue-500 transition-colors w-full"
             />
           </div>
           <div className="flex flex-col gap-1 justify-end">
             <label className="text-[11px] text-transparent select-none">Run</label>
             <button
               onClick={handleRun}
-              className="rounded-md bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
+              className="rounded-md bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-4 py-1.5 text-xs font-semibold text-white transition-colors"
             >
               Run
             </button>
@@ -341,12 +341,12 @@ export default function ReplaceElementsVisualizer({ onStepChange }) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-5 py-3 flex items-center gap-3"
+            className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-5 py-3 flex items-center gap-3"
           >
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 shrink-0">
               Result
             </span>
-            <span className="text-sm font-mono text-violet-300">
+            <span className="text-sm font-mono text-blue-300">
               [{step.result.map((v) => (v === -1 ? '−1' : v)).join(', ')}]
             </span>
           </motion.div>

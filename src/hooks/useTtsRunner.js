@@ -33,7 +33,7 @@ const hasSpeech = typeof window !== 'undefined' && !!window.speechSynthesis
  */
 export function useTtsRunner(steps, getText) {
   const runner = useStepRunner(steps)
-  const { enabled: ttsEnabled, speak, cancel, toggle: rawToggle } = useSpeech()
+  const { enabled: ttsEnabled, speak, cancel, toggle: rawToggle, voices, selectedVoice, setVoice } = useSpeech()
 
   const [ttsPlaying, setTTSPlaying]   = useState(false)
   const ttsPlayingRef                  = useRef(false)
@@ -87,6 +87,6 @@ export function useTtsRunner(steps, getText) {
       },
       stop: stopTTSPlay,
     } : {}),
-    tts: hasSpeech ? { enabled: ttsEnabled, toggle: toggleTTS } : null,
-  }), [runner, ttsEnabled, ttsPlaying, steps.length, stopTTSPlay, toggleTTS])
+    tts: hasSpeech ? { enabled: ttsEnabled, toggle: toggleTTS, voices, selectedVoice, setVoice } : null,
+  }), [runner, ttsEnabled, ttsPlaying, steps.length, stopTTSPlay, toggleTTS, voices, selectedVoice, setVoice])
 }

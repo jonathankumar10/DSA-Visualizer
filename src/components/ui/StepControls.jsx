@@ -77,20 +77,38 @@ export default function StepControls({ runner }) {
         </div>
 
         {runner.tts && (
-          <button
-            onClick={runner.tts.toggle}
-            title={runner.tts.enabled ? 'Disable narration' : 'Enable narration'}
-            className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all"
-            style={{
-              borderColor:     runner.tts.enabled ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)',
-              backgroundColor: runner.tts.enabled ? 'rgba(59,130,246,0.1)' : 'transparent',
-              color:           runner.tts.enabled ? '#93c5fd' : '#475569',
-              boxShadow:       runner.tts.enabled ? '0 0 10px -2px rgba(59,130,246,0.4)' : 'none',
-            }}
-          >
-            <span className="leading-none">{runner.tts.enabled ? '🔊' : '🔇'}</span>
-            <span>{runner.tts.enabled ? 'Narration on' : 'Narration off'}</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={runner.tts.toggle}
+              title={runner.tts.enabled ? 'Disable narration' : 'Enable narration'}
+              className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all"
+              style={{
+                borderColor:     runner.tts.enabled ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)',
+                backgroundColor: runner.tts.enabled ? 'rgba(59,130,246,0.1)' : 'transparent',
+                color:           runner.tts.enabled ? '#93c5fd' : '#475569',
+                boxShadow:       runner.tts.enabled ? '0 0 10px -2px rgba(59,130,246,0.4)' : 'none',
+              }}
+            >
+              <span className="leading-none">{runner.tts.enabled ? '🔊' : '🔇'}</span>
+              <span>{runner.tts.enabled ? 'Narration on' : 'Narration off'}</span>
+            </button>
+
+            {runner.tts.enabled && runner.tts.voices.length > 0 && (
+              <select
+                value={runner.tts.selectedVoice?.voiceURI ?? ''}
+                onChange={e => {
+                  const v = runner.tts.voices.find(v => v.voiceURI === e.target.value) ?? null
+                  runner.tts.setVoice(v)
+                }}
+                className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-300 outline-none cursor-pointer hover:border-white/20 transition-colors"
+              >
+                <option value="">Default voice</option>
+                {runner.tts.voices.map(v => (
+                  <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -1,15 +1,12 @@
 /**
  * Steps for Computer Architecture — full computer system view.
  *
- * Shows a complete computer (CPU, RAM, GPU, SSD, NIC) with cross-component
- * interactions for real operations.
- *
  * Step shape:
  *   activeNodes   — which components glow: 'cpu' | 'ram' | 'gpu' | 'ssd' | 'nic'
  *   connections   — which buses are lit, keyed by ID, value is direction
  *                   { 'cpu-ram': 'request' | 'response' | 'both' | null, ... }
  *   message       — short step label
- *   detail        — full explanation
+ *   detail        — plain-English explanation
  */
 export function buildComputerArchitectureSteps() {
   return [
@@ -17,78 +14,64 @@ export function buildComputerArchitectureSteps() {
       type:        'init',
       activeNodes: [],
       connections: {},
-      message:     'A complete computer system',
-      detail:      'Every modern computer is built from five key hardware components. The CPU is the central orchestrator — all data flows through it. Each component is specialised for speed, capacity, or connectivity.',
+      message:     'Meet the five components',
+      detail:      'Every computer is built from five parts: a CPU, RAM, a GPU, storage (SSD or HDD), and a network card. They each do one job really well — and the CPU ties them all together.',
     },
     {
-      type:        'cpu-intro',
-      activeNodes: ['cpu'],
+      type:        'storage-intro',
+      activeNodes: ['ssd'],
       connections: {},
-      message:     'CPU — the brain of every operation',
-      detail:      'The Central Processing Unit runs at 3–5 GHz with multiple cores, each executing billions of instructions per second. The CPU includes on-die L1/L2/L3 cache and coordinates every other component. No data moves without the CPU orchestrating it.',
+      message:     'Storage: where everything lives permanently',
+      detail:      'Your apps, files, photos, and the operating system all live on the SSD or HDD. Unlike RAM, storage keeps data even when the power is off. SSDs are fast (~100ms to load); HDDs are slower but cheaper per gigabyte.',
+    },
+    {
+      type:        'app-launch',
+      activeNodes: ['cpu', 'ssd', 'ram'],
+      connections: { 'cpu-ssd': 'request', 'cpu-ram': 'response' },
+      message:     'Opening an app: storage → RAM',
+      detail:      'When you launch an app, the CPU reads it from the SSD and loads it into RAM. RAM is about 1,000 times faster than an SSD, so the CPU works from RAM rather than going back to disk every time.',
     },
     {
       type:        'ram-access',
       activeNodes: ['cpu', 'ram'],
       connections: { 'cpu-ram': 'both' },
-      message:     'CPU ↔ RAM: constant reads and writes',
-      detail:      'RAM is the CPU\'s working desk. Every running program, variable, and data structure lives here (~60 ns access). The CPU reads instructions and data from RAM thousands of times per millisecond. RAM is fast but volatile — cleared on power-off.',
+      message:     'The CPU runs your code from RAM',
+      detail:      'The CPU fetches each instruction from RAM, figures out what it means, executes it, and writes the result back — billions of times per second. Every variable, every function call, every piece of data in a running program lives in RAM.',
     },
     {
       type:        'gpu-dispatch',
       activeNodes: ['cpu', 'gpu'],
-      connections: { 'cpu-gpu': 'request' },
-      message:     'CPU → GPU: dispatching parallel work via PCIe',
-      detail:      'When rendering a frame, running ML inference, or encoding video, the CPU packages the work and sends it to the GPU over the PCIe bus. The GPU has thousands of shader cores — ideal for massively parallel workloads that would serialize on the CPU.',
-    },
-    {
-      type:        'gpu-result',
-      activeNodes: ['cpu', 'gpu', 'ram'],
-      connections: { 'cpu-gpu': 'response', 'cpu-ram': 'both' },
-      message:     'GPU → CPU: completed frames and results return',
-      detail:      'The GPU writes results (rendered frames, computed tensors) into shared VRAM/RAM and signals the CPU via an interrupt. The CPU then reads the results and decides what to do next — display the frame, store the output, or queue more work.',
-    },
-    {
-      type:        'storage-read',
-      activeNodes: ['cpu', 'ssd'],
-      connections: { 'cpu-ssd': 'both' },
-      message:     'CPU ↔ SSD: loading programs and files',
-      detail:      'When you open an application, the CPU requests its binary from the SSD via NVMe/SATA. The SSD responds in ~50–150 µs (1,000× slower than RAM). The OS caches frequently-used pages in RAM to avoid repeated slow trips to storage.',
+      connections: { 'cpu-gpu': 'both' },
+      message:     'Heavy work gets offloaded to the GPU',
+      detail:      'Rendering graphics, running AI models, and encoding video all require doing the same calculation millions of times at once. The CPU hands this work to the GPU, which has thousands of small cores built exactly for that kind of parallel job.',
     },
     {
       type:        'network-io',
       activeNodes: ['cpu', 'nic'],
       connections: { 'cpu-nic': 'both' },
-      message:     'CPU ↔ NIC: sending and receiving network packets',
-      detail:      'The CPU writes outgoing data to a DMA buffer in RAM and tells the NIC to transmit it — no CPU involvement during actual transmission. Incoming packets trigger an interrupt; the CPU processes them and routes data to the right process. Network latency adds 0.5 ms (LAN) to 200 ms (internet).',
+      message:     'Talking to the internet via the network card',
+      detail:      'When your app makes a web request, the CPU packages the data and hands it to the network card (NIC). The NIC handles the actual sending and receiving, so the CPU is free to keep working on other things while the data is in transit.',
     },
     {
       type:        'page-fault',
       activeNodes: ['cpu', 'ram', 'ssd'],
       connections: { 'cpu-ram': 'both', 'cpu-ssd': 'both' },
-      message:     'Page fault: RAM full → spill to SSD (~1,000× slower)',
-      detail:      'When RAM fills up, the OS swaps cold memory pages to an SSD swap file (a page fault). The stalled CPU must wait ~100 µs for the SSD instead of ~60 ns for RAM — a 1,000× latency penalty. This is why "out of memory" is catastrophic for performance.',
-    },
-    {
-      type:        'gaming',
-      activeNodes: ['cpu', 'ram', 'gpu', 'nic'],
-      connections: { 'cpu-ram': 'both', 'cpu-gpu': 'both', 'cpu-nic': 'both' },
-      message:     'Gaming: CPU + RAM + GPU + NIC all working together',
-      detail:      'During online gaming: the CPU runs game logic and physics; RAM holds the game state and asset cache; the GPU renders 60–165 frames per second; the NIC syncs player state with the server every 16–50 ms. All four components are simultaneously active, passing data through the CPU.',
+      message:     'RAM full: the OS spills to disk',
+      detail:      'RAM has limited capacity. When it fills up, the OS quietly moves the least-used data to a swap file on the SSD to make room. The problem: the CPU now waits ~100ms for the SSD instead of ~60ns for RAM — a 1,000x slowdown. This is why running out of memory kills performance.',
     },
     {
       type:        'full-system',
       activeNodes: ['cpu', 'ram', 'gpu', 'ssd', 'nic'],
       connections: { 'cpu-ram': 'both', 'cpu-gpu': 'both', 'cpu-ssd': 'both', 'cpu-nic': 'both' },
-      message:     'Full system: all five components active simultaneously',
-      detail:      'A fully loaded workstation — rendering, streaming, and downloading at once. The CPU orchestrates every data transfer. RAM is the hub for in-flight data. GPU handles visual output. SSD persists state. NIC moves data in and out. The CPU\'s bandwidth and the bus speeds are now the bottleneck.',
+      message:     'All five working together',
+      detail:      'Loading a webpage: the CPU coordinates everything — RAM holds the page data, the SSD serves cached assets, the GPU renders the layout, and the NIC streams in new content. Every component is active, and all traffic flows through the CPU.',
     },
     {
       type:        'sd-insight',
       activeNodes: ['cpu', 'ram', 'gpu', 'ssd', 'nic'],
       connections: { 'cpu-ram': 'both', 'cpu-gpu': 'both', 'cpu-ssd': 'both', 'cpu-nic': 'both' },
-      message:     'System design mirrors this exact hardware layout',
-      detail:      'Redis = RAM (fast in-memory cache). Databases = SSD (persistent storage). GPU clusters = parallel compute nodes. CDNs = NIC moved to the network edge. Microservices = CPU cores with their own RAM. The hierarchy never changes — only the scale does.',
+      message:     'The same pattern exists at cloud scale',
+      detail:      'System design is just this diagram made bigger. Redis plays the role of RAM — a fast in-memory store. A database plays the role of the SSD — slower but permanent. GPU clusters handle AI and video. CDNs act like a NIC moved closer to the user. The hierarchy never changes, only the scale does.',
     },
   ]
 }

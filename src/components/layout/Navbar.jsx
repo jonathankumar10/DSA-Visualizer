@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { label: 'Algorithms',    to: '/algorithms' },
   { label: 'Patterns',      to: '/patterns' },
   { label: 'System Design', to: '/system-design' },
+  { label: 'OOD',           to: '/ood' },
 ]
 
 export default function Navbar() {

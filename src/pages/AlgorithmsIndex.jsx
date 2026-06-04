@@ -150,7 +150,7 @@ export default function AlgorithmsIndex() {
           >
             {filtered.map((algo) => (
               <motion.div key={algo.id} variants={card}>
-                <AlgoCard algo={algo} />
+                <AlgoCard algo={algo} number={algo.problemLabel?.match(/#(\d+)/)?.[1]} />
               </motion.div>
             ))}
           </motion.div>

@@ -27,7 +27,7 @@ const ACCENT = {
   design:  'hover:border-blue-500/50 hover:bg-blue-500/5',
 }
 
-function SDCard({ item }) {
+function SDCard({ item, number }) {
   return (
     <motion.div
       className="glow-card rounded-2xl"
@@ -38,6 +38,7 @@ function SDCard({ item }) {
         to={item.path}
         className={`block rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 transition-colors ${ACCENT[item.type]}`}
       >
+        <span className="inline-block rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono font-medium text-slate-400 mb-1">#{number}</span>
         <h3 className="mb-3 font-semibold text-white">{item.title}</h3>
         <p className="mb-4 text-sm text-slate-400 leading-relaxed">{item.metaphor}</p>
         <div className="flex flex-wrap gap-2">
@@ -118,7 +119,7 @@ function Section({
           >
             {items.map((item) => (
               <motion.div key={item.id} variants={card}>
-                <SDCard item={item} />
+                <SDCard item={item} number={allItems.findIndex((i) => i.id === item.id) + 1} />
               </motion.div>
             ))}
           </motion.div>

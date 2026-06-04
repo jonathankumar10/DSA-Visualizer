@@ -7,6 +7,8 @@ import PatternsIndex from './pages/PatternsIndex'
 import PatternPage from './pages/PatternPage'
 import SystemDesignIndex from './pages/SystemDesignIndex'
 import SystemDesignPage from './pages/SystemDesignPage'
+import OODIndex from './pages/OODIndex'
+import OODPage from './pages/OODPage'
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +22,8 @@ export const router = createBrowserRouter([
       { path: 'patterns/:id',       element: <PatternPage /> },
       { path: 'system-design',      element: <SystemDesignIndex /> },
       { path: 'system-design/:id',  element: <SystemDesignPage /> },
+      { path: 'ood',                element: <OODIndex /> },
+      { path: 'ood/:id',            element: <OODPage /> },
     ],
   },
 ])

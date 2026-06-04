@@ -27,7 +27,7 @@ export default function PatternsIndex() {
         animate="show"
         className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {PATTERNS.map((p) => {
+        {PATTERNS.map((p, i) => {
           const c = PATTERN_COLORS[p.color]
           return (
             <motion.div key={p.id} variants={card} className="glow-card rounded-2xl">
@@ -40,6 +40,7 @@ export default function PatternsIndex() {
                 <div className="p-5 space-y-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
+                      <span className="inline-block rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono font-medium text-slate-400 mb-0.5">#{i + 1}</span>
                       <h2 className="text-base font-bold text-white">{p.title}</h2>
                       <p className={`text-xs font-medium ${c.text}`}>{p.tagline}</p>
                     </div>

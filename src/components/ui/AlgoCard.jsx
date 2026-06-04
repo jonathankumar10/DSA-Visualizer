@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { DIFFICULTY_COLOR } from '../../constants/algorithmRegistry'
 import { getAlgoPatternGlows } from '../../constants/patternsRegistry'
 
-export default function AlgoCard({ algo }) {
+export default function AlgoCard({ algo, number }) {
   const glows = getAlgoPatternGlows(algo.id)
 
   const topBarStyle = glows.length === 0
@@ -27,7 +27,12 @@ export default function AlgoCard({ algo }) {
 
         <div className="p-4 sm:p-6">
           <div className="mb-3 flex items-start justify-between gap-3">
-            <h3 className="font-semibold text-white">{algo.title}</h3>
+            <div className="min-w-0">
+              {number && (
+                <span className="inline-block rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono font-medium text-slate-400 mb-1">#{number}</span>
+              )}
+              <h3 className="font-semibold text-white">{algo.title}</h3>
+            </div>
             <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${DIFFICULTY_COLOR[algo.difficulty]}`}>
               {algo.difficulty}
             </span>

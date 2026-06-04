@@ -31,12 +31,16 @@ This is a React + Vite SPA (no TypeScript). Tailwind v4 is used via its Vite plu
 
 ### Routing
 
-`src/router.jsx` defines five top-level sections under a shared `Layout`:
+`src/router.jsx` defines six top-level sections under a shared `Layout` (each has both an index route and a detail route):
 - `/algorithms/:id` — step-through algorithm visualizers
 - `/patterns/:id` — DSA pattern reference pages (link to related algorithms)
 - `/system-design/:id` — system design concept/design explainers
 - `/ood/:id` — GoF design patterns and OOD interview questions
 - `/ai/:id` — AI concepts: history, ML, LLMs, and workflows
+
+`Home.jsx` has four sections: a hero, a unified five-section showcase (one card per content area with count + description), a three-step "how it works" block, and a coming-soon banner. It does not render per-item preview grids.
+
+`Navbar` has five links — Algorithms, Patterns, System Design, OOD, AI. "Home" is intentionally omitted because the DevLens logo already links to `/`.
 
 ### Content registry pattern
 
@@ -67,9 +71,17 @@ Each `steps.js` exports a `build<Name>Steps(...)` function that returns an array
 
 All AI topics are defined inline in `aiRegistry.js`. Each item has: `id`, `category` (history | ml | llms | workflows), `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`.
 
-`AIPage.jsx` lazy-loads per-topic animations via `import.meta.glob('../content/ai/*/Animation.jsx')`. If no `Animation.jsx` exists, the Key Takeaways panel is shown on the right instead.
+`AIPage.jsx` lazy-loads per-topic animations via `import.meta.glob('../content/ai/*/Animation.jsx')`. The Key Takeaways panel is **always rendered**: on the right column when no animation exists, or below the two-column grid when an animation is present.
 
-Topics with animations: `neural-networks`, `transformer-architecture`, `attention-mechanism`, `rag`.
+Current topics (8 total):
+- `ai-history` (history) — The History of AI
+- `neural-networks` (ml) — Neural Networks *(has Animation.jsx)*
+- `training-and-loss` (ml) — Training & Loss
+- `transformer-architecture` (llms) — The Transformer *(has Animation.jsx)*
+- `attention-mechanism` (llms) — The Attention Mechanism *(has Animation.jsx)*
+- `prompt-engineering` (workflows) — Prompt Engineering
+- `rag` (workflows) — Retrieval-Augmented Generation *(has Animation.jsx)*
+- `embeddings` (workflows) — Embeddings & Vector Search
 
 ### OOD content module shape
 

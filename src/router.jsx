@@ -9,6 +9,8 @@ import SystemDesignIndex from './pages/SystemDesignIndex'
 import SystemDesignPage from './pages/SystemDesignPage'
 import OODIndex from './pages/OODIndex'
 import OODPage from './pages/OODPage'
+import AIIndex from './pages/AIIndex'
+import AIPage from './pages/AIPage'
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +26,8 @@ export const router = createBrowserRouter([
       { path: 'system-design/:id',  element: <SystemDesignPage /> },
       { path: 'ood',                element: <OODIndex /> },
       { path: 'ood/:id',            element: <OODPage /> },
+      { path: 'ai',                 element: <AIIndex /> },
+      { path: 'ai/:id',             element: <AIPage /> },
     ],
   },
 ])

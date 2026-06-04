@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { label: 'Patterns',      to: '/patterns' },
   { label: 'System Design', to: '/system-design' },
   { label: 'OOD',           to: '/ood' },
+  { label: 'AI',            to: '/ai' },
 ]
 
 export default function Navbar() {
@@ -21,7 +22,7 @@ export default function Navbar() {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
         <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
           <span className="text-lg sm:text-xl font-bold tracking-tight text-white">
-            Algo<span className="text-blue-400">Viz</span>
+            Dev<span className="text-blue-400">Lens</span>
           </span>
         </Link>
 

@@ -31,11 +31,12 @@ This is a React + Vite SPA (no TypeScript). Tailwind v4 is used via its Vite plu
 
 ### Routing
 
-`src/router.jsx` defines four top-level sections under a shared `Layout`:
+`src/router.jsx` defines five top-level sections under a shared `Layout`:
 - `/algorithms/:id` — step-through algorithm visualizers
 - `/patterns/:id` — DSA pattern reference pages (link to related algorithms)
 - `/system-design/:id` — system design concept/design explainers
 - `/ood/:id` — GoF design patterns and OOD interview questions
+- `/ai/:id` — AI concepts: history, ML, LLMs, and workflows
 
 ### Content registry pattern
 
@@ -44,12 +45,15 @@ Each section has a registry file in `src/constants/` that is the single source o
 - `patternsRegistry.js` — defines pattern metadata inline and joins algorithms by `algorithmIds`
 - `systemDesignRegistry.js` — imports all system-design `index.js` modules and exports `SYSTEM_DESIGN`
 - `oodRegistry.js` — defines all OOD items inline and exports `OOD_PATTERNS`, `OOD_QUESTIONS`, `OOD_ITEMS`, `OOD_COLORS`, and `OOD_CATEGORY_LABELS`
+- `aiRegistry.js` — defines all AI topics inline and exports `AI_ITEMS`, `AI_COLORS`, and `AI_CATEGORY_LABELS`
 
 **To add a new algorithm**: create `src/content/algorithms/<slug>/` with `index.js`, `steps.js`, and `Visualizer.jsx`, then add one import + one array entry to `algorithmRegistry.js`.
 
 **To add a new system-design topic**: create `src/content/system-design/<type>/<slug>/` with `index.js` (and optionally `steps.js` + `Diagram.jsx` for animated entries), then register in `systemDesignRegistry.js`.
 
 **To add a new OOD item**: add an entry directly to `OOD_PATTERNS` or `OOD_QUESTIONS` in `oodRegistry.js`, then optionally create `src/content/ood/<slug>/Animation.jsx` for an interactive diagram.
+
+**To add a new AI topic**: add an entry to `AI_ITEMS` in `aiRegistry.js`, then optionally create `src/content/ai/<slug>/Animation.jsx` for an interactive diagram.
 
 ### Algorithm content module shape
 
@@ -58,6 +62,14 @@ Each `src/content/algorithms/<slug>/index.js` exports a plain object with:
 - `solution.approaches[]` — each approach has `id`, `label`, `complexity`, and per-language (`java`, `python`) `{ code, getHighlightLines(step) }`
 
 Each `steps.js` exports a `build<Name>Steps(...)` function that returns an array of step objects. Step objects must have a `type` string field; everything else is visualizer-specific.
+
+### AI content module shape
+
+All AI topics are defined inline in `aiRegistry.js`. Each item has: `id`, `category` (history | ml | llms | workflows), `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`.
+
+`AIPage.jsx` lazy-loads per-topic animations via `import.meta.glob('../content/ai/*/Animation.jsx')`. If no `Animation.jsx` exists, the Key Takeaways panel is shown on the right instead.
+
+Topics with animations: `neural-networks`, `transformer-architecture`, `attention-mechanism`, `rag`.
 
 ### OOD content module shape
 
@@ -69,7 +81,7 @@ Items are defined inline in `oodRegistry.js` (no separate `index.js` files). Two
 
 ### Visualizer lazy loading
 
-`AlgorithmPage.jsx` uses `import.meta.glob('../content/algorithms/*/Visualizer.jsx')` to lazy-load visualizers at runtime — no manual import needed when adding a new one. `OODPage.jsx` does the same for `src/content/ood/*/Animation.jsx`.
+`AlgorithmPage.jsx` uses `import.meta.glob('../content/algorithms/*/Visualizer.jsx')` to lazy-load visualizers at runtime — no manual import needed when adding a new one. `OODPage.jsx` does the same for `src/content/ood/*/Animation.jsx`. `AIPage.jsx` does the same for `src/content/ai/*/Animation.jsx`.
 
 ### Playback hooks
 

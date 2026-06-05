@@ -14,20 +14,46 @@ const card = {
   show:   { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } },
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Category accents ──────────────────────────────────────────────────────────
 
+const CATEGORY_ACCENT = {
+  hardware:      { bar: 'bg-amber-400',   badge: 'bg-amber-500/15 text-amber-300' },
+  requirements:  { bar: 'bg-green-400',   badge: 'bg-green-500/15 text-green-300' },
+  networking:    { bar: 'bg-cyan-400',    badge: 'bg-cyan-500/15 text-cyan-300' },
+  apis:          { bar: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' },
+  caching:       { bar: 'bg-orange-400',  badge: 'bg-orange-500/15 text-orange-300' },
+  proxies:       { bar: 'bg-yellow-400',  badge: 'bg-yellow-500/15 text-yellow-300' },
+  storage:       { bar: 'bg-sky-400',     badge: 'bg-sky-500/15 text-sky-300' },
+  databases:     { bar: 'bg-sky-400',     badge: 'bg-sky-500/15 text-sky-300' },
+  reliability:   { bar: 'bg-rose-400',    badge: 'bg-rose-500/15 text-rose-300' },
+  scalability:   { bar: 'bg-purple-400',  badge: 'bg-purple-500/15 text-purple-300' },
+  messaging:     { bar: 'bg-indigo-400',  badge: 'bg-indigo-500/15 text-indigo-300' },
+  observability: { bar: 'bg-teal-400',    badge: 'bg-teal-500/15 text-teal-300' },
+  architecture:  { bar: 'bg-violet-400',  badge: 'bg-violet-500/15 text-violet-300' },
+}
+const DEFAULT_ACCENT = { bar: 'bg-slate-400', badge: 'bg-slate-500/15 text-slate-300' }
+
+function accent(cat) { return CATEGORY_ACCENT[cat] ?? DEFAULT_ACCENT }
 function catLabel(slug) {
   return SD_CATEGORY_LABELS[slug] ?? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-// ── SD Card ───────────────────────────────────────────────────────────────────
+// ── Stable data derived from the registry (module-level, not per-render) ─────
 
-const ACCENT = {
+const ALL_CONCEPTS = SYSTEM_DESIGN.filter((i) => i.type === 'concept')
+const ALL_DESIGNS  = SYSTEM_DESIGN.filter((i) => i.type === 'design')
+
+// Category order follows registry insertion order
+const CONCEPT_CATEGORY_ORDER = [...new Set(ALL_CONCEPTS.map((i) => i.category))]
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+const CARD_HOVER = {
   concept: 'hover:border-sky-500/50 hover:bg-sky-500/[0.04]',
-  design:  'hover:border-blue-500/50 hover:bg-blue-500/5',
+  design:  'hover:border-blue-500/50 hover:bg-blue-500/[0.05]',
 }
 
-function SDCard({ item, number }) {
+function SDCard({ item }) {
   return (
     <motion.div
       className="glow-card rounded-2xl"
@@ -36,17 +62,13 @@ function SDCard({ item, number }) {
     >
       <Link
         to={item.path}
-        className={`block rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 transition-colors ${ACCENT[item.type]}`}
+        className={`group block rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors h-full ${CARD_HOVER[item.type]}`}
       >
-        <span className="inline-block rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono font-medium text-slate-400 mb-1">#{number}</span>
-        <h3 className="mb-3 font-semibold text-white">{item.title}</h3>
-        <p className="mb-4 text-sm text-slate-400 leading-relaxed">{item.metaphor}</p>
-        <div className="flex flex-wrap gap-2">
-          <span className="rounded-md bg-white/8 px-2 py-0.5 text-xs text-slate-300">
-            {item.category}
-          </span>
-          {item.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-slate-400">
+        <h3 className="mb-2 font-semibold text-white leading-snug">{item.title}</h3>
+        <p className="mb-4 text-sm text-slate-400 leading-relaxed line-clamp-3">{item.description}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {item.tags.slice(0, 3).map((tag) => (
+            <span key={tag} className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-slate-500">
               {tag}
             </span>
           ))}
@@ -56,131 +78,68 @@ function SDCard({ item, number }) {
   )
 }
 
-// ── Section ───────────────────────────────────────────────────────────────────
+// ── Category group ────────────────────────────────────────────────────────────
 
-function Section({
-  title, description, accentClass, badgeClass,
-  items, allItems, query, onClear,
-  categories, activeCategory, onCategoryChange,
-}) {
-  const showPills = categories.length > 2  // only when ≥ 2 distinct categories exist
-
+function CategoryGroup({ category, items, query }) {
+  const a = accent(category)
   return (
-    <div className="space-y-4">
-      {/* Section header */}
-      <div>
-        <div className="flex items-center gap-3">
-          <div className={`w-1 h-5 rounded-full ${accentClass}`} />
-          <h2 className="text-lg font-semibold text-white">{title}</h2>
-          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${badgeClass}`}>
-            {items.length} topic{items.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-        <p className="mt-1 ml-4 text-sm text-slate-500">{description}</p>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2.5">
+        <div className={`w-1 h-4 rounded-full shrink-0 ${a.bar}`} />
+        <h3 className="text-xs font-semibold text-slate-300 tracking-widest uppercase">
+          {catLabel(category)}
+        </h3>
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${a.badge}`}>
+          {items.length}
+        </span>
       </div>
 
-      {/* Category pills — only when multiple categories exist */}
-      {showPills && (
-        <div className="ml-4 flex flex-wrap gap-1.5">
-          {categories.map((cat) => {
-            const count  = cat === 'all' ? allItems.length : allItems.filter((i) => i.category === cat).length
-            const active = activeCategory === cat
-            return (
-              <button
-                key={cat}
-                onClick={() => onCategoryChange(cat)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                  active
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:border-white/20'
-                }`}
-              >
-                {cat === 'all' ? 'All' : catLabel(cat)}
-                <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                  active ? 'bg-white/20 text-white' : 'bg-white/8 text-slate-500'
-                }`}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Grid or empty state */}
       <AnimatePresence mode="wait">
-        {items.length > 0 ? (
-          <motion.div
-            key={`${title}-${query}-${activeCategory}`}
-            variants={grid}
-            initial="hidden"
-            animate="show"
-            className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {items.map((item) => (
-              <motion.div key={item.id} variants={card}>
-                <SDCard item={item} number={allItems.findIndex((i) => i.id === item.id) + 1} />
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.p
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-sm text-slate-600 pl-4"
-          >
-            No matches.{' '}
-            <button
-              onClick={onClear}
-              className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
-            >
-              Clear filters
-            </button>
-          </motion.p>
-        )}
+        <motion.div
+          key={`${category}-${query}`}
+          variants={grid}
+          initial="hidden"
+          animate="show"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {items.map((item) => (
+            <motion.div key={item.id} variants={card}>
+              <SDCard item={item} />
+            </motion.div>
+          ))}
+        </motion.div>
       </AnimatePresence>
     </div>
   )
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
-// Derive unique ordered categories per type (stable across renders)
-const CONCEPT_CATEGORIES = ['all', ...new Set(
-  SYSTEM_DESIGN.filter((i) => i.type === 'concept').map((i) => i.category)
-)]
-const DESIGN_CATEGORIES = ['all', ...new Set(
-  SYSTEM_DESIGN.filter((i) => i.type === 'design').map((i) => i.category)
-)]
-
-const ALL_CONCEPTS = SYSTEM_DESIGN.filter((i) => i.type === 'concept')
-const ALL_DESIGNS  = SYSTEM_DESIGN.filter((i) => i.type === 'design')
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function SystemDesignIndex() {
-  const [query,           setQuery]           = useState('')
-  const [conceptCategory, setConceptCategory] = useState('all')
-  const [designCategory,  setDesignCategory]  = useState('all')
+  const [query, setQuery] = useState('')
 
-  const { concepts, designs } = useMemo(() => {
+  const { conceptGroups, designs } = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const match = (item, activeCat) =>
-      (activeCat === 'all' || item.category === activeCat) &&
-      (!q ||
-        item.title.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q) ||
-        item.tags.some((t) => t.toLowerCase().includes(q)))
-    return {
-      concepts: ALL_CONCEPTS.filter((i) => match(i, conceptCategory)),
-      designs:  ALL_DESIGNS.filter((i)  => match(i, designCategory)),
-    }
-  }, [query, conceptCategory, designCategory])
+    const match = (item) =>
+      !q ||
+      item.title.toLowerCase().includes(q) ||
+      item.category.toLowerCase().includes(q) ||
+      item.tags.some((t) => t.toLowerCase().includes(q)) ||
+      item.description.toLowerCase().includes(q)
 
-  const clearAll = () => { setQuery(''); setConceptCategory('all'); setDesignCategory('all') }
+    return {
+      conceptGroups: CONCEPT_CATEGORY_ORDER
+        .map((cat) => ({ category: cat, items: ALL_CONCEPTS.filter((i) => i.category === cat && match(i)) }))
+        .filter((g) => g.items.length > 0),
+      designs: ALL_DESIGNS.filter(match),
+    }
+  }, [query])
+
+  const totalConcepts = conceptGroups.reduce((sum, g) => sum + g.items.length, 0)
+  const clearSearch   = () => setQuery('')
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -191,7 +150,6 @@ export default function SystemDesignIndex() {
           </p>
         </div>
 
-        {/* Search */}
         <div className="relative w-full sm:w-64 shrink-0">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
@@ -208,7 +166,7 @@ export default function SystemDesignIndex() {
           />
           {query && (
             <button
-              onClick={() => setQuery('')}
+              onClick={clearSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -219,38 +177,81 @@ export default function SystemDesignIndex() {
         </div>
       </div>
 
-      {/* Concepts section */}
-      <Section
-        title="Concepts"
-        description="Foundational building blocks — learn how individual pieces of the internet work."
-        accentClass="bg-sky-400"
-        badgeClass="bg-sky-500/15 text-sky-300"
-        items={concepts}
-        allItems={ALL_CONCEPTS}
-        query={query}
-        onClear={clearAll}
-        categories={CONCEPT_CATEGORIES}
-        activeCategory={conceptCategory}
-        onCategoryChange={setConceptCategory}
-      />
+      {/* ── Concepts ─────────────────────────────────────────────────────────── */}
+      <div className="space-y-8">
+
+        {/* Section heading */}
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-5 rounded-full bg-sky-400" />
+          <h2 className="text-lg font-semibold text-white">Concepts</h2>
+          <span className="rounded-full px-2 py-0.5 text-[11px] font-medium bg-sky-500/15 text-sky-300">
+            {totalConcepts} topic{totalConcepts !== 1 ? 's' : ''}
+          </span>
+        </div>
+
+        {conceptGroups.length > 0 ? (
+          <div className="space-y-10 pl-4">
+            {conceptGroups.map((group, i) => (
+              <div key={group.category}>
+                {i > 0 && <div className="border-t border-white/[0.05] mb-10" />}
+                <CategoryGroup category={group.category} items={group.items} query={query} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-600 pl-4">
+            No concepts match.{' '}
+            <button onClick={clearSearch} className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+              Clear search
+            </button>
+          </p>
+        )}
+      </div>
 
       {/* Divider */}
       <div className="border-t border-white/[0.06]" />
 
-      {/* System Designs section */}
-      <Section
-        title="System Designs"
-        description="End-to-end architecture walkthroughs — see how real systems are designed and scaled."
-        accentClass="bg-blue-500"
-        badgeClass="bg-blue-500/15 text-blue-300"
-        items={designs}
-        allItems={ALL_DESIGNS}
-        query={query}
-        onClear={clearAll}
-        categories={DESIGN_CATEGORIES}
-        activeCategory={designCategory}
-        onCategoryChange={setDesignCategory}
-      />
+      {/* ── System Designs ────────────────────────────────────────────────────── */}
+      <div className="space-y-6">
+
+        <div>
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-5 rounded-full bg-blue-500" />
+            <h2 className="text-lg font-semibold text-white">System Designs</h2>
+            <span className="rounded-full px-2 py-0.5 text-[11px] font-medium bg-blue-500/15 text-blue-300">
+              {designs.length} design{designs.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <p className="mt-1 ml-4 text-sm text-slate-500">
+            End-to-end walkthroughs — see how real systems are architected and scaled.
+          </p>
+        </div>
+
+        {designs.length > 0 ? (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`designs-${query}`}
+              variants={grid}
+              initial="hidden"
+              animate="show"
+              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {designs.map((item) => (
+                <motion.div key={item.id} variants={card}>
+                  <SDCard item={item} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        ) : (
+          <p className="text-sm text-slate-600 pl-4">
+            No designs match.{' '}
+            <button onClick={clearSearch} className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+              Clear search
+            </button>
+          </p>
+        )}
+      </div>
 
     </div>
   )

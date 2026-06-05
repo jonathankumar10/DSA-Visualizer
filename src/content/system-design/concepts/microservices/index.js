@@ -1,0 +1,25 @@
+export default {
+  id:          'microservices',
+  type:        'concept',
+  title:       'Microservices',
+  category:    'architecture',
+  tags:        ['microservices', 'service-mesh', 'api-gateway', 'monolith', 'domain-driven-design', 'service-discovery', 'sidecar', 'containerization', 'kubernetes'],
+  description: 'Microservices architecture decomposes an application into small, independently deployable services that each own a single bounded domain. Each service runs in its own process, communicates over a network (HTTP/gRPC or async messaging), and can be built, deployed, and scaled independently of the rest. The trade-off versus a monolith: operational complexity increases significantly, but individual services can move fast, scale independently, and be isolated from each other\'s failures.',
+  metaphor:    "A food court versus a single restaurant. In a restaurant (monolith), one kitchen handles all food — efficient when small, but one broken stove affects the entire menu. In a food court (microservices), each vendor operates their own kitchen, hires their own staff, and can swap out equipment without affecting the burger stand next door. Coordination takes more effort (you carry your own tray), but each vendor can specialize, innovate, and scale based on their own demand.",
+  path:        '/system-design/microservices',
+  howItWorks: [
+    'Bounded context: each service owns one clearly defined domain — Users, Orders, Inventory, Payments, Notifications. The boundary is drawn so the service can fulfill its responsibility without calling other services synchronously for its core data. Crossing boundaries is explicit and deliberate.',
+    'API gateway: the single entry point for external clients. Routes requests to the appropriate service, handles authentication and authorization, aggregates responses from multiple services (BFF pattern), and enforces rate limiting. Clients do not know how many services exist or how they are partitioned.',
+    'Service communication: synchronous calls use HTTP REST or gRPC. gRPC offers strongly-typed contracts, bi-directional streaming, and better performance via HTTP/2 framing. Asynchronous communication (via Kafka or SQS) decouples services for operations that do not need an immediate response.',
+    'Service discovery: with containers and dynamic IP addresses, services cannot be hardcoded. DNS-based discovery (Kubernetes Services) or a service registry (Consul) maps service names to healthy instance addresses. The load balancer queries the registry before forwarding requests.',
+    'Data isolation: each service owns its own database schema. No direct cross-service database queries. One service\'s schema change cannot break another. Sharing data across services uses explicit API calls or event streaming — the data contract becomes an interface, not a shared table.',
+    'Operational overhead: each service needs its own CI/CD pipeline, Docker image, Kubernetes deployment, health checks, log aggregation, metrics, and alerting. A 10-service system has 10× the deployment complexity of a monolith. Microservices pay off when team size and deployment frequency make monolith coordination the bottleneck — not before.',
+  ],
+  keyPoints: [
+    'Do not start with microservices — a well-structured monolith is faster to build, easier to debug, and simpler to operate. Extract services when specific domains have genuinely different scaling needs or when team ownership becomes the bottleneck',
+    'The hardest part of microservices is not the technology — it is drawing the right service boundaries. Boundaries drawn too fine create a distributed monolith with all the complexity and none of the benefits',
+    'Distributed transactions across services are extremely hard. Use the Saga pattern (chain of local transactions with compensating rollbacks) or eventual consistency with idempotent event processing instead of two-phase commit',
+    'Each service must have its own data store — shared databases are a trap that couples services at the schema level and eliminates independent deployability',
+    'Kubernetes is the de facto runtime for microservices: it handles scheduling, health checks, rolling deployments, auto-scaling, and service discovery. Istio or Linkerd add a service mesh for mutual TLS, traffic splitting, and observability',
+  ],
+}

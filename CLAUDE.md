@@ -36,7 +36,7 @@ This is a React + Vite SPA (no TypeScript). Tailwind v4 is used via its Vite plu
 - `/patterns/:id` — DSA pattern reference pages (link to related algorithms)
 - `/system-design/:id` — system design concept/design explainers
 - `/ood/:id` — GoF design patterns and OOD interview questions
-- `/ai/:id` — AI concepts: history, ML, LLMs, and workflows
+- `/ai/:id` — AI concepts: history, ML, LLMs, workflows, agents, and production
 
 `Home.jsx` has four sections: a hero, a unified five-section showcase (one card per content area with count + description), a three-step "how it works" block, and a coming-soon banner. It does not render per-item preview grids.
 
@@ -69,19 +69,31 @@ Each `steps.js` exports a `build<Name>Steps(...)` function that returns an array
 
 ### AI content module shape
 
-All AI topics are defined inline in `aiRegistry.js`. Each item has: `id`, `category` (history | ml | llms | workflows), `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`.
+All AI topics are defined inline in `aiRegistry.js`. Each item has: `id`, `category` (history | ml | llms | workflows | agents | production), `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`.
 
 `AIPage.jsx` lazy-loads per-topic animations via `import.meta.glob('../content/ai/*/Animation.jsx')`. The Key Takeaways panel is **always rendered**: on the right column when no animation exists, or below the two-column grid when an animation is present.
 
-Current topics (8 total):
+Current topics (20 total):
 - `ai-history` (history) — The History of AI
 - `neural-networks` (ml) — Neural Networks *(has Animation.jsx)*
 - `training-and-loss` (ml) — Training & Loss
 - `transformer-architecture` (llms) — The Transformer *(has Animation.jsx)*
 - `attention-mechanism` (llms) — The Attention Mechanism *(has Animation.jsx)*
+- `tokenization` (llms) — Tokenization
+- `context-windows` (llms) — Context Windows
+- `llm-inference` (llms) — LLM Inference & Sampling
+- `multimodal-models` (llms) — Multimodal Models
 - `prompt-engineering` (workflows) — Prompt Engineering
 - `rag` (workflows) — Retrieval-Augmented Generation *(has Animation.jsx)*
 - `embeddings` (workflows) — Embeddings & Vector Search
+- `function-calling` (workflows) — Function Calling & Tool Use
+- `fine-tuning` (workflows) — Fine-Tuning
+- `guardrails` (workflows) — Hallucinations & Guardrails
+- `ai-agents` (agents) — AI Agents
+- `multi-agent-systems` (agents) — Multi-Agent Systems
+- `ai-engineer` (production) — The AI Engineer
+- `llm-evaluation` (production) — LLM Evaluation
+- `ai-observability` (production) — AI Observability
 
 ### OOD content module shape
 

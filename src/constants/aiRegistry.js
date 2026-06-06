@@ -534,6 +534,35 @@ export const AI_ITEMS = [
 
   // ── Production & Evaluation ───────────────────────────────────────────────────
   {
+    id:       'ai-engineer',
+    category: 'production',
+    title:    'The AI Engineer',
+    color:    'indigo',
+    tagline:  'The engineer who builds reliable products on top of foundation models',
+    description:
+      'The AI Engineer is a software engineer who specialises in building applications, pipelines, and systems that productively consume foundation models — rather than training them. The role has emerged rapidly because deploying LLMs reliably is its own discipline: prompt design, retrieval systems, evaluation frameworks, cost management, and production observability are engineering problems that exist independently of any ML background.',
+    howItWorks: [
+      'The AI Engineer\'s primary tool is the API — they integrate foundation models (GPT-4, Claude, Gemini) as components in a larger software system. The model is a black-box service with a pricing model, a rate limit, and an SLA; engineering around those constraints is the core job.',
+      'Core workflow: define the desired product behaviour → design and version prompts → choose a knowledge strategy (RAG, fine-tuning, or direct context injection) → build an evaluation dataset → ship → monitor, measure, and iterate.',
+      'Prompt design and management is a first-class engineering concern. Prompts are versioned in source control, tested against an eval suite, and reviewed in pull requests. A prompt change can degrade downstream quality as silently as a broken dependency.',
+      'RAG pipelines are the most common AI Engineer deliverable: chunk and embed a document corpus, build a retrieval layer over a vector database, wire it to an LLM, and expose a reliable question-answering or generation endpoint.',
+      'Evaluation is the AI Engineer\'s test suite. They write LLM-as-judge rubrics, curate domain-specific benchmark datasets, and run regression checks on every deployment to detect quality drops before users do.',
+      'Production concerns dominate: per-request token cost budgets, latency SLAs (especially time-to-first-token), graceful rate-limit handling, model fallback strategies, and semantic caching. These are infrastructure problems, not ML problems.',
+    ],
+    keyPoints: [
+      'AI Engineer ≠ ML Engineer. The AI Engineer rarely trains models — they build on top of pre-trained ones. Deep ML knowledge helps but is not a prerequisite; strong software engineering and systems thinking are essential',
+      'The standard stack: foundation model API + orchestration layer (LangChain, LlamaIndex, or custom code) + retrieval system (vector DB) + evaluation framework + observability tooling',
+      'Prompt engineering is the AI Engineer\'s highest-leverage skill — a carefully crafted system prompt with good few-shot examples often closes the quality gap between an expensive frontier model and a much cheaper one',
+      'The role demands end-to-end ownership: AI Engineers trace failures across the full pipeline — retrieval quality, context window usage, sampling parameters, output parsing, and downstream business logic — not just the model call itself',
+    ],
+    interviewAngles: [
+      'What is the difference between an AI Engineer, an ML Engineer, and a Data Scientist?',
+      'Walk me through how you would build a RAG chatbot from scratch — what are the components and the key decisions at each step?',
+      'How would you evaluate and measure the quality of an LLM feature before shipping it to production?',
+      'A customer support bot you built sometimes gives wrong answers. How do you diagnose whether the problem is retrieval, context, prompting, or the model itself?',
+    ],
+  },
+  {
     id:       'llm-evaluation',
     category: 'production',
     title:    'LLM Evaluation',

@@ -1,0 +1,82 @@
+export function buildMicroservicesSteps() {
+  return [
+    {
+      type:        'intro',
+      activeNodes: [],
+      connections: {},
+      message:     'Microservices: one application, many independently deployable services',
+      detail:      'Microservices decomposes an application into small services, each owning a single bounded domain. Every service runs in its own process, communicates over a network, and can be built, deployed, and scaled independently. The trade-off: operational complexity rises significantly, but individual services can move fast, fail, and scale without affecting the rest.',
+    },
+    {
+      type:        'gateway',
+      activeNodes: ['client', 'gateway'],
+      connections: { 'client-gateway': 'both' },
+      message:     'API Gateway — the single front door for all clients',
+      detail:      'External clients (browser, mobile, third-party) never call services directly. Every request hits the API Gateway — a single entry point that handles authentication, rate limiting, and routing. The gateway hides how many services exist or how they are partitioned internally. Split one service into three tomorrow, and clients notice nothing.',
+    },
+    {
+      type:        'users',
+      activeNodes: ['gateway', 'users'],
+      connections: { 'client-gateway': 'request', 'gateway-users': 'both' },
+      message:     'Users Service — one bounded context, one database',
+      detail:      'The Users Service is responsible for one domain: user identity. It owns its own database — no other service may query the users table directly. When another service needs user data, it calls this service\'s API. A schema migration in Users cannot break Orders or Inventory because they never share the schema.',
+    },
+    {
+      type:        'orders',
+      activeNodes: ['gateway', 'orders'],
+      connections: { 'client-gateway': 'request', 'gateway-orders': 'both' },
+      message:     'Orders Service — manages the order lifecycle',
+      detail:      'The Orders Service owns everything about orders: create, update, cancel, track. It stores order records in its own database — never user profiles or stock levels. When a user places an order, Orders validates and persists it, then publishes an event to notify downstream services rather than calling them synchronously.',
+    },
+    {
+      type:        'inventory',
+      activeNodes: ['gateway', 'inventory'],
+      connections: { 'client-gateway': 'request', 'gateway-inventory': 'both' },
+      message:     'Inventory Service — tracks stock with its own data store',
+      detail:      'The Inventory Service owns stock levels and item reservations. Stock data lives only in its own database — never in the orders schema. Cross-service data sharing happens through APIs or events, not direct SQL joins across service schemas. A change to the inventory model cannot cascade into Orders.',
+    },
+    {
+      type:        'sync',
+      activeNodes: ['orders', 'payments'],
+      connections: { 'orders-payments': 'both' },
+      message:     'Synchronous call: Orders → Payments via HTTP/gRPC',
+      detail:      'Payment processing requires an immediate result — the user must know whether the charge succeeded before the order is confirmed. For latency-sensitive operations like this, services call each other synchronously via HTTP REST or gRPC. The caller blocks until the callee responds. gRPC offers strongly-typed contracts and better performance via HTTP/2 multiplexing.',
+    },
+    {
+      type:        'async',
+      activeNodes: ['orders', 'queue', 'notifs'],
+      connections: { 'orders-queue': 'request', 'queue-notifs': 'request' },
+      message:     'Async event: Orders publishes → Queue → Notifications consumes',
+      detail:      'Sending a confirmation email does not need an immediate response. The Orders Service publishes an "order.placed" event to a message queue (Kafka, SQS). The Notifications Service subscribes and processes it independently. Neither service knows the other exists — they are coupled only through the event schema, not direct dependencies.',
+    },
+    {
+      type:        'isolation',
+      activeNodes: ['users', 'orders', 'inventory', 'payments', 'notifs'],
+      connections: {},
+      message:     'Data isolation: every service owns its own database',
+      detail:      'The hardest rule to enforce and the most important: each service owns its own schema. No shared databases, no cross-service SQL queries. A migration in one service cannot break another. Data sharing happens through APIs or events — the data contract is the interface, not a shared table. Without this rule, you have a distributed monolith with all the complexity and none of the benefits.',
+    },
+    {
+      type:        'scale',
+      activeNodes: ['gateway', 'inventory'],
+      connections: { 'client-gateway': 'request', 'gateway-inventory': 'request' },
+      message:     'Independent scaling: only Inventory scales under load',
+      detail:      'Traffic to inventory checks spikes during a flash sale. In a monolith, the entire application would need to scale. With microservices, Kubernetes detects CPU pressure on the Inventory Service and schedules more pods — only Inventory. Users, Orders, and Payments are completely unaffected and run at their normal resource allocation.',
+    },
+    {
+      type:        'full',
+      activeNodes: ['client', 'gateway', 'users', 'orders', 'inventory', 'payments', 'queue', 'notifs'],
+      connections: {
+        'client-gateway':    'both',
+        'gateway-users':     'both',
+        'gateway-orders':    'both',
+        'gateway-inventory': 'both',
+        'orders-payments':   'both',
+        'orders-queue':      'request',
+        'queue-notifs':      'request',
+      },
+      message:     'Full system: 5 services, 1 gateway, sync + async communication',
+      detail:      'The complete picture: a single API Gateway fronts five independently deployable services, each owning its own database. Synchronous HTTP/gRPC for operations needing immediate responses. Async event publishing for decoupled side effects. Each service team deploys on their own schedule. The gateway is the only publicly reachable endpoint.',
+    },
+  ]
+}

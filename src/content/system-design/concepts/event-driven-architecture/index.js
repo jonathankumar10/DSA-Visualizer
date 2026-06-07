@@ -18,8 +18,9 @@ export default {
   keyPoints: [
     'EDA naturally decouples producers from consumers — adding a new service that reacts to existing events requires zero changes to any existing service',
     'Event sourcing provides a complete, immutable audit log for free — essential for financial systems, compliance-heavy domains, and collaborative editing',
-    'Choreography scales better than orchestration but is harder to reason about — use distributed tracing to reconstruct the flow during debugging',
+    'Choreography scales better than orchestration but is harder to reason about — use distributed tracing to reconstruct the causal chain across services during debugging',
     'The outbox pattern is the standard solution for the dual-write problem: never write to a database and publish to Kafka in separate, non-transactional operations',
-    'CQRS is not required for EDA, but they pair naturally: the event stream feeds multiple read projections optimized for different query patterns, replacing a single normalized database with purpose-built read models',
+    'CQRS pairs naturally with EDA: the event stream feeds multiple read projections optimized for different query patterns, replacing a single normalized database with purpose-built read models',
+    'Schema evolution must be backward-compatible — add optional fields, never remove or rename them. Consumers that ignore unknown fields can be deployed independently of producers',
   ],
 }

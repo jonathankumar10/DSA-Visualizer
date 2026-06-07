@@ -7,6 +7,14 @@ export default {
   description: 'The two transport-layer protocols powering almost all internet communication — TCP for reliable ordered delivery, UDP for fast best-effort transmission.',
   metaphor:    'TCP is a phone call — both sides acknowledge, nothing is lost, the conversation is ordered. UDP is a radio broadcast — fast and one-way, some listeners might miss a word but nobody waits to confirm.',
   path:        '/system-design/tcp-and-udp',
+  howItWorks: [
+    'TCP establishes a connection via the 3-way handshake: SYN (sender), SYN-ACK (receiver), ACK (sender). No application data flows until the handshake completes — this adds 1 RTT of latency before the first byte.',
+    'TCP assigns sequence numbers to every byte. The receiver ACKs received bytes and buffers out-of-order segments, delivering them to the application in order. Lost segments are retransmitted on timeout.',
+    'Flow control uses the TCP receive window — the receiver advertises its buffer capacity so the sender never overwhelms a slow consumer. Congestion control (slow start, AIMD) prevents overwhelming the network itself.',
+    'UDP sends datagrams immediately with an 8-byte header. No connection setup, no ACKs, no ordering, no retransmission. The application receives packets in arrival order — or not at all if dropped.',
+    'TCP FIN teardown requires a 4-way exchange (FIN, ACK, FIN, ACK) in each direction. TIME_WAIT state keeps the connection open for 2×MSL to absorb delayed packets — a source of port exhaustion on high-connection-rate servers.',
+    'QUIC (HTTP/3) reimplements TCP reliability + TLS encryption in user space over UDP, gaining 0-RTT reconnection, no head-of-line blocking between streams, and faster handshakes than TCP+TLS.',
+  ],
   keyPoints: [
     'TCP establishes a connection with a 3-way handshake before sending any data',
     'TCP guarantees ordering, delivery, and error correction — at a latency cost',

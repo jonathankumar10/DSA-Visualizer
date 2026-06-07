@@ -7,6 +7,14 @@ export default {
   description: 'How traffic is routed, distributed, and filtered between clients and servers — forward proxies for client anonymity, reverse proxies for server protection, load balancers for horizontal scaling.',
   metaphor:    'A traffic controller at a busy intersection — directing vehicles to open lanes, hiding the internal road layout, and preventing any single road from becoming gridlocked.',
   path:        '/system-design/proxies-and-load-balancing',
+  howItWorks: [
+    'Forward proxy vs reverse proxy: a forward proxy sits in front of clients, masking their identity — used for content filtering, corporate security, and VPNs. A reverse proxy sits in front of servers, hiding backend topology from the internet — used for SSL termination, compression, caching, and routing. In interviews, "proxy" almost always means reverse proxy.',
+    'Load balancing algorithms: round-robin cycles through servers in order — simple and effective when requests have similar cost. Least-connections routes to the server with the fewest active connections — better for variable-duration requests (file uploads, streaming). IP hash (sticky hash) consistently routes the same client IP to the same server — a simple form of session affinity.',
+    'Health checks: the load balancer polls each backend server at regular intervals (e.g., GET /health every 5 seconds). After N consecutive failures, the server is marked unhealthy and removed from the rotation. After M consecutive successes, it is re-added. This enables zero-downtime deployments and automatic recovery from crashes.',
+    'L4 vs L7 load balancing: Layer 4 (transport) routes by IP address and TCP port — fast, low CPU overhead, no HTTP awareness. Layer 7 (application) reads the HTTP request line, headers, and body — enables content-based routing (/api/* to API servers, /static/* to CDN origin), A/B testing by cookie, and canary deployments. AWS ALB, nginx, and HAProxy operate at L7.',
+    'SSL termination: the load balancer decrypts HTTPS at the edge and forwards plain HTTP to backend servers. Benefits: one certificate to manage, backends avoid TLS overhead, L7 routing can inspect headers. The backend-to-LB connection is on a trusted private network. If end-to-end encryption is required, use SSL passthrough (L4) or re-encrypt to backends.',
+    'Active-active vs active-passive: active-active runs all servers simultaneously, maximizing throughput and providing instant failover — requires stateless servers with shared state in Redis or a database. Active-passive keeps one server idle as a hot standby — simpler for stateful workloads (primary database + replica). For stateless app servers, always prefer active-active.',
+  ],
   keyPoints: [
     'Forward proxies sit in front of clients — used for privacy, filtering, and corporate security',
     'Reverse proxies sit in front of servers — SSL termination, caching, and routing',

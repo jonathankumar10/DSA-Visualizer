@@ -9,12 +9,13 @@ const card = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transiti
 // ── Category accent colors ────────────────────────────────────────────────────
 
 const CATEGORY_ACCENT = {
-  history:    { bar: 'bg-amber-400',   badge: 'bg-amber-500/15 text-amber-300' },
-  ml:         { bar: 'bg-blue-400',    badge: 'bg-blue-500/15 text-blue-300' },
-  llms:       { bar: 'bg-violet-400',  badge: 'bg-violet-500/15 text-violet-300' },
-  workflows:  { bar: 'bg-teal-400',    badge: 'bg-teal-500/15 text-teal-300' },
-  agents:     { bar: 'bg-sky-400',     badge: 'bg-sky-500/15 text-sky-300' },
-  production: { bar: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' },
+  history:       { bar: 'bg-amber-400',   badge: 'bg-amber-500/15 text-amber-300' },
+  ml:            { bar: 'bg-blue-400',    badge: 'bg-blue-500/15 text-blue-300' },
+  llms:          { bar: 'bg-violet-400',  badge: 'bg-violet-500/15 text-violet-300' },
+  workflows:     { bar: 'bg-teal-400',    badge: 'bg-teal-500/15 text-teal-300' },
+  agents:        { bar: 'bg-sky-400',     badge: 'bg-sky-500/15 text-sky-300' },
+  production:    { bar: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300' },
+  'live-coding': { bar: 'bg-rose-400',    badge: 'bg-rose-500/15 text-rose-300' },
 }
 
 // Category order follows registry insertion order

@@ -1,7 +1,7 @@
 import React, { Suspense, useMemo } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { AI_ITEMS, AI_COLORS, AI_CATEGORY_LABELS } from '../constants/aiRegistry'
+import { AI_ITEMS, AI_COLORS, AI_CATEGORY_LABELS, LIVE_CODING_AI_GUIDE } from '../constants/aiRegistry'
 
 const AI_ANIMATIONS = import.meta.glob('../content/ai/*/Animation.jsx')
 
@@ -36,6 +36,11 @@ export default function AIPage() {
           <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${c.badgeBg} ${c.badgeBorder} ${c.text}`}>
             {AI_CATEGORY_LABELS[item.category]}
           </span>
+          {item.duration && (
+            <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-medium text-slate-400">
+              {item.duration}
+            </span>
+          )}
         </div>
         <p className={`text-base font-medium ${c.text}`}>{item.tagline}</p>
       </div>
@@ -51,6 +56,8 @@ export default function AIPage() {
 }
 
 function AIDetail({ item, c }) {
+  if (item.category === 'live-coding') return <LiveCodingDetail item={item} c={c} />
+
   const AnimationComponent = useMemo(() => {
     const loader = AI_ANIMATIONS[`../content/ai/${item.id}/Animation.jsx`]
     return loader ? React.lazy(loader) : null
@@ -109,6 +116,158 @@ function AIDetail({ item, c }) {
 
       {/* Key points — always visible below the two-column grid */}
       {AnimationComponent && <KeyPointsPanel item={item} c={c} />}
+    </div>
+  )
+}
+
+function LiveCodingDetail({ item, c }) {
+  return (
+    <div className="space-y-6">
+      {/* Core / Bonus | Skills / Angles */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="space-y-5">
+          <InfoPanel title="Core requirements" c={c}>
+            <ol className="space-y-2.5">
+              {item.core.map((req, i) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300">
+                  <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${c.badgeBg} ${c.text}`}>{i + 1}</span>
+                  <span className="leading-relaxed">{req}</span>
+                </li>
+              ))}
+            </ol>
+          </InfoPanel>
+          <InfoPanel title="Bonus features" c={c}>
+            <ul className="space-y-2">
+              {item.bonus.map((f, i) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300">
+                  <span className={`shrink-0 mt-0.5 font-bold ${c.text}`}>+</span>
+                  <span className="leading-relaxed">{f}</span>
+                </li>
+              ))}
+            </ul>
+          </InfoPanel>
+        </div>
+        <div className="lg:sticky lg:top-20 space-y-5">
+          <InfoPanel title="Skills tested" c={c}>
+            <ul className="space-y-2">
+              {item.skillsTested.map((s, i) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300">
+                  <span className={`shrink-0 mt-0.5 ${c.text}`}>◆</span>
+                  <span className="leading-relaxed">{s}</span>
+                </li>
+              ))}
+            </ul>
+          </InfoPanel>
+          <InfoPanel title="Interview angles" c={c}>
+            <ul className="space-y-2">
+              {item.interviewAngles.map((q, i) => (
+                <li key={i} className="flex gap-3 text-sm text-slate-300">
+                  <span className={`shrink-0 mt-0.5 font-bold ${c.text}`}>?</span>
+                  <span className="leading-relaxed">{q}</span>
+                </li>
+              ))}
+            </ul>
+          </InfoPanel>
+        </div>
+      </div>
+
+      {/* Interview approach */}
+      {item.interviewApproach && (
+        <InfoPanel title="How to run this interview" c={c}>
+          <ol className="space-y-2.5">
+            {item.interviewApproach.map((step, i) => (
+              <li key={i} className="flex gap-3 text-sm text-slate-300">
+                <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${c.badgeBg} ${c.text}`}>{i + 1}</span>
+                <span className="leading-relaxed">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </InfoPanel>
+      )}
+
+      {/* Clarifying questions + Claude workflow */}
+      {(item.clarifyingQuestions || item.claudeWorkflow) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {item.clarifyingQuestions && (
+            <InfoPanel title="Clarifying questions to ask" c={c}>
+              <ul className="space-y-2">
+                {item.clarifyingQuestions.map((q, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-slate-300">
+                    <span className={`shrink-0 mt-0.5 font-bold ${c.text}`}>→</span>
+                    <span className="leading-relaxed">{q}</span>
+                  </li>
+                ))}
+              </ul>
+            </InfoPanel>
+          )}
+          {item.claudeWorkflow && (
+            <InfoPanel title="Claude workflow" c={c}>
+              <ul className="space-y-2">
+                {item.claudeWorkflow.map((tip, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-slate-300">
+                    <span className={`shrink-0 mt-0.5 font-bold ${c.text}`}>⌘</span>
+                    <span className="leading-relaxed">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </InfoPanel>
+          )}
+        </div>
+      )}
+
+      {/* Starter CLAUDE.md */}
+      {item.claudeMdContent && <ClaudeMdPanel item={item} c={c} />}
+
+      {/* Shared AI tools guide */}
+      <AIToolsGuide c={c} />
+    </div>
+  )
+}
+
+function ClaudeMdPanel({ item, c }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
+      <div className={`border-b border-white/10 px-5 py-3 flex items-center justify-between ${c.bg}`}>
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${c.dot}`} />
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Starter CLAUDE.md</p>
+        </div>
+        <p className="text-[10px] text-slate-500">Drop in project root before prompting Claude</p>
+      </div>
+      <div className="overflow-auto max-h-96 scrollbar-thin">
+        <pre className="p-5 text-xs font-mono text-slate-300 leading-relaxed whitespace-pre">{item.claudeMdContent}</pre>
+      </div>
+    </div>
+  )
+}
+
+function AIToolsGuide({ c }) {
+  const sections = [
+    { key: 'claudeMd', label: 'Creating CLAUDE.md' },
+    { key: 'planMode', label: 'Using Plan Mode' },
+    { key: 'prompting', label: 'Prompting Effectively' },
+  ]
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
+      <div className={`border-b border-white/10 px-5 py-3 flex items-center gap-2 ${c.bg}`}>
+        <div className={`w-2 h-2 rounded-full ${c.dot} animate-pulse`} />
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">AI tooling playbook</p>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+        {sections.map(({ key, label }) => (
+          <div key={key} className="p-5 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+            <ul className="space-y-2.5">
+              {LIVE_CODING_AI_GUIDE[key].map((tip, i) => (
+                <li key={i} className="flex gap-2.5 text-sm text-slate-300">
+                  <span className={`shrink-0 mt-0.5 ${c.text}`}>◆</span>
+                  <span className="leading-relaxed">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

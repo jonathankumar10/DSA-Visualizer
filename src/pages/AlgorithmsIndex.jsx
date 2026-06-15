@@ -68,17 +68,16 @@ export default function AlgorithmsIndex() {
     <div className="space-y-8">
 
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">Algorithms</h1>
-        <p className="mt-2 text-slate-400">
-          {ALGORITHMS.length} visualizer{ALGORITHMS.length !== 1 ? 's' : ''} — step through each one at your own pace.
-        </p>
-      </div>
-
-      {/* Filter bar */}
-      <div className="space-y-3">
-        {/* Search input */}
-        <div className="relative w-full sm:max-w-sm">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Algorithms</h1>
+          <p className="mt-2 text-slate-400 max-w-2xl">
+            {ALGORITHMS.length} interactive visualizers covering the most common LeetCode-style interview problems.
+            Watch each algorithm execute step by step, follow along with Java and Python solutions, and see exactly which lines are active at each stage.
+            Every problem surfaces complexity trade-offs and the interview angles interviewers actually ask about.
+          </p>
+        </div>
+        <div className="relative w-full sm:w-72 shrink-0">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
             width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -103,32 +102,32 @@ export default function AlgorithmsIndex() {
             </button>
           )}
         </div>
+      </div>
 
-        {/* Category pills */}
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => {
-            const count  = cat === 'all' ? ALGORITHMS.length : ALGORITHMS.filter((a) => a.category === cat).length
-            const active = category === cat
-            return (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                  active
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:border-white/20'
-                }`}
-              >
-                {cat === 'all' ? 'All' : categoryLabel(cat)}
-                <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                  active ? 'bg-white/20 text-white' : 'bg-white/8 text-slate-500'
-                }`}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+      {/* Category pills */}
+      <div className="flex flex-wrap gap-2">
+        {CATEGORIES.map((cat) => {
+          const count  = cat === 'all' ? ALGORITHMS.length : ALGORITHMS.filter((a) => a.category === cat).length
+          const active = category === cat
+          return (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                active
+                  ? 'bg-blue-600 text-white'
+                  : 'border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:border-white/20'
+              }`}
+            >
+              {cat === 'all' ? 'All' : categoryLabel(cat)}
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
+                active ? 'bg-white/20 text-white' : 'bg-white/8 text-slate-500'
+              }`}>
+                {count}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Count */}

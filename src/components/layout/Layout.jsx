@@ -20,7 +20,7 @@ export default function Layout() {
     <div className="min-h-screen bg-[#09090b] text-slate-100">
       <div ref={glowRef} className="cursor-glow" />
       <Navbar />
-      <main className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
+      <main className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <Outlet />
       </main>
       <ChatBot />

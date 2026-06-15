@@ -190,7 +190,7 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0,  scale: 1 }}
             exit={{   opacity: 0, y: 16, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-            className="fixed bottom-20 right-6 z-50 flex flex-col w-[360px] h-[500px] rounded-2xl border border-white/10 bg-slate-900 shadow-2xl shadow-black/50 overflow-hidden"
+            className="fixed bottom-20 right-3 sm:right-6 z-50 flex flex-col w-[calc(100vw-24px)] sm:w-[360px] h-[min(500px,80vh)] rounded-2xl border border-white/10 bg-slate-900 shadow-2xl shadow-black/50 overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center gap-2.5 px-4 py-3 border-b border-white/8 bg-slate-900/90 shrink-0">
@@ -269,7 +269,7 @@ export default function ChatBot() {
       </AnimatePresence>
 
       {/* ── Bubble trigger ───────────────────────────────────────────────── */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-3 sm:right-6 z-50">
         {/* Pulse ring — only shows when closed */}
         {!isOpen && (
           <motion.span

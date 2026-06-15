@@ -100,12 +100,12 @@ User opens ChatBot (FAB bottom-right)
 
 | Feature | Status | Notes |
 |---|---|---|
-| Algorithm visualizers | Live | 13 algorithms |
+| Algorithm visualizers | Live | 15 algorithms |
 | DSA pattern reference | Live | 7 patterns with animations |
-| System Design concepts | Live | ~28 concepts + ~10 designs |
+| System Design concepts | Live | 30 concepts + 9 designs |
 | OOD patterns | Live | 11 patterns with animations |
-| OOD interview questions | Live | defined in oodRegistry |
-| AI topic pages | Live | 19 topics, 4 with animations |
+| OOD interview questions | Live | 6 questions in oodRegistry |
+| AI topic pages | Live | 20 concept topics + 15 live-coding interview items, 5 with animations |
 | AI chat assistant | Live | Claude Haiku, 10 msg/day |
 | TTS narration (OOD) | Live | opt-in, browser Speech API |
 | Frontend internals | Planned | on roadmap |

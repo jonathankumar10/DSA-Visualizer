@@ -201,7 +201,7 @@ export default function Home() {
 
         <motion.div
           variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
-          className="grid gap-4 sm:grid-cols-3"
+          className="grid gap-4 grid-cols-1 sm:grid-cols-3"
         >
           {HOW_IT_WORKS.map((s) => (
             <motion.div

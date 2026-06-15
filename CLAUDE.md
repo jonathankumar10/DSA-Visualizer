@@ -35,17 +35,17 @@ firebase functions:secrets:set ANTHROPIC_API_KEY
 | `/patterns/:id` | DSA pattern reference pages |
 | `/system-design/:id` | System design concept/design explainers |
 | `/ood/:id` | GoF design patterns and OOD interview questions |
-| `/ai/:id` | AI concepts: history, ML, LLMs, workflows, agents, production |
+| `/ai/:id` | AI concepts: history, ML, LLMs, workflows, agents, production, live-coding interviews |
 
 ## Registries (`src/constants/`)
 
 | File | Exports | Content type |
 |---|---|---|
-| `algorithmRegistry.js` | `ALGORITHMS` | Imports `index.js` modules |
-| `patternsRegistry.js` | `PATTERNS` | Inline, joins algorithms by `algorithmIds` |
-| `systemDesignRegistry.js` | `SYSTEM_DESIGN` | Imports `index.js` modules |
+| `algorithmRegistry.js` | `ALGORITHMS`, `DIFFICULTY_COLOR` | Imports `index.js` modules |
+| `patternsRegistry.js` | `PATTERNS`, `PATTERN_COLORS` | Inline, joins algorithms by `algorithmIds` |
+| `systemDesignRegistry.js` | `SYSTEM_DESIGN`, `TYPE_LABEL`, `TYPE_COLOR`, `SD_CATEGORY_LABELS` | Imports `index.js` modules |
 | `oodRegistry.js` | `OOD_PATTERNS`, `OOD_QUESTIONS`, `OOD_ITEMS`, `OOD_COLORS`, `OOD_CATEGORY_LABELS` | Inline |
-| `aiRegistry.js` | `AI_ITEMS`, `AI_COLORS`, `AI_CATEGORY_LABELS` | Inline |
+| `aiRegistry.js` | `AI_ITEMS`, `AI_COLORS`, `AI_CATEGORY_LABELS`, `LIVE_CODING_AI_GUIDE` | Inline |
 
 ## Content Module Shapes
 
@@ -59,11 +59,27 @@ firebase functions:secrets:set ANTHROPIC_API_KEY
 
 `Visualizer.jsx` is lazy-loaded via `import.meta.glob` in `AlgorithmPage.jsx` — no manual import needed.
 
+### System Design — `src/content/system-design/<concepts|designs>/<slug>/`
+
+`index.js` exports a plain object with `id`, `type` (concept | design), `category`, `title`, `tagline`, and concept-specific fields.
+
+`steps.js` exports a steps array used by the diagram animator.
+
+`Diagram.jsx` is lazy-loaded via `import.meta.glob` in `SystemDesignPage.jsx` — no manual import needed.
+
+### Pattern — `src/content/patterns/<slug>/`
+
+`Animation.jsx` is lazy-loaded via `import.meta.glob` in `PatternPage.jsx`. Pattern metadata is inline in `patternsRegistry.js`.
+
 ### AI topic — `aiRegistry.js` inline
 
-Each item: `id`, `category` (history | ml | llms | workflows | agents | production), `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`
+Concept items (`category`: history | ml | llms | workflows | agents | production): `id`, `category`, `title`, `color`, `tagline`, `description`, `howItWorks[]`, `keyPoints[]`, `interviewAngles[]`
 
-`AIPage.jsx` lazy-loads `src/content/ai/*/Animation.jsx`. Key Takeaways always renders — right column when no animation, below the two-column grid when animation is present.
+Live-coding items (`category: 'live-coding'`): `id`, `category`, `title`, `color`, `tagline`, `duration`, `description`, `core[]`, and additional interview-guide fields. Rendered by `LiveCodingDetail` component in `AIPage.jsx`.
+
+`LIVE_CODING_AI_GUIDE` is a standalone object with AI coding interview tips (keys: `claudeMd`, `planMode`, `prompting`, etc.) used in the live-coding detail view.
+
+`AIPage.jsx` lazy-loads `src/content/ai/*/Animation.jsx`. Key Takeaways always renders for concept items — right column when no animation, below the two-column grid when animation is present.
 
 ### OOD item — `oodRegistry.js` inline
 

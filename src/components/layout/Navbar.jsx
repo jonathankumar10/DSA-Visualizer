@@ -18,7 +18,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#09090b]/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+      <nav className="max-w-[1400px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
           <span className="text-lg sm:text-xl font-bold tracking-tight text-white">
             Dev<span className="text-blue-400">Lens</span>

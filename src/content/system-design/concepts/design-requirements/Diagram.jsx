@@ -97,7 +97,7 @@ function PillarCard({ pillar, active }) {
 function ThroughputViz({ active }) {
   const [qps, setQps] = useState(0)
   useEffect(() => {
-    if (!active) { setQps(0); return }
+    if (!active) return
     const id = setInterval(() => setQps(() => Math.floor(Math.random() * 4200 + 600)), 110)
     return () => clearInterval(id)
   }, [active])

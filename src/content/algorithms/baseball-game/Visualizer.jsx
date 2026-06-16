@@ -221,7 +221,7 @@ function useCountUp(target, active) {
   const rafRef = useRef(null)
 
   useEffect(() => {
-    if (!active) { setDisplay(0); return }
+    if (!active) return
     let startTime = null
     const duration = Math.min(900, Math.max(300, Math.abs(target) * 30))
 
@@ -237,7 +237,7 @@ function useCountUp(target, active) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [target, active])
 
-  return display
+  return active ? display : 0
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────

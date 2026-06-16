@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTtsRunner } from '../../../hooks/useTtsRunner'
 import StepControls from '../../../components/ui/StepControls'

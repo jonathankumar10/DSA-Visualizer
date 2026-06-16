@@ -56,7 +56,6 @@ export default function FactoryMethodAnimation() {
   const runner = useTtsRunner(steps, (s) => `${s.message}. ${s.detail}`)
   const { step } = runner
 
-  const creator = step.activeCreator ? CREATORS[step.activeCreator] : null
   const product = step.createdProduct ? PRODUCTS[step.createdProduct] : null
 
   return (

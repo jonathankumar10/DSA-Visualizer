@@ -145,9 +145,51 @@ export function buildUrlShortenerSteps() {
       phase: 'read',
       activeNodes: ['api', 'client'],
       activeArrow: { from: 'api', to: 'client' },
-      message: 'Server sends HTTP 301 redirect to the original URL.',
+      message: 'Server sends HTTP 302 redirect to the original URL.',
       detail:
-        '301 Moved Permanently: browsers cache this mapping forever, so future visits skip the server entirely.\n\nUse 302 Found (temporary) if you need click analytics — 301 means the browser never asks again.',
+        '302 Found (temporary): the browser does not cache the mapping, so every future click on this link routes through the server again.\n\nThis is the trade-off that makes analytics possible — a 301 would let browsers skip the server entirely after the first visit, and clicks would go uncounted.',
+      shortCode: 'aB3xK9z',
+    },
+
+    // ── Analytics flow (decoupled from the redirect, fires async) ─────────
+    {
+      type: 'analytics-publish',
+      phase: 'analytics',
+      activeNodes: ['api', 'kafka'],
+      activeArrow: { from: 'api', to: 'kafka' },
+      message: 'Click event is published to Kafka.',
+      detail:
+        'This happens after the 302 response has already been sent to the client — the user never waits for it. Event payload: { short_code, timestamp, ip, referer, user_agent }.\n\nIf Kafka or the Analytics Service is down, redirects are completely unaffected.',
+      shortCode: 'aB3xK9z',
+    },
+    {
+      type: 'analytics-consume',
+      phase: 'analytics',
+      activeNodes: ['kafka', 'analytics'],
+      activeArrow: { from: 'kafka', to: 'analytics' },
+      message: 'Analytics Service consumes the event from the stream.',
+      detail:
+        'Consumers can lag behind by minutes during traffic spikes without any impact on the redirect path — the two systems are fully decoupled.',
+      shortCode: 'aB3xK9z',
+    },
+    {
+      type: 'analytics-counters',
+      phase: 'analytics',
+      activeNodes: ['analytics', 'counters'],
+      activeArrow: { from: 'analytics', to: 'counters' },
+      message: 'Redis counter is incremented for this short code.',
+      detail:
+        'INCR rl:{short_code}:{YYYY-MM-DD-HH}\n\nGives a real-time count (e.g. "clicks in the last hour") cheaply, without writing to a database on every single click.',
+      shortCode: 'aB3xK9z',
+    },
+    {
+      type: 'analytics-clickhouse',
+      phase: 'analytics',
+      activeNodes: ['analytics', 'clickhouse'],
+      activeArrow: { from: 'analytics', to: 'clickhouse' },
+      message: 'Counters are periodically flushed to ClickHouse.',
+      detail:
+        'Every few minutes, the Analytics Service flushes Redis counters into ClickHouse (or BigQuery) for durable, ad-hoc historical queries — e.g. "clicks per country per day over the last 90 days."\n\nRedis gives speed for the live dashboard; ClickHouse gives durability and depth for analysis.',
       shortCode: 'aB3xK9z',
     },
   ]

@@ -1,10 +1,15 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { Suspense } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { OOD_ITEMS, OOD_COLORS, OOD_CATEGORY_LABELS } from '../constants/oodRegistry'
 
 // Lazy-load per-pattern animations from content/ood/*/Animation.jsx
 const OOD_ANIMATIONS = import.meta.glob('../content/ood/*/Animation.jsx')
+
+// Lazy components must be created once, at module scope — not during render.
+const OOD_LAZY_ANIMATIONS = Object.fromEntries(
+  Object.entries(OOD_ANIMATIONS).map(([key, loader]) => [key, React.lazy(loader)])
+)
 
 const DIFFICULTY_COLOR = {
   Easy:   'text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
@@ -65,10 +70,7 @@ export default function OODPage() {
 // ── Pattern detail ────────────────────────────────────────────────────────────
 
 function PatternDetail({ item, c }) {
-  const AnimationComponent = useMemo(() => {
-    const loader = OOD_ANIMATIONS[`../content/ood/${item.id}/Animation.jsx`]
-    return loader ? React.lazy(loader) : null
-  }, [item.id])
+  const AnimationComponent = OOD_LAZY_ANIMATIONS[`../content/ood/${item.id}/Animation.jsx`] ?? null
 
   return (
     <div className="space-y-8">
@@ -251,7 +253,7 @@ function QuestionDetail({ item, c }) {
 
 // ── Shared info panel ─────────────────────────────────────────────────────────
 
-function InfoPanel({ title, c, children }) {
+function InfoPanel({ title, children }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 space-y-3">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{title}</p>

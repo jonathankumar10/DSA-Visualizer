@@ -135,7 +135,7 @@ function CoinStack({ value, status, idx }) {
 // Enters with a rotateY flip — like a coin tossed into a collection bowl.
 // When it's the duplicate match, shakes hard and glows red.
 
-function SetCoin({ value, isMatch, runnerIndex }) {
+function SetCoin({ value, isMatch }) {
   return (
     <motion.div
       initial={{ rotateY: 90, scale: 0.5, opacity: 0 }}

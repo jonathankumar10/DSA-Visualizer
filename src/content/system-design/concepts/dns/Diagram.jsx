@@ -253,17 +253,6 @@ export default function DnsDiagram({ onStepChange }) {
 
   const [expandedNode, setExpandedNode] = useState(null)
 
-  // popKeys — increments each time a node becomes active, used to re-trigger animations
-  const [popKeys, setPopKeys] = useState({})
-  useEffect(() => {
-    if (!step.activeNodes.length) return
-    setPopKeys((prev) => {
-      const next = { ...prev }
-      step.activeNodes.forEach((id) => { next[id] = (prev[id] ?? -1) + 1 })
-      return next
-    })
-  }, [step])
-
   // visitedNodes — the set of all nodes that have been active at some point
   const visitedNodes = useMemo(() => {
     const visited = new Set()
@@ -311,7 +300,7 @@ export default function DnsDiagram({ onStepChange }) {
                   isExpanded={expandedNode === node.id}
                   onClick={() => setExpandedNode((p) => p === node.id ? null : node.id)}
                   revealedIp={node.id === 'browser' ? step.revealedIp : null}
-                  popKey={popKeys[node.id] ?? null}
+                  popKey={step.activeNodes.includes(node.id) ? index : null}
                   stampText={getStampText(node.id)}
                 />
                 {i < NODES.length - 1 && (

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useState } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { buildBFSSteps, DEFAULT_CITY } from './steps'
 import { useStepRunner } from '../../../hooks/useStepRunner'
@@ -197,30 +197,36 @@ export default function BFSVisualizer({ onStepChange }) {
   const startNode = nodeMap[start] ?? nodes[0]
   const [carPos,   setCarPos]   = useState({ x: startNode?.x ?? 300, y: startNode?.y ?? 60 })
   const [carAngle, setCarAngle] = useState(0)
-  const prevIdRef = useRef(start)
+  const [prevId,   setPrevId]   = useState(start)
 
-  useEffect(() => {
+  // Reset the car to the start node whenever the graph or start node changes —
+  // adjusted during render (React's recommended pattern) instead of an effect.
+  const [resetTrack, setResetTrack] = useState({ nodes, start })
+  if (resetTrack.nodes !== nodes || resetTrack.start !== start) {
+    setResetTrack({ nodes, start })
     const sn = nodeMap[start]
     if (sn) { setCarPos({ x: sn.x, y: sn.y }); setCarAngle(0) }
-    prevIdRef.current = start
-  }, [nodes, start])
+    setPrevId(start)
+  }
 
-  useEffect(() => {
+  // Drive the car toward the current BFS step's node — adjusted during render
+  // (guarded by tracking the previous step.current) instead of an effect.
+  const [trackedCurrent, setTrackedCurrent] = useState(step.current)
+  if (trackedCurrent !== step.current) {
+    setTrackedCurrent(step.current)
     const targetId = step.current ?? start
     const target   = nodeMap[targetId]
-    if (!target) return
+    if (target) {
+      const prev  = prevId !== targetId ? nodeMap[prevId] : null
+      const dx    = prev ? target.x - prev.x : 0
+      const dy    = prev ? target.y - prev.y : 0
+      const angle = prev && (dx !== 0 || dy !== 0) ? Math.atan2(dy, dx) * (180 / Math.PI) : null
 
-    const prevId = prevIdRef.current
-    if (prevId !== targetId) {
-      const prev = nodeMap[prevId]
-      if (prev) {
-        const dx = target.x - prev.x, dy = target.y - prev.y
-        if (dx !== 0 || dy !== 0) setCarAngle(Math.atan2(dy, dx) * (180 / Math.PI))
-      }
-      prevIdRef.current = targetId
+      if (angle !== null) setCarAngle(angle)
+      if (prevId !== targetId) setPrevId(targetId)
+      setCarPos({ x: target.x, y: target.y })
     }
-    setCarPos({ x: target.x, y: target.y })
-  }, [step.current])
+  }
 
   function handleApply() {
     const parsed = parseEdgeList(draftEdges)

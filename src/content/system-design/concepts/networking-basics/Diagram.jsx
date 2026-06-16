@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useRef } from 'react'
+import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { buildNetworkingBasicsSteps } from './steps'
 import { useTtsRunner } from '../../../../hooks/useTtsRunner'
@@ -188,9 +188,9 @@ function NodeCard({ node, isActive, wasVisited, isExpanded, onClick, popKey }) {
 // ── Packet header display ─────────────────────────────────────────────────────
 
 function PacketHeader({ packet, direction }) {
-  const prevTtl = useRef(null)
-  const ttlChanged = packet && prevTtl.current !== null && prevTtl.current !== packet.ttl
-  if (packet) prevTtl.current = packet.ttl
+  const [prevTtl, setPrevTtl] = useState(null)
+  const ttlChanged = packet && prevTtl !== null && prevTtl !== packet.ttl
+  if (packet && prevTtl !== packet.ttl) setPrevTtl(packet.ttl)
 
   if (!packet) {
     return (
@@ -270,16 +270,6 @@ export default function NetworkingBasicsDiagram() {
   const { step, index } = runner
 
   const [expandedNode, setExpandedNode] = useState(null)
-  const [popKeys, setPopKeys]           = useState({})
-
-  useEffect(() => {
-    if (!step.activeNodes.length) return
-    setPopKeys((prev) => {
-      const next = { ...prev }
-      step.activeNodes.forEach((id) => { next[id] = (prev[id] ?? -1) + 1 })
-      return next
-    })
-  }, [step])
 
   const visitedNodes = useMemo(() => {
     const s = new Set()
@@ -318,7 +308,7 @@ export default function NetworkingBasicsDiagram() {
                   wasVisited={visitedNodes.has(node.id) && !step.activeNodes.includes(node.id)}
                   isExpanded={expandedNode === node.id}
                   onClick={() => setExpandedNode((p) => p === node.id ? null : node.id)}
-                  popKey={popKeys[node.id] ?? null}
+                  popKey={step.activeNodes.includes(node.id) ? index : null}
                 />
                 {i < NODES.length - 1 && (
                   <EdgeArrow

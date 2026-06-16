@@ -141,9 +141,6 @@ function ComparisonBadge({ step }) {
   const { type, chosen, comparison, list1, list2, p1, p2 } = step
   if (type !== 'pick') return null
 
-  const v1   = list1[p1 - (chosen === 1 ? 1 : 0)]?.val
-  const v2   = list2[p2 - (chosen === 2 ? 1 : 0)]?.val
-
   // The comparison used the values BEFORE advancing
   const leftVal  = chosen === 1 ? list1[p1 - 1]?.val : list1[p1]?.val
   const rightVal = chosen === 2 ? list2[p2 - 1]?.val : list2[p2]?.val
@@ -220,7 +217,7 @@ function MergedRow({ merged, step }) {
   const isDone = step.type === 'done'
   const lastId = merged.length > 0 ? merged[merged.length - 1].id : null
 
-  function getMergedTheme(node, i) {
+  function getMergedTheme(node) {
     if (isDone) return 'done'
     if (node.id === lastId) {
       return step.type === 'drain' ? 'merged-drain' : `merged-${node.fromList === 1 ? 'l1' : 'l2'}`
@@ -246,7 +243,7 @@ function MergedRow({ merged, step }) {
               <motion.div key={node.id} className="flex items-center gap-1.5">
                 <NodeCard
                   node={node}
-                  themeKey={getMergedTheme(node, i)}
+                  themeKey={getMergedTheme(node)}
                   isNew={node.id === lastId && step.type !== 'init' && step.type !== 'done'}
                 />
                 {i < merged.length - 1 && <ChainArrow color={isDone ? 'text-emerald-800' : 'text-slate-600'} />}

@@ -1,9 +1,18 @@
-import React, { Suspense, useMemo, useState, useEffect } from 'react'
+import React, { Suspense, useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { SYSTEM_DESIGN, TYPE_COLOR, TYPE_LABEL } from '../constants/systemDesignRegistry'
 
-const DIAGRAMS = import.meta.glob('../content/system-design/**/Diagram.jsx')
+const DIAGRAMS               = import.meta.glob('../content/system-design/**/Diagram.jsx')
+const CONCEPT_ILLUSTRATIONS  = import.meta.glob('../content/system-design/**/ConceptIllustration.jsx')
+
+// Lazy components must be created once, at module scope — not during render.
+const LAZY_DIAGRAMS = Object.fromEntries(
+  Object.entries(DIAGRAMS).map(([key, loader]) => [key, React.lazy(loader)])
+)
+const LAZY_CONCEPT_ILLUSTRATIONS = Object.fromEntries(
+  Object.entries(CONCEPT_ILLUSTRATIONS).map(([key, loader]) => [key, React.lazy(loader)])
+)
 
 // ── Component animations ──────────────────────────────────────────────────────
 
@@ -11,9 +20,7 @@ function DiskAnimation({ color }) {
   return (
     <div className="flex items-center justify-center py-3 bg-[#060e20] rounded-xl mx-4 sm:mx-5 mb-3">
       <svg viewBox="0 0 80 80" width="80" height="80">
-        {/* Platter background */}
         <circle cx="40" cy="40" r="34" fill="#060e20" />
-        {/* Spinning platter: tracks + sectors */}
         <motion.g
           style={{ transformOrigin: '40px 40px' }}
           animate={{ rotate: 360 }}
@@ -31,9 +38,7 @@ function DiskAnimation({ color }) {
             />
           ))}
         </motion.g>
-        {/* Outer edge */}
         <circle cx="40" cy="40" r="34" fill="none" stroke={color} strokeWidth="0.8" opacity="0.25" />
-        {/* Read/write arm — sweeps ±40° around center */}
         <motion.g
           style={{ transformOrigin: '40px 40px' }}
           animate={{ rotate: [-40, 40, -40] }}
@@ -43,7 +48,6 @@ function DiskAnimation({ color }) {
           <circle cx="40" cy="9" r="4" fill={color} opacity="0.9" style={{ filter: `drop-shadow(0 0 5px ${color})` }} />
           <circle cx="40" cy="9" r="1.5" fill="#060e20" />
         </motion.g>
-        {/* Hub */}
         <circle cx="40" cy="40" r="5.5" fill={color} opacity="0.55" />
         <circle cx="40" cy="40" r="2.5" fill="#060e20" />
       </svg>
@@ -98,7 +102,6 @@ function CpuAnimation({ color }) {
 
   return (
     <div className="bg-[#060e20] rounded-xl mx-4 sm:mx-5 mb-3 px-3 py-4 space-y-3">
-      {/* Stage boxes */}
       <div className="flex items-center justify-between gap-1">
         {stages.map((s, i) => (
           <React.Fragment key={s.label}>
@@ -129,7 +132,6 @@ function CpuAnimation({ color }) {
           </React.Fragment>
         ))}
       </div>
-      {/* Stage name label */}
       <motion.p
         key={active}
         initial={{ opacity: 0, y: 4 }}
@@ -147,7 +149,6 @@ function CpuAnimation({ color }) {
 function CacheAnimation({ color }) {
   return (
     <div className="bg-[#060e20] rounded-xl mx-4 sm:mx-5 mb-3 px-4 py-3 space-y-3">
-      {/* Cache path — fast */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color }}>Cache HIT</span>
@@ -162,7 +163,6 @@ function CacheAnimation({ color }) {
           />
         </div>
       </div>
-      {/* RAM path — slow */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <span className="text-[9px] font-bold uppercase tracking-wide text-cyan-500">Cache MISS → RAM</span>
@@ -201,10 +201,8 @@ function ComponentCard({ comp, index }) {
       className="rounded-2xl border overflow-hidden bg-white/[0.02]"
       style={{ borderColor: `${comp.color}28` }}
     >
-      {/* Colored top strip */}
       <div className="h-1 w-full" style={{ backgroundColor: comp.color }} />
 
-      {/* Header */}
       <div className="px-4 sm:px-5 py-3.5 flex items-center gap-3 border-b border-white/[0.06]">
         <span className="text-2xl select-none leading-none">{comp.icon}</span>
         <h3 className="font-semibold text-white text-sm flex-1">{comp.title}</h3>
@@ -214,18 +212,15 @@ function ComponentCard({ comp, index }) {
         />
       </div>
 
-      {/* Component animation */}
       {comp.animationType && (() => {
         const Anim = COMPONENT_ANIMATIONS[comp.animationType]
         return Anim ? <Anim color={comp.color} /> : null
       })()}
 
-      {/* Summary */}
       <div className="px-4 sm:px-5 pt-1 pb-2.5">
         <p className="text-sm text-slate-300 leading-relaxed">{comp.summary}</p>
       </div>
 
-      {/* Stats */}
       {comp.stats?.length > 0 && (
         <div className="mx-4 sm:mx-5 mb-3 rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
           <div className="flex divide-x divide-white/[0.06]">
@@ -241,11 +236,607 @@ function ComponentCard({ comp, index }) {
         </div>
       )}
 
-      {/* Detail */}
       <div className="px-4 sm:px-5 pb-4">
         <p className="text-xs text-slate-400 leading-relaxed">{comp.detail}</p>
       </div>
     </motion.div>
+  )
+}
+
+// ── Requirements section ──────────────────────────────────────────────────────
+
+const REQ_COLUMNS = [
+  { key: 'functional',    label: 'Functional',      accent: 'text-violet-400', dot: 'bg-violet-400',  border: 'border-violet-500/20' },
+  { key: 'nonFunctional', label: 'Non-Functional',  accent: 'text-sky-400',    dot: 'bg-sky-400',     border: 'border-sky-500/20'    },
+  { key: 'scale',         label: 'Scale Estimates', accent: 'text-emerald-400',dot: 'bg-emerald-400', border: 'border-emerald-500/20' },
+]
+
+function RequirementsSection({ requirements }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Requirements</p>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {REQ_COLUMNS.map(({ key, label, accent, dot, border }) =>
+          requirements[key]?.length > 0 && (
+            <div key={key} className={`rounded-xl border ${border} bg-white/[0.02] px-5 py-4 space-y-3`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider ${accent}`}>{label}</p>
+              <ul className="space-y-2.5">
+                {requirements[key].map((r, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-300 leading-relaxed">
+                    <span className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${dot}`} />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Data model section ────────────────────────────────────────────────────────
+
+function DataModelSection({ dataModel }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Data Model</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {dataModel.map((entity) => (
+          <div key={entity.entity} className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+            <div className="px-5 py-3 border-b border-white/[0.06] flex items-baseline gap-3">
+              <span className="font-mono text-sm font-bold text-white">{entity.entity}</span>
+              {entity.note && (
+                <span className="text-xs text-slate-500 leading-snug">{entity.note}</span>
+              )}
+            </div>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/[0.05]">
+                  <th className="px-5 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-600">Field</th>
+                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-600">Type</th>
+                  <th className="px-5 py-2 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-600 hidden sm:table-cell">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entity.fields.map((field) => (
+                  <tr key={field.name} className="border-b border-white/[0.04] last:border-0">
+                    <td className="px-5 py-2 font-mono text-xs text-violet-300">{field.name}</td>
+                    <td className="px-3 py-2 font-mono text-xs text-slate-400 whitespace-nowrap">{field.type}</td>
+                    <td className="px-5 py-2 text-xs text-slate-500 hidden sm:table-cell">{field.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── API design section ────────────────────────────────────────────────────────
+
+const METHOD_COLOR = {
+  GET:    'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
+  POST:   'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+  PUT:    'bg-amber-500/15 text-amber-300 border border-amber-500/30',
+  PATCH:  'bg-orange-500/15 text-orange-300 border border-orange-500/30',
+  DELETE: 'bg-red-500/15 text-red-300 border border-red-500/30',
+}
+
+function ApiDesignSection({ apiDesign }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">API Design</p>
+      <div className="space-y-2">
+        {apiDesign.map((endpoint, i) => (
+          <div key={i} className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+            {/* Header row */}
+            <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-white/[0.06]">
+              <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold font-mono ${METHOD_COLOR[endpoint.method] ?? 'bg-white/5 text-slate-300'}`}>
+                {endpoint.method}
+              </span>
+              <code className="font-mono text-sm text-white">{endpoint.path}</code>
+              <span className="text-xs text-slate-500 sm:ml-auto">{endpoint.description}</span>
+            </div>
+
+            {/* Body panels */}
+            {(endpoint.reqBody || endpoint.resBody) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.06]">
+                {/* Request body */}
+                <div className="px-4 py-3 space-y-2">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-600">Request</p>
+                  <pre className="font-mono text-[11px] text-slate-400 leading-relaxed whitespace-pre-wrap">
+                    {endpoint.reqBody ?? '—'}
+                  </pre>
+                </div>
+                {/* Response body */}
+                <div className="px-4 py-3 space-y-2">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-600">Response</p>
+                  <pre className="font-mono text-[11px] text-slate-300 leading-relaxed whitespace-pre-wrap">
+                    {endpoint.resBody ?? '—'}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── High level design section ─────────────────────────────────────────────────
+
+function HldNode({ node }) {
+  return (
+    <div className="flex flex-col items-center gap-1 shrink-0">
+      <div className="rounded-xl border border-white/10 bg-[#07101f] px-3 py-2.5 flex flex-col items-center gap-1 min-w-[80px] max-w-[110px]">
+        <span className="text-lg leading-none">{node.icon}</span>
+        <p className="text-[11px] font-medium text-white text-center leading-tight">{node.label}</p>
+        {node.note && <p className="text-[9px] text-slate-500 text-center leading-tight">{node.note}</p>}
+      </div>
+    </div>
+  )
+}
+
+function HldArrow() {
+  return (
+    <div className="flex items-center shrink-0">
+      <div className="w-5 h-px bg-slate-700" />
+      <svg width="6" height="10" viewBox="0 0 6 10" fill="#334155" className="shrink-0">
+        <polygon points="0,0 0,10 6,5" />
+      </svg>
+    </div>
+  )
+}
+
+function LinearFlow({ nodes }) {
+  return (
+    <div className="flex items-center flex-wrap gap-y-4 overflow-x-auto py-2">
+      {nodes.map((node, i) => (
+        <React.Fragment key={i}>
+          <HldNode node={node} />
+          {i < nodes.length - 1 && <HldArrow />}
+        </React.Fragment>
+      ))}
+    </div>
+  )
+}
+
+function BranchedFlow({ preFlow, branches }) {
+  return (
+    <div className="flex items-center gap-0 overflow-x-auto py-2">
+      {/* Pre-fork nodes */}
+      <div className="flex items-center shrink-0">
+        {preFlow.map((node, i) => (
+          <React.Fragment key={i}>
+            <HldNode node={node} />
+            <HldArrow />
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Fork: vertical bar + branches */}
+      <div className="relative flex flex-col gap-4 shrink-0">
+        {/* Vertical connector spanning all branches */}
+        <div
+          className="absolute left-0 w-px bg-slate-700 pointer-events-none"
+          style={{ top: '25%', bottom: '25%' }}
+        />
+
+        {branches.map((branch, bi) => (
+          <div key={bi} className="flex items-center">
+            {/* Horizontal stub from vertical bar */}
+            <div className="flex items-center shrink-0">
+              <div className="w-5 h-px bg-slate-700" />
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="#334155" className="shrink-0 mr-1">
+                <polygon points="0,0 0,10 6,5" />
+              </svg>
+            </div>
+            {/* Branch label + nodes */}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] font-semibold uppercase tracking-wider text-slate-600 mr-1 whitespace-nowrap">
+                {branch.label}
+              </span>
+              {branch.nodes.map((node, ni) => (
+                <React.Fragment key={ni}>
+                  <HldNode node={node} />
+                  {ni < branch.nodes.length - 1 && <HldArrow />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function HldSection({ hldFlows }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const flow = hldFlows[activeIdx]
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 px-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">High Level Design</p>
+        <div className="flex-1 h-px bg-white/[0.06]" />
+        <span className="text-[10px] text-slate-600">{hldFlows.length} flows</span>
+      </div>
+
+      {/* Tab switcher */}
+      <div className="flex flex-wrap gap-2">
+        {hldFlows.map((f, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveIdx(i)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+              activeIdx === i
+                ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40'
+                : 'bg-white/[0.02] text-slate-400 border border-white/10 hover:bg-white/[0.04]'
+            }`}
+          >
+            {f.title}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIdx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.18 }}
+          className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 space-y-4"
+        >
+          <p className="text-sm text-slate-300 leading-relaxed">{flow.description}</p>
+
+          <div className="rounded-xl border border-white/[0.06] bg-[#07101f] px-4 py-4 overflow-x-auto">
+            {flow.flow && <LinearFlow nodes={flow.flow} />}
+            {flow.preFlow && flow.branches && (
+              <BranchedFlow preFlow={flow.preFlow} branches={flow.branches} />
+            )}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ── Option content renderer ───────────────────────────────────────────────────
+
+const LABEL_COLORS = {
+  'Pros':            'text-emerald-400',
+  'Cons':            'text-red-400',
+  'Best for':        'text-blue-400',
+  'Result':          'text-sky-400',
+  'Method':          'text-violet-400',
+  'Structure':       'text-violet-400',
+  'Drawback':        'text-amber-400',
+  'Why this wins':   'text-emerald-400',
+  'Fix':             'text-amber-400',
+  'Scale':           'text-sky-400',
+  'Trade-off':       'text-amber-400',
+  'Critical':        'text-red-400',
+  'Acceptable':      'text-emerald-400',
+}
+
+const CODE_TRIGGERS = [
+  '  Example:', '  CHARS', '  def ', '  SET ', '  GET ',
+  '  INCR ', '  encode(', '  if ', '  out', '  while ', '  return ',
+]
+
+function renderOptionContent(raw) {
+  const lines = raw.split('\n')
+  const blocks = []
+  let codeBuf = []
+  let inCode = false
+  let lastEmpty = false
+  let k = 0
+
+  const flushCode = () => {
+    if (!codeBuf.length) return
+    blocks.push(
+      <pre key={k++} className="rounded-lg bg-[#060e20] border border-white/[0.06] px-4 py-3 font-mono text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
+        {codeBuf.join('\n')}
+      </pre>
+    )
+    codeBuf = []
+    inCode = false
+    lastEmpty = false
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+
+    // Code block: trigger on known prefixes, continue while indented
+    const isCodeTrigger = CODE_TRIGGERS.some((p) => line.startsWith(p))
+    const isCodeContinuation = inCode && line.startsWith('  ')
+
+    if (isCodeTrigger || isCodeContinuation) {
+      inCode = true
+      codeBuf.push(line.replace(/^ {2}/, ''))
+      lastEmpty = false
+      continue
+    }
+
+    // Non-indented line while inCode → flush
+    if (inCode) flushCode()
+
+    // Empty line
+    if (trimmed === '') {
+      if (inCode) flushCode()
+      else if (!lastEmpty) { blocks.push(<div key={k++} className="h-1.5" />); lastEmpty = true }
+      continue
+    }
+    lastEmpty = false
+
+    // Bullet point
+    if (trimmed.startsWith('•') || trimmed.startsWith('- ')) {
+      const text = trimmed.replace(/^[•-]\s*/, '')
+      blocks.push(
+        <div key={k++} className="flex items-start gap-2.5">
+          <span className="mt-[6px] shrink-0 w-1.5 h-1.5 rounded-full bg-violet-400/70" />
+          <span className="text-sm text-slate-300 leading-relaxed">{text}</span>
+        </div>
+      )
+      continue
+    }
+
+    // Numbered step
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.+)/)
+    if (numMatch) {
+      blocks.push(
+        <div key={k++} className="flex items-start gap-2.5">
+          <span className="mt-0.5 shrink-0 w-4 h-4 rounded-full bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-[9px] text-violet-400 font-bold leading-none">
+            {numMatch[1]}
+          </span>
+          <span className="text-sm text-slate-300 leading-relaxed">{numMatch[2]}</span>
+        </div>
+      )
+      continue
+    }
+
+    // Colored label: "Label: rest..."
+    const labelMatch = trimmed.match(/^([A-Za-z][A-Za-z\s-]*?):\s+(.+)/)
+    if (labelMatch) {
+      const color = LABEL_COLORS[labelMatch[1]]
+      if (color) {
+        blocks.push(
+          <p key={k++} className="text-sm leading-relaxed">
+            <span className={`font-semibold ${color}`}>{labelMatch[1]}: </span>
+            <span className="text-slate-300">{labelMatch[2]}</span>
+          </p>
+        )
+        continue
+      }
+    }
+
+    // Regular text
+    blocks.push(<p key={k++} className="text-sm text-slate-300 leading-relaxed">{trimmed}</p>)
+  }
+  flushCode()
+
+  return <div className="space-y-2">{blocks}</div>
+}
+
+// ── Deep dive section ─────────────────────────────────────────────────────────
+
+const LEVEL_STYLE = {
+  mid:    'bg-sky-500/15 text-sky-300 border-sky-500/30',
+  senior: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  staff:  'bg-amber-500/15 text-amber-300 border-amber-500/30',
+}
+
+const LEVEL_CHEVRON = {
+  mid:    'text-sky-400',
+  senior: 'text-violet-400',
+  staff:  'text-amber-400',
+}
+
+const BADGE_CONFIG = {
+  'Chosen':         { cls: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25', card: 'border-emerald-500/25 bg-emerald-950/20', divider: 'border-emerald-500/10' },
+  'Decision Guide': { cls: 'text-violet-400 bg-violet-500/10 border-violet-500/25',   card: 'border-violet-500/20 bg-violet-950/10',   divider: 'border-violet-500/10' },
+  'Key Insight':    { cls: 'text-amber-400 bg-amber-500/10 border-amber-500/25',       card: 'border-amber-500/20 bg-amber-950/10',     divider: 'border-amber-500/10' },
+}
+
+function DeepDiveOption({ opt, isOpen, onToggle }) {
+  const badge = opt.badge ? BADGE_CONFIG[opt.badge] : null
+
+  return (
+    <div className={`rounded-lg border overflow-hidden transition-colors duration-200 ${badge ? badge.card : 'border-white/[0.06] bg-[#07101f]'}`}>
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-white/[0.025] transition-colors"
+      >
+        <motion.svg
+          animate={{ rotate: isOpen ? 90 : 0 }}
+          transition={{ duration: 0.18 }}
+          className={`shrink-0 w-3.5 h-3.5 transition-colors ${isOpen ? 'text-violet-400' : 'text-slate-500'}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </motion.svg>
+        <span className={`text-sm font-medium flex-1 ${isOpen ? 'text-slate-100' : 'text-slate-300'}`}>{opt.label}</span>
+        {opt.badge && (
+          <span className={`shrink-0 text-[9px] font-semibold rounded-full border px-2 py-0.5 tracking-wide ${badge.cls}`}>
+            {opt.badge}
+          </span>
+        )}
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="opt-body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className={`px-4 pb-4 pt-3 border-t ${badge ? badge.divider : 'border-white/[0.04]'}`}>
+              {renderOptionContent(opt.content)}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function DeepDiveItem({ item, isOpen, onToggle }) {
+  const [openOptions, setOpenOptions] = useState(new Set())
+
+  const toggleOption = (idx) => {
+    setOpenOptions((prev) => {
+      const next = new Set(prev)
+      if (next.has(idx)) next.delete(idx)
+      else next.add(idx)
+      return next
+    })
+  }
+
+  return (
+    <div className={`rounded-xl border overflow-hidden transition-all duration-200 ${
+      isOpen ? 'border-white/[0.16] bg-white/[0.025]' : 'border-white/10 bg-white/[0.02]'
+    }`}>
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors"
+      >
+        <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold capitalize ${LEVEL_STYLE[item.level]}`}>
+          {item.level}
+        </span>
+        <span className={`text-sm flex-1 leading-snug transition-colors ${isOpen ? 'text-white font-medium' : 'text-slate-200'}`}>
+          {item.question}
+        </span>
+        {item.options?.length > 0 && (
+          <span className="shrink-0 text-[10px] text-slate-600 font-mono mr-1">{item.options.length}</span>
+        )}
+        <motion.svg
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className={`shrink-0 w-4 h-4 transition-colors ${isOpen ? LEVEL_CHEVRON[item.level] : 'text-slate-500'}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </motion.svg>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="dd-body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 pb-5 pt-3 border-t border-white/[0.06] space-y-3">
+              {(item.description || item.answer) && (
+                <div className="rounded-lg border border-white/[0.05] bg-white/[0.015] px-4 py-3">
+                  <p className="text-sm text-slate-400 leading-relaxed">{item.description ?? item.answer}</p>
+                </div>
+              )}
+              {item.options?.length > 0 && (
+                <div className="space-y-1.5">
+                  {item.options.map((opt, i) => (
+                    <DeepDiveOption
+                      key={i}
+                      opt={opt}
+                      isOpen={openOptions.has(i)}
+                      onToggle={() => toggleOption(i)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function DeepDiveSection({ items }) {
+  const [openIdx, setOpenIdx] = useState(null)
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3 px-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Deep Dive</p>
+        <div className="flex-1 h-px bg-white/[0.06]" />
+        <div className="flex items-center gap-1.5">
+          {['mid', 'senior', 'staff'].map((level) => (
+            <span key={level} className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold ${LEVEL_STYLE[level]}`}>
+              {level}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-2">
+        {items.map((item, i) => (
+          <DeepDiveItem
+            key={i}
+            item={item}
+            isOpen={openIdx === i}
+            onToggle={() => setOpenIdx(openIdx === i ? null : i)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Level expectations section ────────────────────────────────────────────────
+
+const LEVEL_COLS = [
+  { key: 'mid',    label: 'Mid  (L4)',    style: 'text-sky-300 bg-sky-500/10 border-sky-500/30' },
+  { key: 'senior', label: 'Senior (L5)', style: 'text-violet-300 bg-violet-500/10 border-violet-500/30' },
+  { key: 'staff',  label: 'Staff  (L6)', style: 'text-amber-300 bg-amber-500/10 border-amber-500/30' },
+]
+
+function LevelExpectationsSection({ rows }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Level Expectations</p>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
+        {/* Header */}
+        <div className="grid grid-cols-4 border-b border-white/[0.06] bg-white/[0.02]">
+          <div className="px-4 py-2.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">Dimension</span>
+          </div>
+          {LEVEL_COLS.map((col) => (
+            <div key={col.key} className="px-4 py-2.5">
+              <span className={`text-[10px] font-semibold uppercase tracking-wider ${col.style.split(' ')[0]}`}>
+                {col.label}
+              </span>
+            </div>
+          ))}
+        </div>
+        {/* Rows */}
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-4 border-b border-white/[0.04] last:border-0"
+          >
+            <div className="px-4 py-3 flex items-start">
+              <span className="text-xs font-semibold text-white leading-relaxed">{row.dimension}</span>
+            </div>
+            {LEVEL_COLS.map((col) => (
+              <div key={col.key} className="px-4 py-3 border-l border-white/[0.04]">
+                <p className="text-xs text-slate-400 leading-relaxed">{row[col.key]}</p>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -255,12 +846,13 @@ export default function SystemDesignPage() {
   const { id }  = useParams()
   const item    = SYSTEM_DESIGN.find((s) => s.id === id)
 
-  const DiagramComponent = useMemo(() => {
-    if (!item) return null
-    const folder = `${item.type}s`
-    const loader = DIAGRAMS[`../content/system-design/${folder}/${id}/Diagram.jsx`]
-    return loader ? React.lazy(loader) : null
-  }, [id, item])
+  const folder = item ? `${item.type}s` : null
+  const ConceptIllustrationComponent = folder
+    ? LAZY_CONCEPT_ILLUSTRATIONS[`../content/system-design/${folder}/${id}/ConceptIllustration.jsx`] ?? null
+    : null
+  const DiagramComponent = folder
+    ? LAZY_DIAGRAMS[`../content/system-design/${folder}/${id}/Diagram.jsx`] ?? null
+    : null
 
   if (!item) return <Navigate to="/system-design" replace />
 
@@ -307,6 +899,25 @@ export default function SystemDesignPage() {
         )}
       </div>
 
+      {/* Concept illustration */}
+      {ConceptIllustrationComponent && (
+        <Suspense fallback={null}>
+          <ConceptIllustrationComponent />
+        </Suspense>
+      )}
+
+      {/* Requirements */}
+      {item.requirements && <RequirementsSection requirements={item.requirements} />}
+
+      {/* Data Model */}
+      {item.dataModel?.length > 0 && <DataModelSection dataModel={item.dataModel} />}
+
+      {/* API Design */}
+      {item.apiDesign?.length > 0 && <ApiDesignSection apiDesign={item.apiDesign} />}
+
+      {/* High Level Design */}
+      {item.hldFlows?.length > 0 && <HldSection hldFlows={item.hldFlows} />}
+
       {/* Diagram */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3 sm:p-5">
         <Suspense fallback={
@@ -348,6 +959,12 @@ export default function SystemDesignPage() {
         </div>
       )}
 
+      {/* Deep Dive Q&A */}
+      {item.deepDive?.length > 0 && <DeepDiveSection items={item.deepDive} />}
+
+      {/* Level expectations */}
+      {item.levelExpectations?.length > 0 && <LevelExpectationsSection rows={item.levelExpectations} />}
+
       {/* Components */}
       {item.components?.length > 0 && (
         <div className="space-y-5">
@@ -364,7 +981,7 @@ export default function SystemDesignPage() {
         </div>
       )}
 
-            {/* Key takeaways */}
+      {/* Key takeaways */}
       {item.keyPoints?.length > 0 && (
         <div className="space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 px-1">Key takeaways</p>

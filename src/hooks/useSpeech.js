@@ -17,15 +17,17 @@ export function useSpeech() {
     return () => { window.speechSynthesis.onvoiceschanged = null }
   }, [])
 
-  // Restore saved voice once the voice list is available
-  useEffect(() => {
-    if (!voices.length) return
+  // Restore saved voice once the voice list is available — adjusted during
+  // render (guarded by state) instead of an effect, since it only needs to run once.
+  const [restoredVoice, setRestoredVoice] = useState(false)
+  if (!restoredVoice && voices.length) {
+    setRestoredVoice(true)
     const saved = localStorage.getItem('tts-voice-uri')
     if (saved) {
       const match = voices.find(v => v.voiceURI === saved)
       if (match) setSelectedVoiceState(match)
     }
-  }, [voices])
+  }
 
   const setVoice = useCallback((voice) => {
     setSelectedVoiceState(voice)

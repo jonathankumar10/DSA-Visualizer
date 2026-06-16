@@ -184,16 +184,6 @@ export default function ConsistentHashingDiagram({ onStepChange }) {
   useEffect(() => { onStepChange?.(step) }, [step, onStepChange])
 
   const [expandedNode, setExpandedNode] = useState(null)
-  const [popKeys,      setPopKeys]      = useState({})
-
-  useEffect(() => {
-    if (!step.activeNodes.length) return
-    setPopKeys((prev) => {
-      const next = { ...prev }
-      step.activeNodes.forEach((id) => { next[id] = (prev[id] ?? -1) + 1 })
-      return next
-    })
-  }, [step])
 
   const visitedNodes = useMemo(() => {
     const s = new Set()
@@ -317,7 +307,7 @@ export default function ConsistentHashingDiagram({ onStepChange }) {
                 wasVisited={visitedNodes.has(sv.id) && !step.activeNodes.includes(sv.id)}
                 isExpanded={expandedNode === sv.id}
                 onClick={() => setExpandedNode((p) => p === sv.id ? null : sv.id)}
-                popKey={popKeys[sv.id] ?? null}
+                popKey={step.activeNodes.includes(sv.id) ? index : null}
                 show={sv.id !== 'server-e' || step.activeNodes.includes('server-e')}
               />
             ))}

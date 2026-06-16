@@ -206,7 +206,7 @@ function RibbonStrip({ step }) {
             />
           )}
 
-          {cells.map(({ i, val, isMid, isActive, bg }) => (
+          {cells.map(({ i, val, isMid, bg }) => (
             <div key={i} className="relative flex-shrink-0" style={{ width: 28, height: 28 }}>
               {/* Pinch burst on mid */}
               {isMid && (
@@ -255,7 +255,6 @@ function RibbonStrip({ step }) {
 // Shows mid → row → col → value in a lively animated sequence
 function FormulaPanel({ step, animKey }) {
   const { mid, midRow, midCol, midVal, left, right, cols, type } = step
-  const isSmall = type === 'go-right' || type === 'go-left'
 
   const valColor =
     type === 'found'    ? 'text-emerald-300' :

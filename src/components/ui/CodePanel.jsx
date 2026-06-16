@@ -20,7 +20,7 @@ function tokenizeJava(line) {
   let m
   JAVA_TOKEN_RE.lastIndex = 0
   while ((m = JAVA_TOKEN_RE.exec(line)) !== null) {
-    const [full, lineComment, blockComment, str, num, ident, punct] = m
+    const [full, lineComment, blockComment, str, num, ident] = m
     if (lineComment || blockComment) tokens.push({ t: 'cm', v: full })
     else if (str)   tokens.push({ t: 'st', v: full })
     else if (num)   tokens.push({ t: 'nm', v: full })
@@ -54,7 +54,7 @@ function tokenizePython(line) {
   let m
   PY_TOKEN_RE.lastIndex = 0
   while ((m = PY_TOKEN_RE.exec(line)) !== null) {
-    const [full, comment, str, num, ident, punct] = m
+    const [full, comment, str, num, ident] = m
     if (comment) tokens.push({ t: 'cm', v: full })
     else if (str)   tokens.push({ t: 'st', v: full })
     else if (num)   tokens.push({ t: 'nm', v: full })
@@ -117,23 +117,25 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
   const [activeLang, setActiveLang] = useState('java')
   const scrollRef = useRef(null)
 
-  // Follow visualizer-controlled approach (e.g. tree-traversal order)
-  useEffect(() => {
-    if (syncedApproachId) setActiveId(syncedApproachId)
-  }, [syncedApproachId])
+  // Follow visualizer-controlled approach (e.g. tree-traversal order) —
+  // adjusted during render instead of an effect.
+  const [prevSyncedApproachId, setPrevSyncedApproachId] = useState(syncedApproachId)
+  if (syncedApproachId && syncedApproachId !== prevSyncedApproachId) {
+    setPrevSyncedApproachId(syncedApproachId)
+    setActiveId(syncedApproachId)
+  }
 
   const approach = approaches.find((a) => a.id === activeId) ?? approaches[0]
-  if (!approach) return null
 
   // Reset to java when switching to an approach that has no python
-  const hasPython = !!(approach.python)
+  const hasPython = !!(approach?.python)
   const currentLang = hasPython ? activeLang : 'java'
 
   // Resolve code + highlighter for the current language
-  const impl = currentLang === 'python' ? approach.python : (approach.java ?? approach)
-  const code         = impl?.code         ?? approach.code ?? ''
+  const impl = currentLang === 'python' ? approach?.python : (approach?.java ?? approach)
+  const code         = impl?.code         ?? approach?.code ?? ''
   const getHL        = impl?.getHighlightLines
-  const legacyLines  = impl?.stepLines ?? approach.stepLines
+  const legacyLines  = impl?.stepLines ?? approach?.stepLines
 
   const highlightedLines = (() => {
     if (!step) return []
@@ -145,7 +147,7 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
   const highlightSet = new Set(highlightedLines)
   const currentLine  = highlightedLines[0] ?? null
 
-  const language = currentLang === 'python' ? 'python' : (approach.language ?? 'java')
+  const language = currentLang === 'python' ? 'python' : (approach?.language ?? 'java')
 
   const lines = code.split('\n')
   const tokenizedLines = lines.map((line) => tokenize(line.length ? line : ' ', language))
@@ -155,6 +157,8 @@ export default function CodePanel({ solution, step, syncedApproachId }) {
     const lineEl = scrollRef.current.querySelector(`[data-line="${currentLine}"]`)
     lineEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [currentLine, activeId, currentLang])
+
+  if (!approach) return null
 
   return (
     <div className="flex flex-col rounded-2xl border border-white/10 bg-slate-900 overflow-hidden">

@@ -7,16 +7,44 @@ import StepControls from '../../../../components/ui/StepControls'
 // ── Node definitions ──────────────────────────────────────────────────────────
 
 const NODE_META = {
-  client: { label: 'Client',        icon: '💻', desc: 'Browser or mobile app making the request.' },
-  lb:     { label: 'Load Balancer', icon: '⚖️',  desc: 'Distributes traffic across API server instances. Handles SSL termination.' },
-  api:    { label: 'API Server',    icon: '⚙️',  desc: 'Validates requests, generates Base62 codes, orchestrates reads/writes.' },
-  cache:  { label: 'Redis Cache',   icon: '⚡',  desc: 'In-memory key→value store. O(1) lookup, sub-millisecond reads.' },
-  db:     { label: 'Database',      icon: '🗄️',  desc: 'Persistent store for all short_code → long_url mappings.' },
+  client:     { label: 'Client',          icon: '💻', desc: 'Browser or mobile app making the request.' },
+  lb:         { label: 'Load Balancer',   icon: '⚖️',  desc: 'Distributes traffic across API server instances. Handles SSL termination.' },
+  api:        { label: 'API Server',      icon: '⚙️',  desc: 'Validates requests, generates Base62 codes, orchestrates reads/writes.' },
+  cache:      { label: 'Redis Cache',     icon: '⚡',  desc: 'In-memory key→value store. O(1) lookup, sub-millisecond reads.' },
+  db:         { label: 'Database',        icon: '🗄️',  desc: 'Persistent store for all short_code → long_url mappings.' },
+  kafka:      { label: 'Kafka',           icon: '📨', desc: 'Receives the click event after the redirect is already sent — fully decoupled from user-facing latency.' },
+  analytics:  { label: 'Analytics Svc',   icon: '📊', desc: 'Consumes the Kafka stream asynchronously and tallies clicks.' },
+  counters:   { label: 'Redis Counters',  icon: '⚡',  desc: 'INCR per short_code — real-time click counts for dashboards.' },
+  clickhouse: { label: 'ClickHouse',      icon: '🗄️',  desc: 'Periodic flush target — durable store for historical, ad-hoc analytics queries.' },
 }
 
 // Vertical layout order for the main path: client → lb → api
 // Then storage: cache and db side-by-side below api
 const MAIN_PATH = ['client', 'lb', 'api']
+
+// ── Branch layout (api fans out to cache / db / kafka, kafka fans further down) ─
+// All coordinates are pixel positions inside a fixed-size SVG canvas so every
+// line is guaranteed to start and end exactly at the node it connects to.
+
+const BRANCH_W = 700
+const BOX_W = 120
+const BOX_H = 92
+
+const JUNCTION_Y1   = 26
+const TOP_ROW1      = 46
+const BOTTOM_ROW1   = TOP_ROW1 + BOX_H
+const TOP_ANALYTICS = BOTTOM_ROW1 + 34
+const BOTTOM_ANALYTICS = TOP_ANALYTICS + BOX_H
+const JUNCTION_Y2   = BOTTOM_ANALYTICS + 18
+const TOP_ROW3       = JUNCTION_Y2 + 20
+const BOTTOM_ROW3    = TOP_ROW3 + BOX_H
+const BRANCH_H        = BOTTOM_ROW3 + 10
+
+const CACHE_X = 140
+const DB_X    = 350
+const KAFKA_X = 560
+const COUNTERS_X   = 490
+const CLICKHOUSE_X = 630
 
 // ── Vertical connector arrow ──────────────────────────────────────────────────
 
@@ -89,9 +117,51 @@ function HorizArrow({ isActive, direction = 'right', stepKey }) {
   )
 }
 
+// ── Branch connector line (drawn inside the SVG canvas) ────────────────────────
+
+function BranchLine({ x1, y1, x2, y2, isActive, withArrow = true, stepKey, delayMs = 0 }) {
+  const isVertical = x1 === x2
+  return (
+    <g>
+      <line
+        x1={x1} y1={y1} x2={x2} y2={y2}
+        stroke={isActive ? '#3b82f6' : '#334155'}
+        strokeWidth={isActive ? 2 : 1}
+        style={{ transition: 'stroke 0.3s' }}
+      />
+      {withArrow && (
+        <polygon
+          points={isVertical ? `${x2 - 5},${y2 - 6} ${x2 + 5},${y2 - 6} ${x2},${y2}` : `${x2 - 6},${y2 - 5} ${x2 - 6},${y2 + 5} ${x2},${y2}`}
+          fill={isActive ? '#2563eb' : '#334155'}
+        />
+      )}
+      {isActive && (
+        <motion.circle
+          key={`${stepKey}-branch-${x1}-${y1}-${x2}-${y2}`}
+          r={3.5}
+          fill="#60a5fa"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(96,165,250,0.85))' }}
+          animate={{ cx: [x1, x2], cy: [y1, y2] }}
+          transition={{ duration: 0.5, delay: delayMs / 1000, ease: 'linear', repeat: Infinity, repeatDelay: 0.4 }}
+        />
+      )}
+    </g>
+  )
+}
+
+// ── Branch node (absolutely positioned inside the SVG canvas's HTML overlay) ───
+
+function BranchNode({ id, cx, top, isActive, shortCode }) {
+  return (
+    <div className="absolute" style={{ left: cx - BOX_W / 2, top, width: BOX_W }}>
+      <NodeCard id={id} isActive={isActive} shortCode={shortCode} fullWidth />
+    </div>
+  )
+}
+
 // ── Node card ─────────────────────────────────────────────────────────────────
 
-function NodeCard({ id, isActive, shortCode }) {
+function NodeCard({ id, isActive, shortCode, fullWidth = false }) {
   const meta = NODE_META[id]
   const isStorage = id === 'cache' || id === 'db'
 
@@ -104,7 +174,7 @@ function NodeCard({ id, isActive, shortCode }) {
       className="relative flex flex-col items-center gap-1.5 rounded-2xl border bg-slate-900 px-3 py-3 select-none"
       style={{
         boxShadow: isActive ? '0 0 22px -4px rgba(59,130,246,0.55)' : 'none',
-        width: isStorage ? '5.5rem' : '7.5rem',
+        width: fullWidth ? '100%' : isStorage ? '5.5rem' : '7.5rem',
       }}
     >
       <span className="text-xl leading-none">{meta.icon}</span>
@@ -142,7 +212,14 @@ function NodeCard({ id, isActive, shortCode }) {
 
 // ── Phase badge ───────────────────────────────────────────────────────────────
 
+const PHASE_META = {
+  write:     { icon: '✏️', label: 'Write Flow — Shorten a URL',         classes: 'bg-amber-500/15 text-amber-300 border border-amber-500/30' },
+  read:      { icon: '↗️', label: 'Read Flow — Follow the Short URL',   classes: 'bg-sky-500/15 text-sky-300 border border-sky-500/30' },
+  analytics: { icon: '📊', label: 'Analytics Flow — Track the Click (Async)', classes: 'bg-violet-500/15 text-violet-300 border border-violet-500/30' },
+}
+
 function PhaseBadge({ phase }) {
+  const meta = PHASE_META[phase]
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -151,14 +228,10 @@ function PhaseBadge({ phase }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 6 }}
         transition={{ duration: 0.2 }}
-        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-          phase === 'write'
-            ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-            : 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
-        }`}
+        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${meta.classes}`}
       >
-        <span>{phase === 'write' ? '✏️' : '↗️'}</span>
-        {phase === 'write' ? 'Write Flow — Shorten a URL' : 'Read Flow — Follow the Short URL'}
+        <span>{meta.icon}</span>
+        {meta.label}
       </motion.div>
     </AnimatePresence>
   )
@@ -227,32 +300,35 @@ export default function UrlShortenerDiagram({ onStepChange }) {
           {/* API Server */}
           <NodeCard id="api" isActive={active.includes('api')} shortCode={shortCode} />
 
-          {/* api → cache AND api → db (horizontal row below api) */}
-          <div className="flex items-start gap-0 mt-0">
+          {/* api fans out to cache / db / kafka; kafka fans further down to
+              analytics → {counters, clickhouse}. Drawn on a fixed-size SVG
+              canvas so every connector line starts and ends exactly at the
+              node it links — nothing is left visually floating. */}
+          <div className="relative" style={{ width: BRANCH_W, height: BRANCH_H, maxWidth: '100%' }}>
+            <svg className="absolute inset-0 pointer-events-none overflow-visible" viewBox={`0 0 ${BRANCH_W} ${BRANCH_H}`} width="100%" height={BRANCH_H}>
+              {/* api → fan-out junction → cache / db / kafka */}
+              <BranchLine x1={DB_X} y1={0} x2={DB_X} y2={JUNCTION_Y1} isActive={active.includes('api')} withArrow={false} stepKey={index} />
+              <line x1={CACHE_X} y1={JUNCTION_Y1} x2={KAFKA_X} y2={JUNCTION_Y1} stroke="#334155" strokeWidth={1} />
+              <BranchLine x1={CACHE_X} y1={JUNCTION_Y1} x2={CACHE_X} y2={TOP_ROW1} isActive={arrowActive('api', 'cache')} stepKey={index} />
+              <BranchLine x1={DB_X}    y1={JUNCTION_Y1} x2={DB_X}    y2={TOP_ROW1} isActive={arrowActive('api', 'db')} stepKey={index} delayMs={80} />
+              <BranchLine x1={KAFKA_X} y1={JUNCTION_Y1} x2={KAFKA_X} y2={TOP_ROW1} isActive={arrowActive('api', 'kafka')} stepKey={index} delayMs={160} />
 
-            {/* Left branch: cache */}
-            <div className="flex flex-col items-center">
-              <VerticalArrow
-                isActive={arrowActive('api', 'cache') || arrowActive('cache', 'api')}
-                direction={arrowActive('cache', 'api') ? 'up' : 'down'}
-                stepKey={index}
-              />
-              <NodeCard id="cache" isActive={active.includes('cache')} shortCode={shortCode} />
-            </div>
+              {/* kafka → analytics */}
+              <BranchLine x1={KAFKA_X} y1={BOTTOM_ROW1} x2={KAFKA_X} y2={TOP_ANALYTICS} isActive={arrowActive('kafka', 'analytics')} stepKey={index} />
 
-            {/* Spacer */}
-            <div className="w-8" />
+              {/* analytics → junction → counters / clickhouse */}
+              <BranchLine x1={KAFKA_X} y1={BOTTOM_ANALYTICS} x2={KAFKA_X} y2={JUNCTION_Y2} isActive={active.includes('analytics')} withArrow={false} stepKey={index} />
+              <line x1={COUNTERS_X} y1={JUNCTION_Y2} x2={CLICKHOUSE_X} y2={JUNCTION_Y2} stroke="#334155" strokeWidth={1} />
+              <BranchLine x1={COUNTERS_X}   y1={JUNCTION_Y2} x2={COUNTERS_X}   y2={TOP_ROW3} isActive={arrowActive('analytics', 'counters')} stepKey={index} />
+              <BranchLine x1={CLICKHOUSE_X} y1={JUNCTION_Y2} x2={CLICKHOUSE_X} y2={TOP_ROW3} isActive={arrowActive('analytics', 'clickhouse')} stepKey={index} delayMs={80} />
+            </svg>
 
-            {/* Right branch: db */}
-            <div className="flex flex-col items-center">
-              <VerticalArrow
-                isActive={arrowActive('api', 'db') || arrowActive('db', 'api')}
-                direction={arrowActive('db', 'api') ? 'up' : 'down'}
-                stepKey={index}
-                delayMs={80}
-              />
-              <NodeCard id="db" isActive={active.includes('db')} shortCode={shortCode} />
-            </div>
+            <BranchNode id="cache"      cx={CACHE_X}      top={TOP_ROW1}      isActive={active.includes('cache')}      shortCode={shortCode} />
+            <BranchNode id="db"         cx={DB_X}         top={TOP_ROW1}      isActive={active.includes('db')}         shortCode={shortCode} />
+            <BranchNode id="kafka"      cx={KAFKA_X}      top={TOP_ROW1}      isActive={active.includes('kafka')}      shortCode={shortCode} />
+            <BranchNode id="analytics"  cx={KAFKA_X}      top={TOP_ANALYTICS} isActive={active.includes('analytics')}  shortCode={shortCode} />
+            <BranchNode id="counters"   cx={COUNTERS_X}   top={TOP_ROW3}      isActive={active.includes('counters')}   shortCode={shortCode} />
+            <BranchNode id="clickhouse" cx={CLICKHOUSE_X} top={TOP_ROW3}      isActive={active.includes('clickhouse')} shortCode={shortCode} />
           </div>
 
         </div>

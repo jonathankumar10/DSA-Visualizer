@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { Suspense } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { PATTERNS, PATTERN_COLORS } from '../constants/patternsRegistry'
@@ -6,18 +6,20 @@ import { DIFFICULTY_COLOR } from '../constants/algorithmRegistry'
 
 const ANIMATIONS = import.meta.glob('../content/patterns/*/Animation.jsx')
 
+// Lazy components must be created once, at module scope — not during render.
+const LAZY_ANIMATIONS = Object.fromEntries(
+  Object.entries(ANIMATIONS).map(([key, loader]) => [key, React.lazy(loader)])
+)
+
 export default function PatternPage() {
   const { id } = useParams()
   const pattern = PATTERNS.find((p) => p.id === id)
 
+  const AnimationComponent = LAZY_ANIMATIONS[`../content/patterns/${id}/Animation.jsx`] ?? null
+
   if (!pattern) return <Navigate to="/patterns" replace />
 
   const c = PATTERN_COLORS[pattern.color]
-
-  const AnimationComponent = useMemo(() => {
-    const loader = ANIMATIONS[`../content/patterns/${id}/Animation.jsx`]
-    return loader ? React.lazy(loader) : null
-  }, [id])
 
   return (
     <motion.div

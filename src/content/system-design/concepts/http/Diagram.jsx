@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { buildHttpSteps } from './steps'
 import { useTtsRunner } from '../../../../hooks/useTtsRunner'
@@ -143,7 +143,6 @@ function FlyingMessage({ msg, trackY, stepKey, trackIndex }) {
 function ConnectionLane({ connection, messages, stepKey }) {
   const isHttp2    = connection === 'http2'
   const connMeta   = connection ? CONN_LABEL[connection] : null
-  const trackCount = Math.max(messages.length, 1)
   const laneH      = isHttp2 ? 110 : 80
 
   const trackPositions = isHttp2
@@ -283,17 +282,7 @@ export default function HttpDiagram() {
   const { step, index } = runner
 
   const [expandedNode, setExpandedNode] = useState(null)
-  const [popKeys, setPopKeys]           = useState({})
-
-  useEffect(() => {
-    const active = step.messages.length ? ['client', 'server'] : []
-    if (!active.length) return
-    setPopKeys((prev) => {
-      const next = { ...prev }
-      active.forEach((id) => { next[id] = (prev[id] ?? -1) + 1 })
-      return next
-    })
-  }, [step])
+  const popKey = step.messages.length ? index : null
 
   const clientActive = !!step.messages.find((m) => m.dir === 'forward') || step.connection === 'connecting'
   const serverActive = !!step.messages.find((m) => m.dir === 'backward') || step.connection === 'connecting'
@@ -327,7 +316,7 @@ export default function HttpDiagram() {
             wasVisited={anyActive && !clientActive}
             isExpanded={expandedNode === 'client'}
             onClick={() => setExpandedNode((p) => p === 'client' ? null : 'client')}
-            popKey={popKeys['client'] ?? null}
+            popKey={popKey}
             desc="The initiator of every HTTP exchange. Sends a request and waits for a response. Can be a browser, mobile app, CLI tool, or another service."
             example="curl, fetch(), axios"
           />
@@ -347,7 +336,7 @@ export default function HttpDiagram() {
             wasVisited={anyActive && !serverActive}
             isExpanded={expandedNode === 'server'}
             onClick={() => setExpandedNode((p) => p === 'server' ? null : 'server')}
-            popKey={popKeys['server'] ?? null}
+            popKey={popKey}
             desc="Listens on a port, parses the request, executes application logic, and writes a response. Can serve multiple clients simultaneously through threading or async I/O."
             example=":443 (HTTPS)"
           />

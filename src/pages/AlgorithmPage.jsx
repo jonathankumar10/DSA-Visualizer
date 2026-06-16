@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useCallback, useMemo } from 'react'
+import React, { Suspense, useState, useCallback } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ALGORITHMS, DIFFICULTY_COLOR } from '../constants/algorithmRegistry'
@@ -7,6 +7,11 @@ import CodePanel from '../components/ui/CodePanel'
 // Vite resolves this glob at build time — no manual imports ever needed.
 // To add a new visualizer: drop Visualizer.jsx in its algorithm folder. Done.
 const VISUALIZERS = import.meta.glob('../content/algorithms/*/Visualizer.jsx')
+
+// Lazy components must be created once, at module scope — not during render.
+const LAZY_VISUALIZERS = Object.fromEntries(
+  Object.entries(VISUALIZERS).map(([key, loader]) => [key, React.lazy(loader)])
+)
 
 export default function AlgorithmPage() {
   const { id } = useParams()
@@ -18,15 +23,12 @@ export default function AlgorithmPage() {
   const handleStep  = useCallback((s) => setCurrentStep(s), [])
   const handleOrder = useCallback((o) => setTreeOrder(o),   [])
 
+  const VisualizerComponent = LAZY_VISUALIZERS[`../content/algorithms/${id}/Visualizer.jsx`] ?? null
+
   if (!algo) return <Navigate to="/algorithms" replace />
 
   // tree-traversal keeps its code panel tab in sync with the order selector
   const syncedApproachId = algo.id === 'tree-traversal' ? treeOrder : undefined
-
-  const VisualizerComponent = useMemo(() => {
-    const loader = VISUALIZERS[`../content/algorithms/${id}/Visualizer.jsx`]
-    return loader ? React.lazy(loader) : null
-  }, [id])
 
   return (
     <motion.div

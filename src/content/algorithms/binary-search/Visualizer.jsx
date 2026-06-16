@@ -137,7 +137,7 @@ function LockerCell({ value, state, animKey }) {
 }
 
 // ─── Wall markers — L and R squeeze inward, M probes from above ───────────────
-function WallMarker({ label, pos, color, totalCells }) {
+function WallMarker({ label, pos, color }) {
   const isR = label === 'R'
   const isM = label === 'M'
 

@@ -283,7 +283,7 @@ function DepthGhosts({ count }) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getCharState(idx, step, inputLen) {
+function getCharState(idx, step) {
   const { type, charIndex, cause } = step
   if (type === 'init') return 'pending'
   if (type === 'valid' || (type === 'invalid' && cause === 'unclosed')) return 'done'
@@ -403,7 +403,7 @@ export default function ValidParenthesesVisualizer({ onStepChange }) {
               <GateChip
                 key={i}
                 char={c}
-                state={getCharState(i, step, chars.length)}
+                state={getCharState(i, step)}
                 runnerIndex={runnerIndex}
               />
             ))}

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { buildKeyValueStoreSteps } from './steps'
 import { useStepRunner } from '../../../../hooks/useStepRunner'
@@ -260,16 +260,6 @@ export default function KeyValueStoreDiagram() {
   const { step, index } = runner
 
   const [expandedNode, setExpandedNode] = useState(null)
-  const [popKeys,      setPopKeys]      = useState({})
-
-  useEffect(() => {
-    if (!step.activeNodes.length) return
-    setPopKeys((prev) => {
-      const next = { ...prev }
-      step.activeNodes.forEach((id) => { next[id] = (prev[id] ?? -1) + 1 })
-      return next
-    })
-  }, [step])
 
   const visitedNodes = useMemo(() => {
     const s = new Set()
@@ -330,7 +320,7 @@ export default function KeyValueStoreDiagram() {
                   wasVisited={visitedNodes.has(node.id) && !step.activeNodes.includes(node.id)}
                   isExpanded={expandedNode === node.id}
                   onClick={() => setExpandedNode((p) => p === node.id ? null : node.id)}
-                  popKey={popKeys[node.id] ?? null}
+                  popKey={step.activeNodes.includes(node.id) ? index : null}
                   isDown={nodeCDown && node.id === 'nodeC'}
                 />
               ))}

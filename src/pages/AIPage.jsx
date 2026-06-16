@@ -1,9 +1,14 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { Suspense } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AI_ITEMS, AI_COLORS, AI_CATEGORY_LABELS, LIVE_CODING_AI_GUIDE } from '../constants/aiRegistry'
 
 const AI_ANIMATIONS = import.meta.glob('../content/ai/*/Animation.jsx')
+
+// Lazy components must be created once, at module scope — not during render.
+const AI_LAZY_ANIMATIONS = Object.fromEntries(
+  Object.entries(AI_ANIMATIONS).map(([key, loader]) => [key, React.lazy(loader)])
+)
 
 export default function AIPage() {
   const { id } = useParams()
@@ -58,10 +63,7 @@ export default function AIPage() {
 function AIDetail({ item, c }) {
   if (item.category === 'live-coding') return <LiveCodingDetail item={item} c={c} />
 
-  const AnimationComponent = useMemo(() => {
-    const loader = AI_ANIMATIONS[`../content/ai/${item.id}/Animation.jsx`]
-    return loader ? React.lazy(loader) : null
-  }, [item.id])
+  const AnimationComponent = AI_LAZY_ANIMATIONS[`../content/ai/${item.id}/Animation.jsx`] ?? null
 
   return (
     <div className="space-y-8">
@@ -291,7 +293,7 @@ function KeyPointsPanel({ item, c }) {
   )
 }
 
-function InfoPanel({ title, c, children }) {
+function InfoPanel({ title, children }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 space-y-3">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{title}</p>

@@ -114,7 +114,7 @@ const PTR_LABEL = {
   head: { text: 'head', color: 'text-amber-300',   line: 'bg-amber-400'   },
 }
 
-function NodeCard({ node, stateKey, ptrKey, animKey }) {
+function NodeCard({ node, stateKey, ptrKey }) {
   const s   = NODE_STYLE[stateKey] || NODE_STYLE.remaining
   const ptr = ptrKey ? PTR_LABEL[ptrKey] : null
   const pop = stateKey === 'prev' || stateKey === 'head'
@@ -173,7 +173,7 @@ function NodeCard({ node, stateKey, ptrKey, animKey }) {
 
 // ── Null terminal ─────────────────────────────────────────────────────────────
 
-function NullTerminal({ label, glow }) {
+function NullTerminal({ glow }) {
   return (
     <div className="flex flex-col items-center gap-0.5 shrink-0 self-end mb-0.5">
       <div className="h-8" />

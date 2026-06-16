@@ -17,13 +17,53 @@ const DIFFICULTY_COLOR = {
   Hard:   'text-rose-400 bg-rose-500/10 border-rose-500/25',
 }
 
+function AdjacentNav({ prevItem, nextItem, basePath }) {
+  if (!prevItem && !nextItem) return null
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+      {prevItem ? (
+        <Link
+          to={`${basePath}/${prevItem.id}`}
+          className="group rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-colors px-5 py-4 flex items-center gap-3"
+        >
+          <svg className="shrink-0 w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">Previous</p>
+            <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors truncate">{prevItem.title}</p>
+          </div>
+        </Link>
+      ) : <div />}
+      {nextItem && (
+        <Link
+          to={`${basePath}/${nextItem.id}`}
+          className="group rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-colors px-5 py-4 flex items-center justify-end gap-3 text-right"
+        >
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">Next</p>
+            <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors truncate">{nextItem.title}</p>
+          </div>
+          <svg className="shrink-0 w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      )}
+    </div>
+  )
+}
+
 export default function OODPage() {
   const { id } = useParams()
-  const item   = OOD_ITEMS.find((i) => i.id === id)
+  const index  = OOD_ITEMS.findIndex((i) => i.id === id)
+  const item   = OOD_ITEMS[index]
 
   if (!item) return <Navigate to="/ood" replace />
 
   const c = OOD_COLORS[item.color]
+  const prevItem = index > 0 ? OOD_ITEMS[index - 1] : null
+  const nextItem = index < OOD_ITEMS.length - 1 ? OOD_ITEMS[index + 1] : null
 
   return (
     <motion.div
@@ -63,6 +103,9 @@ export default function OODPage() {
       </div>
 
       {item.type === 'pattern' ? <PatternDetail item={item} c={c} /> : <QuestionDetail item={item} c={c} />}
+
+      {/* Next / Previous */}
+      <AdjacentNav prevItem={prevItem} nextItem={nextItem} basePath="/ood" />
     </motion.div>
   )
 }

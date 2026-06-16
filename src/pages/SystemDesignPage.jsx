@@ -842,9 +842,47 @@ function LevelExpectationsSection({ rows }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
+function AdjacentNav({ prevItem, nextItem }) {
+  if (!prevItem && !nextItem) return null
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+      {prevItem ? (
+        <Link
+          to={prevItem.path}
+          className="group rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-colors px-5 py-4 flex items-center gap-3"
+        >
+          <svg className="shrink-0 w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">Previous</p>
+            <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors truncate">{prevItem.title}</p>
+          </div>
+        </Link>
+      ) : <div />}
+      {nextItem && (
+        <Link
+          to={nextItem.path}
+          className="group rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20 transition-colors px-5 py-4 flex items-center justify-end gap-3 text-right"
+        >
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-600">Next</p>
+            <p className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors truncate">{nextItem.title}</p>
+          </div>
+          <svg className="shrink-0 w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      )}
+    </div>
+  )
+}
+
 export default function SystemDesignPage() {
   const { id }  = useParams()
-  const item    = SYSTEM_DESIGN.find((s) => s.id === id)
+  const index   = SYSTEM_DESIGN.findIndex((s) => s.id === id)
+  const item    = SYSTEM_DESIGN[index]
 
   const folder = item ? `${item.type}s` : null
   const ConceptIllustrationComponent = folder
@@ -855,6 +893,9 @@ export default function SystemDesignPage() {
     : null
 
   if (!item) return <Navigate to="/system-design" replace />
+
+  const prevItem = index > 0 ? SYSTEM_DESIGN[index - 1] : null
+  const nextItem = index < SYSTEM_DESIGN.length - 1 ? SYSTEM_DESIGN[index + 1] : null
 
   return (
     <motion.div
@@ -1018,6 +1059,9 @@ export default function SystemDesignPage() {
           ))}
         </div>
       )}
+
+      {/* Next / Previous */}
+      <AdjacentNav prevItem={prevItem} nextItem={nextItem} />
     </motion.div>
   )
 }

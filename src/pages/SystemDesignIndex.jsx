@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import ZoomControls from '../components/ui/ZoomControls'
+import { useZoomPan } from '../hooks/useZoomPan'
 import { SYSTEM_DESIGN } from '../constants/systemDesignRegistry'
 
 // ── Short display labels ───────────────────────────────────────────────────────
@@ -240,6 +242,7 @@ function NodeRect({ id, hovered, onHover, path }) {
 
 function DependencyGraph({ byId }) {
   const [hovered, setHovered] = useState(null)
+  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1280, 585)
 
   const activeEdgeSet = useMemo(() => {
     if (!hovered) return new Set()
@@ -249,8 +252,16 @@ function DependencyGraph({ byId }) {
   }, [hovered])
 
   return (
-    <div className="w-full overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
-      <svg viewBox="0 0 1280 585" className="w-full min-w-[760px]" style={{ display: 'block' }}>
+    <div className="relative w-full overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+      <ZoomControls onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={reset} isZoomed={zoom !== 1} />
+      <svg
+        ref={svgRef}
+        viewBox={viewBox}
+        className="w-full min-w-[760px]"
+        style={{ display: 'block', cursor: dragging ? 'grabbing' : zoom > 1 ? 'grab' : 'default' }}
+        onMouseDown={onMouseDown}
+        onClickCapture={onClickCapture}
+      >
         {/* Edges below nodes */}
         {EDGES.map(([from, to]) => {
           const key = `${from}→${to}`
@@ -278,6 +289,8 @@ function DependencyGraph({ byId }) {
             />
           ) : null
         })}
+
+        {isPanning && <rect x={pan.x} y={pan.y} width={1280 / zoom} height={585 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
       </svg>
 
       {/* Legend */}

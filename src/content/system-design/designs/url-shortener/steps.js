@@ -43,9 +43,9 @@ export function buildUrlShortenerSteps() {
       phase: 'write',
       activeNodes: ['client', 'lb'],
       activeArrow: { from: 'client', to: 'lb' },
-      message: 'Request hits the Load Balancer.',
+      message: 'Request hits the API Gateway.',
       detail:
-        'The load balancer distributes incoming requests across multiple API server instances using round-robin or least-connections. It also handles SSL termination.',
+        'The API Gateway is the single entry point for all traffic. For this POST, it routes the request to the URL Shortening Service — the same gateway will route GET requests to the Redirection Handler instead.',
       shortCode: null,
     },
     {
@@ -53,7 +53,7 @@ export function buildUrlShortenerSteps() {
       phase: 'write',
       activeNodes: ['lb', 'api'],
       activeArrow: { from: 'lb', to: 'api' },
-      message: 'API Server receives and validates the request.',
+      message: 'URL Shortening Service receives and validates the request.',
       detail:
         'The server validates the URL format, checks rate limits, and optionally deduplicates (returns the same short code if the URL was already shortened).',
       shortCode: null,
@@ -69,13 +69,23 @@ export function buildUrlShortenerSteps() {
       shortCode: 'aB3xK9z',
     },
     {
+      type: 'write-custom-alias',
+      phase: 'write',
+      activeNodes: ['api'],
+      activeArrow: null,
+      message: 'Or: a custom alias skips ID generation entirely.',
+      detail:
+        'If the request includes custom_alias, the server skips Base62 encoding and uses that string as short_code directly.\n\nUniqueness is enforced by a DB constraint — an insert conflict returns 409 Conflict so the client can prompt for a different alias.',
+      shortCode: 'my-launch',
+    },
+    {
       type: 'write-db',
       phase: 'write',
       activeNodes: ['api', 'db'],
       activeArrow: { from: 'api', to: 'db' },
       message: 'Mapping is persisted to the database.',
       detail:
-        'Schema: { id, short_code, long_url, created_at, user_id }\n\nWrite to DB first (source of truth), then warm the cache. Use a relational DB for consistency or Cassandra for high write throughput.',
+        'Schema: { id, short_code, long_url, created_at, user_id, is_custom, expires_at }\n\nWrite to DB first (source of truth), then warm the cache. Use a relational DB for consistency or Cassandra for high write throughput.',
       shortCode: 'aB3xK9z',
     },
     {
@@ -115,9 +125,9 @@ export function buildUrlShortenerSteps() {
       phase: 'read',
       activeNodes: ['client', 'lb'],
       activeArrow: { from: 'client', to: 'lb' },
-      message: 'Request hits the Load Balancer.',
+      message: 'Request hits the API Gateway.',
       detail:
-        'The same load balancer as the write path. It may route to a different API server instance, which is why cache and DB must be shared external services.',
+        'The same gateway as the write path — but this time it\'s a GET, so it routes to the Redirection Handler (and, as covered in the analytics flow, fans out a click event toward the analytics pipeline too).',
       shortCode: 'aB3xK9z',
     },
     {
@@ -125,7 +135,7 @@ export function buildUrlShortenerSteps() {
       phase: 'read',
       activeNodes: ['lb', 'api'],
       activeArrow: { from: 'lb', to: 'api' },
-      message: 'API Server parses the short code "aB3xK9z".',
+      message: 'Request Handler parses the short code "aB3xK9z".',
       detail:
         'The server extracts the 7-character code from the path and prepares a lookup. It checks the cache first before going to the database.',
       shortCode: 'aB3xK9z',
@@ -138,6 +148,16 @@ export function buildUrlShortenerSteps() {
       message: 'Cache HIT — Redis returns the long URL instantly.',
       detail:
         'Redis lookup is O(1) and takes < 1 ms. Since this URL was just created, it\'s warm in cache. The database is not touched — this is the fast path for popular links.',
+      shortCode: 'aB3xK9z',
+    },
+    {
+      type: 'read-expiry-check',
+      phase: 'read',
+      activeNodes: ['api'],
+      activeArrow: null,
+      message: 'Before redirecting, the server checks expires_at.',
+      detail:
+        'If now() > expires_at, the server returns 410 Gone instead of a redirect — the link is dead, not just missing.\n\nRedis TTL is set to min(default_ttl, expires_at - now()) when the cache is warmed, so expired entries fall out of cache on their own without an explicit eviction step.',
       shortCode: 'aB3xK9z',
     },
     {

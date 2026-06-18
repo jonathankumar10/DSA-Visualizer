@@ -10,22 +10,30 @@ export default {
 
   requirements: {
     functional: [
-      'Given a long URL, generate and return a unique short code (7 chars)',
-      'Visiting the short URL redirects the user to the original long URL',
+      'Given a long URL, generate and return a unique short code (7 chars) — the CREATE operation',
+      'Visiting the short URL redirects the user to the original long URL — the READ operation',
       'Short URLs can optionally expire after a configurable TTL',
-      'Track click analytics per short URL (count, referrer, country)',
+      'Users can optionally request a custom alias (vanity URL) instead of an auto-generated code',
+      'Track click analytics per short URL (count, referrer, country) — the UPDATE/INCREMENT operation, handled internally rather than as a public endpoint',
     ],
     nonFunctional: [
-      'Redirect latency < 10 ms p99 — must feel instantaneous',
-      '99.99% availability — short links must never go dark',
-      'Short codes must be globally unique and non-guessable',
-      'Analytics lag up to a few seconds is acceptable (eventual consistency)',
+      'Low latency: redirects must complete in milliseconds (derived from "near real-time" + "efficiently") — < 10 ms p99',
+      'High availability: 99.99% uptime, short links must never go dark (derived from "handle high traffic")',
+      'High durability: mappings must survive server failures (derived from "persistent")',
+      'Uniqueness: every short code maps to exactly one long URL, no collisions (derived from "unique")',
+      'Security: prevent malicious/spam links and unauthorized access to analytics (derived from "millions of URLs" at "high traffic")',
+      'Analytics lag up to a few seconds is acceptable (eventual consistency) — counts don\'t need to be real-time-exact',
     ],
     scale: [
-      '100M DAU, 100:1 read/write ratio → ~1B redirects/day',
-      '~11,500 redirects/sec at peak; ~115 writes/sec',
-      'Storage: 500 bytes/row × 500M URLs over 5 years ≈ 250 GB',
+      '100M DAU, 100:1 read/write ratio, ~1M new short URLs created/day',
+      '~100M redirects/day → ~1,160/sec average (~3,500/sec at 3× peak); ~12 writes/sec average',
+      'Storage: 500 bytes/row × 1M new rows/day × 5 years ≈ 1.8B rows ≈ ~915 GB',
       'Cache hot set: top 20% of URLs serve 80% of traffic → ~5 GB in Redis',
+    ],
+    outOfScope: [
+      'Authentication/authorization for who can create URLs or view analytics',
+      'User-initiated expiration or deletion of URLs',
+      'Advanced analytics beyond click counts (geographic tracking, device types)',
     ],
   },
 
@@ -38,7 +46,8 @@ export default {
         { name: 'short_code', type: 'VARCHAR(7)',  note: 'Unique index — fast lookup on every redirect' },
         { name: 'long_url',   type: 'TEXT',        note: 'The original destination URL' },
         { name: 'user_id',    type: 'BIGINT',      note: 'FK → User, nullable (anonymous links allowed)' },
-        { name: 'expires_at', type: 'TIMESTAMP',   note: 'NULL = never expires' },
+        { name: 'is_custom',  type: 'BOOLEAN',     note: 'TRUE if user supplied the alias — skips the ID generator, still needs a uniqueness check' },
+        { name: 'expires_at', type: 'TIMESTAMP',   note: 'NULL = never expires — checked on read, enforced by a background cleanup job' },
         { name: 'created_at', type: 'TIMESTAMP',   note: 'Default NOW()' },
       ],
     },
@@ -59,16 +68,16 @@ export default {
     {
       method:      'POST',
       path:        '/api/urls/shorten',
-      description: 'Create a short URL',
-      reqBody:     `{\n  "url": "https://example.com/very/long/path?ref=campaign",\n  "ttl_days": 30\n}`,
-      resBody:     `201 Created\n{\n  "short_url": "https://short.ly/aB3xK9z",\n  "short_code": "aB3xK9z",\n  "expires_at": "2026-07-15T00:00:00Z"\n}`,
+      description: 'Create a short URL (optionally with a custom alias)',
+      reqBody:     `{\n  "url": "https://example.com/very/long/path?ref=campaign",\n  "ttl_days": 30,\n  "custom_alias": "my-launch"   // optional\n}`,
+      resBody:     `201 Created\n{\n  "short_url": "https://short.ly/aB3xK9z",\n  "short_code": "aB3xK9z",\n  "expires_at": "2026-07-15T00:00:00Z"\n}\n\n// 409 Conflict if custom_alias is already taken`,
     },
     {
       method:      'GET',
       path:        '/{shortCode}',
       description: 'Redirect to the original URL',
       reqBody:     null,
-      resBody:     `301 Moved Permanently\nLocation: https://example.com/very/long/path?ref=campaign\n\n// Use 302 Found when click analytics are required`,
+      resBody:     `302 Found\nLocation: https://example.com/very/long/path?ref=campaign\n\n// 410 Gone if the short code has expired\n// Use 301 only for permanent links where click analytics don't matter`,
     },
     {
       method:      'GET',
@@ -89,7 +98,7 @@ export default {
   hldFlows: [
     {
       title: '1. URL Shortening',
-      description: 'Start with the simplest version of the product: turning a long URL into a short one. The client sends a POST request containing the long URL. The URL Shortening Service validates the input, generates a unique short code by encoding an auto-incremented ID in Base62, and persists the short_code → long_url mapping to the database before returning the short URL. No caching and no redirects yet — this stage is just the write path.',
+      description: 'Start with the simplest version of the product: turning a long URL into a short one. The client sends a POST request containing the long URL. The URL Shortening Service validates the input, generates a unique short code by encoding an auto-incremented ID in Base62, and persists the short_code → long_url mapping to the database before returning the short URL. If the client supplied a custom_alias instead, the service skips ID generation entirely and writes that string directly as short_code, relying on a DB uniqueness constraint to reject duplicates. No caching and no redirects yet — this stage is just the write path.',
       flow: [
         { label: 'Client',                  icon: '💻', note: 'POST /api/urls/shorten' },
         { label: 'URL Shortening Service',   icon: '⚙️', note: 'Validate + generate Base62 code' },
@@ -98,13 +107,15 @@ export default {
     },
     {
       title: '2. URL Redirection',
-      description: 'Now add the read path: following a short link back to its destination. The system handles two distinct request types — POST to shorten, GET to redirect — so an API Gateway is introduced to route each one to the right handler. On a GET, the Redirection Handler checks Redis first: a cache hit returns the redirect in under 1 ms. On a cache miss, it falls back to the database and warms the cache so the next request for that code is fast too.',
+      description: 'Now add the read path: following a short link back to its destination. The system handles two distinct request types — POST to shorten, GET to redirect — so an API Gateway is introduced to route each one to the right handler. On a GET, the Redirection Handler checks Redis first: a cache hit returns the redirect in under 1 ms. On a cache miss, it falls back to the database and warms the cache so the next request for that code is fast too. Before issuing the redirect, the handler also checks expires_at — an expired mapping returns 410 Gone instead.',
       flow: [
         { label: 'Client',           icon: '💻', note: 'GET /{shortCode}' },
         { label: 'API Gateway',      icon: '🔀', note: 'Route GET → redirect handler' },
         { label: 'Request Handler',  icon: '⚙️', note: 'Cache-first lookup' },
-        { label: 'Redis Cache',      icon: '⚡', note: '< 1 ms on cache hit' },
-        { label: 'Database',         icon: '🗄️', note: 'Fallback on cache miss' },
+        [
+          { label: 'Redis Cache', icon: '⚡', note: 'Checked first — < 1 ms on hit' },
+          { label: 'Database',    icon: '🗄️', note: 'Fallback only on cache miss' },
+        ],
       ],
     },
     {
@@ -118,9 +129,11 @@ export default {
         {
           label: 'Redirect path',
           nodes: [
-            { label: 'Request Handler',  icon: '⚙️', note: '302 redirect — must hit the server every time' },
-            { label: 'Redis Cache',      icon: '⚡', note: 'URL lookup' },
-            { label: 'Database',         icon: '🗄️', note: 'Miss fallback' },
+            { label: 'Request Handler', icon: '⚙️', note: '302 redirect — must hit the server every time' },
+            [
+              { label: 'Redis Cache', icon: '⚡', note: 'Checked first — URL lookup' },
+              { label: 'Database',    icon: '🗄️', note: 'Fallback only on cache miss' },
+            ],
           ],
         },
         {
@@ -138,11 +151,13 @@ export default {
 
   keyPoints: [
     'Write path: validate → encode auto-increment ID in Base62 → persist to DB → warm Redis cache',
-    'Read path: parse 7-char code → Redis GET (< 1 ms) → 301 redirect; DB fallback on cache miss',
+    'Read path: parse 7-char code → Redis GET (< 1 ms) → check expiry → 302 redirect; DB fallback on cache miss',
     '7-char Base62 yields 62⁷ ≈ 3.5 trillion unique codes — effectively unlimited at any scale',
     '301 (permanent) lets browsers cache forever; 302 (temporary) routes every click through your server for analytics',
     'Decouple analytics: publish click events to Kafka; consume asynchronously into ClickHouse — keeps redirect path read-only against Redis',
     'Fail-open on Redis outage: fall back to DB reads rather than returning errors — a slower redirect beats a broken link',
+    'Expired links: cache TTL ≤ expires_at so stale entries fall out of Redis naturally; a periodic job deletes expired rows from the DB to reclaim storage',
+    'Custom aliases skip the ID generator entirely — the user-chosen string is written directly as short_code after a uniqueness check',
   ],
 
   deepDive: [
@@ -216,12 +231,55 @@ export default {
         },
         {
           label: '302 Found (Temporary)',
-          content: 'Bypasses the browser cache. Every click routes through your servers, so you can record analytics, check expiry, and change the destination URL later.\n\nPros: accurate click analytics, supports mutable destinations.\nCons: every redirect incurs server round-trip latency. At 1B clicks/day this is significant infrastructure cost.\n\nBest for: marketing campaigns, short-lived links, any scenario where analytics matter.',
+          content: 'Bypasses the browser cache. Every click routes through your servers, so you can record analytics, check expiry, and change the destination URL later.\n\nPros: accurate click analytics, supports mutable destinations.\nCons: every redirect incurs server round-trip latency. At 100M clicks/day this is significant infrastructure cost.\n\nBest for: marketing campaigns, short-lived links, any scenario where analytics matter.',
         },
         {
           label: 'Decision Guide',
           badge: 'Decision Guide',
           content: 'Practical rule:\n  • Marketing / campaign links → 302 (analytics are valuable)\n  • Permanent reference links → 301 (eliminate server load)\n  • Default when unsure → 302 (safer choice)\n\nCritical: you cannot retroactively recover click data from 301-cached requests. If analytics might matter later, start with 302. You can switch to 301 later, but you cannot undo lost analytics.',
+        },
+      ],
+    },
+    {
+      level: 'mid',
+      question: 'How do you support user-requested custom aliases?',
+      description: 'Some users want a memorable code (e.g., short.ly/my-launch) instead of an auto-generated one. This changes the write path and has knock-on effects for sharding.',
+      options: [
+        {
+          label: 'Skip the ID Generator',
+          content: 'When custom_alias is present in the request, skip Base62 encoding entirely and attempt to write the user-supplied string directly as short_code.\n\nThe ID generator (and its Machine ID prefix) is only used for auto-generated codes — custom aliases bypass it completely.',
+        },
+        {
+          label: 'Uniqueness Check Before Insert',
+          content: 'Rely on a UNIQUE constraint on short_code and catch the insert conflict, or SELECT first if a pre-check is preferred.\n\nReturn HTTP 409 Conflict if the alias is already taken, with a clear error message so the client can prompt the user for a different alias.',
+        },
+        {
+          label: 'Validation & Reserved Namespace',
+          content: 'Whitelist the character set (alphanumeric + hyphen, no spaces) and cap length (e.g., 3–20 chars).\n\nReject aliases that collide with the app\'s own routes (api, admin, health, etc.) — otherwise a custom alias could shadow an internal endpoint.',
+        },
+        {
+          label: 'Sharding Implication',
+          badge: 'Key Insight',
+          content: 'The read-path optimization that derives the DB shard from the first character of the code (the Machine ID prefix) does not hold for arbitrary user strings.\n\nFix: route custom-alias lookups through a separate index (or a dedicated shard) keyed by short_code directly, since there\'s no embedded shard key to extract on a cache miss.',
+        },
+      ],
+    },
+    {
+      level: 'senior',
+      question: 'How do you enforce short URL expiration?',
+      description: 'expires_at is stored on write, but the system needs an active mechanism to actually stop serving — and eventually clean up — expired links.',
+      options: [
+        {
+          label: 'Lazy Check on Read',
+          content: 'On every redirect, after the cache/DB lookup returns a mapping, compare expires_at to now(). If expired, return 410 Gone instead of a redirect.\n\nThis is correct instantly — no background process needs to run for the system to stop honoring an expired link.',
+        },
+        {
+          label: 'Cache TTL Tied to Expiration',
+          content: 'Set the Redis TTL to min(default_ttl, expires_at - now()) when warming the cache, instead of a flat 24 h.\n\nThis way an expired mapping naturally falls out of Redis at (or before) its expiration time — no stale "still valid" cache entries can outlive the row.',
+        },
+        {
+          label: 'Background Cleanup Job',
+          content: 'Lazy checks alone leave dead rows in the database forever, bloating storage and indexes. Run a periodic batch job (e.g., hourly) that deletes rows where expires_at < now().\n\nThis is a low-priority background job — it only reclaims storage, it does not affect correctness (the lazy check already guarantees expired links 410 before this job ever runs).',
         },
       ],
     },
@@ -290,6 +348,26 @@ export default {
     },
     {
       level: 'staff',
+      question: 'Should redirects be served from the edge (CDN) instead of origin servers?',
+      description: 'Regional Redis replicas already get reads close to users. The next lever is skipping the origin entirely for the hottest codes.',
+      options: [
+        {
+          label: 'Edge Redirect Logic',
+          content: 'Deploy the short-URL domain behind a CDN (Cloudflare, Fastly) and run the redirect lookup in an edge function (Cloudflare Workers, Lambda@Edge).\n\nHot codes resolve at the nearest Point of Presence without a round trip to any region\'s origin servers — shaving latency beyond what regional Redis replicas alone achieve.',
+        },
+        {
+          label: 'Trade-offs',
+          content: 'Edge runtimes have restricted language/library support and are harder to debug and observe than a normal service.\n\nInvalidation lag is the real risk: if a destination URL changes, expires, or is deleted, the edge cache may keep serving the old mapping until its TTL lapses — worse than the DB-backed staleness window of regional caching.',
+        },
+        {
+          label: 'When It Is Worth It',
+          badge: 'Decision Guide',
+          content: 'Only pays off once your user base is meaningfully cross-continental and the marginal latency below the regional-cache floor actually matters to the product.\n\nIf traffic is concentrated within a few regions, multi-region Redis replicas (already in the design) capture most of the benefit at a fraction of the operational complexity. Add edge redirects as a later optimization, not a day-one requirement.',
+        },
+      ],
+    },
+    {
+      level: 'staff',
       question: 'How do you design multi-region active-active while guaranteeing uniqueness?',
       description: 'Multi-region deployment has two very different problems: the read path (easy) and the write path (hard). They must be solved independently.',
       options: [
@@ -310,7 +388,7 @@ export default {
     },
     {
       level: 'staff',
-      question: 'How do you handle analytics at 1 billion clicks/day without slowing redirects?',
+      question: 'How do you handle analytics at 100 million clicks/day without slowing redirects?',
       description: 'The key insight: analytics writes must be completely decoupled from the redirect path. Any synchronous analytics work on the critical path is a latency and availability risk.',
       options: [
         {
@@ -319,7 +397,7 @@ export default {
         },
         {
           label: 'Kafka Event Stream',
-          content: 'Event payload: { short_code, timestamp, ip, referer, user_agent }\n\nScale: 1B clicks/day = ~11,500 events/sec peak. A single Kafka partition handles ~100K msg/sec. Three partitions with RF=3 (replication factor 3) provide fault tolerance and more than enough throughput.\n\nConsumers can lag behind by minutes during spikes — the redirect path is unaffected.',
+          content: 'Event payload: { short_code, timestamp, ip, referer, user_agent }\n\nScale: 100M clicks/day ≈ 1,160 events/sec average, ~3,500/sec at peak — well under a single Kafka partition\'s ~100K msg/sec ceiling. Even so, run 3 partitions with RF=3 (replication factor 3) for fault tolerance, not throughput — the volume itself doesn\'t demand it.\n\nConsumers can lag behind by minutes during spikes — the redirect path is unaffected.',
         },
         {
           label: 'Analytics Service + Storage',

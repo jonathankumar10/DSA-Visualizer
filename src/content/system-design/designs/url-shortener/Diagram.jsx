@@ -8,11 +8,17 @@ import StepControls from '../../../../components/ui/StepControls'
 
 const NODE_META = {
   client:     { label: 'Client',          icon: '💻', desc: 'Browser or mobile app making the request.' },
-  lb:         { label: 'Load Balancer',   icon: '⚖️',  desc: 'Distributes traffic across API server instances. Handles SSL termination.' },
+  lb:         { label: 'API Gateway',     icon: '🔀',  desc: 'Routes POST → shortening, GET → redirect, and fans out GET to the analytics path too.' },
   api:        { label: 'API Server',      icon: '⚙️',  desc: 'Validates requests, generates Base62 codes, orchestrates reads/writes.' },
+  // The 'api' node is one physical tier playing two logical roles — labeled
+  // differently per phase since the deepDive content argues they scale independently.
+  apiByPhase: {
+    write: { label: 'URL Shortening Svc', desc: 'Validates the URL, generates the Base62 code, writes the mapping.' },
+    read:  { label: 'Request Handler',    desc: 'Cache-first lookup, checks expiry, issues the redirect.' },
+  },
   cache:      { label: 'Redis Cache',     icon: '⚡',  desc: 'In-memory key→value store. O(1) lookup, sub-millisecond reads.' },
   db:         { label: 'Database',        icon: '🗄️',  desc: 'Persistent store for all short_code → long_url mappings.' },
-  kafka:      { label: 'Kafka',           icon: '📨', desc: 'Receives the click event after the redirect is already sent — fully decoupled from user-facing latency.' },
+  kafka:      { label: 'Kafka',           icon: '📨', desc: 'Buffers click events, sent after the redirect — decoupled from user latency.' },
   analytics:  { label: 'Analytics Svc',   icon: '📊', desc: 'Consumes the Kafka stream asynchronously and tallies clicks.' },
   counters:   { label: 'Redis Counters',  icon: '⚡',  desc: 'INCR per short_code — real-time click counts for dashboards.' },
   clickhouse: { label: 'ClickHouse',      icon: '🗄️',  desc: 'Periodic flush target — durable store for historical, ad-hoc analytics queries.' },
@@ -33,7 +39,7 @@ const BOX_H = 92
 const JUNCTION_Y1   = 26
 const TOP_ROW1      = 46
 const BOTTOM_ROW1   = TOP_ROW1 + BOX_H
-const TOP_ANALYTICS = BOTTOM_ROW1 + 34
+const TOP_ANALYTICS = BOTTOM_ROW1 + 48
 const BOTTOM_ANALYTICS = TOP_ANALYTICS + BOX_H
 const JUNCTION_Y2   = BOTTOM_ANALYTICS + 18
 const TOP_ROW3       = JUNCTION_Y2 + 20
@@ -161,8 +167,9 @@ function BranchNode({ id, cx, top, isActive, shortCode }) {
 
 // ── Node card ─────────────────────────────────────────────────────────────────
 
-function NodeCard({ id, isActive, shortCode, fullWidth = false }) {
-  const meta = NODE_META[id]
+function NodeCard({ id, isActive, shortCode, fullWidth = false, phase }) {
+  const phaseOverride = id === 'api' ? NODE_META.apiByPhase[phase === 'write' ? 'write' : 'read'] : null
+  const meta = phaseOverride ? { ...NODE_META[id], ...phaseOverride } : NODE_META[id]
   const isStorage = id === 'cache' || id === 'db'
 
   return (
@@ -263,12 +270,9 @@ export default function UrlShortenerDiagram({ onStepChange }) {
     <div className="space-y-4">
 
       {/* Header */}
-      <div>
-        <h2 className="text-lg font-semibold text-white">URL Shortener Architecture</h2>
-        <p className="text-sm text-slate-400">
-          Trace the write (shorten) and read (redirect) flows through the system.
-        </p>
-      </div>
+      <p className="text-sm text-slate-400">
+        Same architecture, now animated step by step — trace the write (shorten) and read (redirect) flows live.
+      </p>
 
       {/* Phase badge */}
       <PhaseBadge phase={step.phase} />
@@ -287,7 +291,7 @@ export default function UrlShortenerDiagram({ onStepChange }) {
             stepKey={index}
           />
 
-          {/* Load Balancer */}
+          {/* API Gateway */}
           <NodeCard id="lb" isActive={active.includes('lb')} shortCode={shortCode} />
 
           {/* lb → api */}
@@ -298,7 +302,7 @@ export default function UrlShortenerDiagram({ onStepChange }) {
           />
 
           {/* API Server */}
-          <NodeCard id="api" isActive={active.includes('api')} shortCode={shortCode} />
+          <NodeCard id="api" isActive={active.includes('api')} shortCode={shortCode} phase={step.phase} />
 
           {/* api fans out to cache / db / kafka; kafka fans further down to
               analytics → {counters, clickhouse}. Drawn on a fixed-size SVG

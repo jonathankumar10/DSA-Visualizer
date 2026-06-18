@@ -28,7 +28,7 @@ export default {
       title:         'Developer & Version Control',
       icon:          '👨‍💻',
       color:         '#6366f1',
-      animationType: null,
+      animationType: 'git',
       summary:       'Where every change begins — all code lives in version control',
       detail:        'Developers push changes to a shared repository (GitHub, GitLab). Every line is tracked, linked to a pull request, reviewed by teammates, and associated with a deploy. If a release breaks something, reverting to the previous version takes seconds.',
       stats: [
@@ -41,7 +41,7 @@ export default {
       title:         'CI/CD Pipeline',
       icon:          '🔄',
       color:         '#8b5cf6',
-      animationType: null,
+      animationType: 'pipeline',
       summary:       'Automates build, test, and deploy — no manual steps, no human errors',
       detail:        'A push to the main branch triggers the pipeline: code is compiled, tests run, a container image is built, and the new version deploys automatically. If any test fails, the pipeline stops — nothing broken reaches users. Teams with good CI/CD ship dozens of times a day.',
       stats: [
@@ -54,7 +54,7 @@ export default {
       title:         'Frontend (Client)',
       icon:          '💻',
       color:         '#06b6d4',
-      animationType: null,
+      animationType: 'cdn',
       summary:       "The app running in the user's browser — served globally by a CDN",
       detail:        'The frontend is a JavaScript app (React, Vue, or plain JS) that runs in the browser. The initial bundle is served by a CDN from a server close to the user — fast regardless of where your backend lives. Once loaded, the app makes API calls to your backend for dynamic data.',
       stats: [
@@ -67,7 +67,7 @@ export default {
       title:         'Load Balancer',
       icon:          '⚖️',
       color:         '#0ea5e9',
-      animationType: null,
+      animationType: 'loadbalancer',
       summary:       'The front door — distributes requests across servers, routes around failures',
       detail:        'Every API request hits the load balancer first. It forwards each to a healthy backend server, spreading traffic evenly. It continuously health-checks every server — if one goes down, traffic is rerouted instantly. Adding a server is automatic: the load balancer starts including it right away.',
       stats: [
@@ -80,7 +80,7 @@ export default {
       title:         'Application Server',
       icon:          '🖥️',
       color:         '#3b82f6',
-      animationType: null,
+      animationType: 'serverpulse',
       summary:       'Runs the business logic — stateless and horizontally scalable',
       detail:        'The server receives a request, runs your application code, and returns a response. The critical rule: servers must be stateless — no user sessions, no in-memory state. All shared data lives in the cache or database. This means any server can handle any request, and scaling is simply running more copies.',
       stats: [
@@ -93,7 +93,7 @@ export default {
       title:         'Cache (Redis)',
       icon:          '⚡',
       color:         '#10b981',
-      animationType: null,
+      animationType: 'cache',
       summary:       'In-memory store — returns frequently-read data without hitting the database',
       detail:        'Redis sits between the server and the database. On a cache hit the data returns in under a millisecond. On a miss the server queries the database and stores the result. A well-tuned cache hits 90%+ of the time, meaning the database only sees 10% of read traffic.',
       stats: [
@@ -106,7 +106,7 @@ export default {
       title:         'Database',
       icon:          '🗄️',
       color:         '#f59e0b',
-      animationType: null,
+      animationType: 'database',
       summary:       'The permanent source of truth — every write ends up here',
       detail:        'The database stores every user, order, post, and transaction durably. Slower than the cache but the ground truth. Reads are served from cache when possible. Writes go directly to the database so nothing is ever lost.',
       stats: [
@@ -120,7 +120,7 @@ export default {
       title:         'Monitoring & Alerts',
       icon:          '📊',
       color:         '#f43f5e',
-      animationType: null,
+      animationType: 'monitor',
       summary:       'Logs, metrics, and alerts — tells you what your system is doing right now',
       detail:        'Every request is logged. Every error is captured. Latency, error rate, CPU, and memory are graphed in real time. When something crosses a threshold, an alert fires and the on-call engineer is paged. Production without monitoring is flying blind.',
       stats: [

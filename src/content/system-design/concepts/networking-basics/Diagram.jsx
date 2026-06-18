@@ -187,7 +187,25 @@ function NodeCard({ node, isActive, wasVisited, isExpanded, onClick, popKey }) {
 
 // ── Packet header display ─────────────────────────────────────────────────────
 
-function PacketHeader({ packet, direction }) {
+function RttMeter({ elapsedMs, color }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.span
+        key={elapsedMs}
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 4 }}
+        transition={{ duration: 0.2 }}
+        className="text-[10px] font-mono font-bold"
+        style={{ color }}
+      >
+        ⏱ {elapsedMs} ms
+      </motion.span>
+    </AnimatePresence>
+  )
+}
+
+function PacketHeader({ packet, direction, elapsedMs }) {
   const [prevTtl, setPrevTtl] = useState(null)
   const ttlChanged = packet && prevTtl !== null && prevTtl !== packet.ttl
   if (packet && prevTtl !== packet.ttl) setPrevTtl(packet.ttl)
@@ -212,14 +230,17 @@ function PacketHeader({ packet, direction }) {
       }}
       transition={{ duration: 0.35 }}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <motion.div
-          className="w-2 h-2 rounded-full"
-          animate={{ backgroundColor: dirClr.hex, boxShadow: `0 0 6px 1px ${dirClr.glow}` }}
-        />
-        <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: dirClr.hex }}>
-          {direction === 'backward' ? 'Response Packet' : 'Request Packet'} — IP header
-        </span>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2">
+          <motion.div
+            className="w-2 h-2 rounded-full"
+            animate={{ backgroundColor: dirClr.hex, boxShadow: `0 0 6px 1px ${dirClr.glow}` }}
+          />
+          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: dirClr.hex }}>
+            {direction === 'backward' ? 'Response Packet' : 'Request Packet'} — IP header
+          </span>
+        </div>
+        {elapsedMs != null && <RttMeter elapsedMs={elapsedMs} color={dirClr.hex} />}
       </div>
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-1">
@@ -295,7 +316,7 @@ export default function NetworkingBasicsDiagram() {
         }}
       >
         {/* Packet header */}
-        <PacketHeader packet={step.packet} direction={step.edgeDirection} />
+        <PacketHeader packet={step.packet} direction={step.edgeDirection} elapsedMs={step.elapsedMs} />
 
         {/* Node chain */}
         <div className="overflow-x-auto pb-2">
@@ -351,6 +372,18 @@ export default function NetworkingBasicsDiagram() {
           <p className="text-xs text-slate-400 leading-relaxed">{step.detail}</p>
         </motion.div>
       </AnimatePresence>
+
+      {/* Total RTT, shown once the response arrives */}
+      {index === steps.length - 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] px-5 py-3 flex items-center justify-between"
+        >
+          <span className="text-xs font-semibold text-emerald-300">Total round-trip time (latency)</span>
+          <span className="text-sm font-mono font-bold text-emerald-300">{step.elapsedMs} ms</span>
+        </motion.div>
+      )}
 
       <StepControls runner={runner} />
     </div>

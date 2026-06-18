@@ -22,7 +22,7 @@ const STATUS_COLOR = {
   500: '#ef4444', 502: '#ef4444', 503: '#ef4444',
 }
 
-const LANE_W = 300
+const LANE_LEN = 170
 
 // ── Reusable node card ────────────────────────────────────────────────────────
 
@@ -102,21 +102,22 @@ function EndpointCard({ label, icon, sub, clr, isActive, wasVisited, isExpanded,
 
 // ── Flying message badge ──────────────────────────────────────────────────────
 
-function FlyingMessage({ msg, trackY, stepKey, trackIndex }) {
+function FlyingMessage({ msg, trackX, stepKey, trackIndex }) {
   const isForward = msg.dir === 'forward'
   return (
     <motion.div
       key={`${stepKey}-track-${trackIndex}`}
       className="absolute flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap select-none pointer-events-none"
       style={{
-        top:             trackY - 10,
-        left:            0,
+        left:            trackX,
+        top:             0,
+        transform:       'translateX(-50%)',
         color:           msg.color,
         border:          `1px solid ${msg.color}60`,
         backgroundColor: `${msg.color}15`,
         boxShadow:       `0 0 10px 2px ${msg.glow}`,
       }}
-      animate={{ x: isForward ? [0, LANE_W - 110] : [LANE_W - 110, 0] }}
+      animate={{ y: isForward ? [0, LANE_LEN - 26] : [LANE_LEN - 26, 0] }}
       transition={{
         duration:    0.9,
         ease:        'easeInOut',
@@ -143,25 +144,25 @@ function FlyingMessage({ msg, trackY, stepKey, trackIndex }) {
 function ConnectionLane({ connection, messages, stepKey }) {
   const isHttp2    = connection === 'http2'
   const connMeta   = connection ? CONN_LABEL[connection] : null
-  const laneH      = isHttp2 ? 110 : 80
+  const laneW      = isHttp2 ? 130 : 90
 
   const trackPositions = isHttp2
-    ? [30, 56, 82]
-    : [laneH / 2]
+    ? [22, 65, 108]
+    : [laneW / 2]
 
   return (
-    <div className="flex-1 flex flex-col justify-center gap-2 min-w-0" style={{ minWidth: LANE_W, maxWidth: LANE_W }}>
+    <div className="flex flex-col items-center gap-2 shrink-0">
 
       {/* Connection status bar */}
       <AnimatePresence>
         {connMeta && (
           <motion.div
             key={connection}
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border"
+            className="flex items-center gap-2 px-2.5 py-1 rounded-lg border whitespace-nowrap"
             style={{
               borderColor:     `${connMeta.color}40`,
               backgroundColor: `${connMeta.color}0a`,
@@ -181,21 +182,21 @@ function ConnectionLane({ connection, messages, stepKey }) {
       </AnimatePresence>
 
       {/* Message tracks */}
-      <div className="relative rounded-xl border border-white/[0.06] bg-black/20" style={{ height: laneH }}>
+      <div className="relative rounded-xl border border-white/[0.06] bg-black/20" style={{ width: laneW, height: LANE_LEN }}>
 
         {/* Rail lines for each track */}
         {messages.map((_, ti) => (
           <div
             key={ti}
-            className="absolute left-0 right-0 h-px"
-            style={{ top: trackPositions[ti], backgroundColor: `${messages[ti].color}18` }}
+            className="absolute top-0 bottom-0 w-px"
+            style={{ left: trackPositions[ti], backgroundColor: `${messages[ti].color}18` }}
           />
         ))}
 
         {/* Idle hint */}
         {!messages.length && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[9px] text-slate-700 font-mono">no active exchange</span>
+            <span className="text-[8px] text-slate-700 font-mono">idle</span>
           </div>
         )}
 
@@ -205,7 +206,7 @@ function ConnectionLane({ connection, messages, stepKey }) {
             <FlyingMessage
               key={`${stepKey}-${ti}`}
               msg={msg}
-              trackY={trackPositions[ti]}
+              trackX={trackPositions[ti]}
               stepKey={stepKey}
               trackIndex={ti}
             />
@@ -305,8 +306,8 @@ export default function HttpDiagram() {
           backgroundSize:  '22px 22px',
         }}
       >
-        {/* Client ← lane → Server */}
-        <div className="flex items-center gap-3 overflow-x-auto pb-1">
+        {/* Client ↕ lane ↕ Server */}
+        <div className="flex flex-col items-center gap-3">
           <EndpointCard
             label="Client"
             icon="🌐"

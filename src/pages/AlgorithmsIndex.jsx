@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AlgoCard from '../components/ui/AlgoCard'
+import ZoomControls from '../components/ui/ZoomControls'
+import { useZoomPan } from '../hooks/useZoomPan'
 import { ALGORITHMS } from '../constants/algorithmRegistry'
 
 // ── Labels ────────────────────────────────────────────────────────────────────
@@ -212,6 +214,7 @@ function NodeRect({ id, selected, hovered, hasProblems, count, onSelect, onHover
 
 function DependencyGraph({ selected, onSelect, problemCounts }) {
   const [hovered, setHovered] = useState(null)
+  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1040, 470)
 
   const activeEdgeSet = useMemo(() => {
     const active = selected || hovered
@@ -222,11 +225,15 @@ function DependencyGraph({ selected, onSelect, problemCounts }) {
   }, [selected, hovered])
 
   return (
-    <div className="w-full overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+    <div className="relative w-full overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+      <ZoomControls onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={reset} isZoomed={zoom !== 1} />
       <svg
-        viewBox="0 0 1040 470"
+        ref={svgRef}
+        viewBox={viewBox}
         className="w-full min-w-[640px]"
-        style={{ display: 'block' }}
+        style={{ display: 'block', cursor: dragging ? 'grabbing' : zoom > 1 ? 'grab' : 'default' }}
+        onMouseDown={onMouseDown}
+        onClickCapture={onClickCapture}
       >
         {/* Edges — render before nodes so nodes sit on top */}
         {EDGES.map(([from, to]) => {
@@ -255,6 +262,9 @@ function DependencyGraph({ selected, onSelect, problemCounts }) {
             onHover={setHovered}
           />
         ))}
+
+        {/* Transparent overlay during drag — captures pointer events and enforces grabbing cursor */}
+        {isPanning && <rect x={pan.x} y={pan.y} width={1040 / zoom} height={470 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
       </svg>
 
       {/* Legend */}

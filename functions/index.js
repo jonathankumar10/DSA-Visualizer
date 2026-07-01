@@ -38,6 +38,112 @@ BEHAVIOUR RULES:
 4. Keep all responses concise: 3-5 sentences maximum.
 5. Never make up content that isn't on the site. Only claim a visualizer exists if it is listed above.`
 
+const INTERVIEW_STAGES = `1. Functional & non-functional requirements (and scale estimates)
+2. Data model
+3. API design
+4. High-level architecture (HLD)
+5. Deep-dive trade-offs`
+
+function interviewSystemPrompt(rubric) {
+  return `You are a senior staff engineer conducting a live mock system design interview for the prompt: "${rubric.title}".
+${rubric.description ? `Context for you only: ${rubric.description}` : ''}
+
+INTERVIEW STAGES (guide the candidate through these in order, at a pace driven by their answers — do not force a rigid script, ask natural follow-ups, and only move on once a stage has been reasonably covered):
+${INTERVIEW_STAGES}
+
+Ask one focused question at a time. Keep each of your turns concise (2-5 sentences) like a real interviewer — do not lecture or info-dump.
+
+GRADING RUBRIC (for your eyes only — this is the canonical reference solution, NEVER reveal its exact wording, numbers, or specific decisions verbatim to the candidate, including in your final assessment; always restate things in your own words and let the candidate arrive at ideas themselves):
+${JSON.stringify(rubric)}
+
+If the candidate asks you to just give them the answer, decline politely and redirect them to attempt it themselves with a hint at most.
+
+ENDING THE INTERVIEW: When the candidate signals they are done, or you receive a bracketed instruction like "[SYSTEM: ...end the interview...]", stop asking questions and immediately produce your final assessment. The final assessment message MUST start with the exact literal text "**Mock Interview Assessment**" on its own, followed by a brief **Strengths** section, a **Gaps** section, and a **Suggested Level** (mid, senior, or staff) with a one-sentence justification per relevant dimension. Do not ask any further questions after this message.`
+}
+
+exports.interviewChat = onCall({ secrets: [ANTHROPIC_API_KEY], cors: true }, async (request) => {
+  const { uid, sessionId, rubric, messages, endRequested } = request.data
+
+  if (!uid || typeof uid !== 'string' || uid.length > 64) {
+    return { error: 'INVALID_UID' }
+  }
+  if (!sessionId || typeof sessionId !== 'string' || sessionId.length > 64) {
+    return { error: 'INVALID_MESSAGES' }
+  }
+  if (!Array.isArray(messages) || messages.length === 0 || messages.length > 24) {
+    return { error: messages && messages.length > 24 ? 'SESSION_TURN_LIMIT' : 'INVALID_MESSAGES' }
+  }
+
+  // The function is stateless across calls (no session store), so the client
+  // resends the rubric on every turn and we rebuild the system prompt each time.
+  if (
+    typeof rubric !== 'object' || rubric === null ||
+    typeof rubric.title !== 'string' ||
+    !(rubric.requirements || rubric.apiDesign) ||
+    JSON.stringify(rubric).length > 60000
+  ) {
+    return { error: 'INVALID_MESSAGES' }
+  }
+
+  // The first call of a session always sends exactly one user (kickoff) message.
+  const isSessionStart = messages.length === 1 && messages[0]?.role === 'user'
+  if (isSessionStart) {
+    // Rate limiting: 2 interview sessions per user per day via Firestore
+    const today = new Date().toISOString().slice(0, 10)
+    const ref = db.collection('interviewRateLimits').doc(uid)
+
+    try {
+      const doc = await ref.get()
+      if (doc.exists) {
+        const { sessionsStarted, date } = doc.data()
+        if (date === today && sessionsStarted >= 2) {
+          return { error: 'RATE_LIMITED' }
+        }
+        await ref.set({
+          sessionsStarted: date === today ? sessionsStarted + 1 : 1,
+          date: today,
+        })
+      } else {
+        await ref.set({ sessionsStarted: 1, date: today })
+      }
+    } catch (err) {
+      console.error('Firestore interview rate limit error:', err)
+      // Fail open — don't block the user if Firestore is unavailable
+    }
+  }
+
+  const sanitised = messages
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))
+
+  if (sanitised.length === 0) {
+    return { error: 'INVALID_MESSAGES' }
+  }
+
+  if (endRequested) {
+    sanitised.push({
+      role: 'user',
+      content: '[SYSTEM: The candidate has requested to end the interview now. Provide your final assessment immediately based on what has been covered so far.]',
+    })
+  }
+
+  const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY.value() })
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: interviewSystemPrompt(rubric),
+      messages: sanitised,
+    })
+
+    return { reply: response.content[0].text }
+  } catch (err) {
+    console.error('Anthropic API error (interviewChat):', err)
+    return { error: 'API_ERROR' }
+  }
+})
+
 exports.chat = onCall({ secrets: [ANTHROPIC_API_KEY], cors: true }, async (request) => {
   const { messages, uid } = request.data
 

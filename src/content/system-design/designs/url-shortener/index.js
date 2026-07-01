@@ -7,6 +7,7 @@ export default {
   description: 'A service that maps long URLs to short codes (like bit.ly). Handles high read traffic with caching, generates unique codes with Base62, and persists mappings to a database.',
   metaphor:    'A coat-check counter: you hand in a long URL and receive a short ticket (code). Anyone with the ticket can redeem it later for the original coat (URL).',
   path:        '/system-design/url-shortener',
+  interviewEnabled: true,
 
   requirements: {
     functional: [

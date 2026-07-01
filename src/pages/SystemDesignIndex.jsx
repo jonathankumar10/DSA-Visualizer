@@ -75,41 +75,55 @@ const NODE_COLOR = {
   'distributed-tracing':        '#10b981',
 }
 
-// ── Graph layout (viewBox: 0 0 1280 600) ─────────────────────────────────────
-// x, y = center of each node
+// ── Graph layout (viewBox: 0 0 1320 650) ──────────────────────────────────────
+// x, y = center of each node. Nodes are placed by dependency tier (longest
+// path from a root) so a node always sits in the tier right after its
+// prerequisites, then ordered within each tier (barycenter sweep) so that
+// connected nodes — and same-category nodes — land close together vertically.
 
 const NODES = {
-  'computer-architecture':      { x: 80,   y: 215 },
-  'design-requirements':        { x: 80,   y: 455 },
-  'networking-basics':          { x: 245,  y: 120 },
-  'application-architecture':   { x: 245,  y: 395 },
-  'tcp-and-udp':                { x: 415,  y: 70  },
-  'proxies-and-load-balancing': { x: 415,  y: 255 },
-  'sql':                        { x: 415,  y: 385 },
-  'nosql':                      { x: 415,  y: 500 },
-  'dns':                        { x: 580,  y: 45  },
-  'http':                       { x: 580,  y: 145 },
-  'caching':                    { x: 580,  y: 255 },
-  'database-replication':       { x: 580,  y: 365 },
-  'database-sharding':          { x: 580,  y: 445 },
-  'acid-and-base':              { x: 580,  y: 525 },
-  'websockets':                 { x: 745,  y: 45  },
-  'api-paradigms':              { x: 745,  y: 130 },
-  'api-design':                 { x: 745,  y: 215 },
-  'cdns':                       { x: 745,  y: 300 },
-  'consistent-hashing':         { x: 745,  y: 385 },
-  'cap-theorem':                { x: 745,  y: 465 },
-  'object-storage':             { x: 745,  y: 545 },
-  'rate-limiting':              { x: 915,  y: 95  },
-  'database-indexes':           { x: 915,  y: 200 },
-  'consistency-patterns':       { x: 915,  y: 390 },
-  'availability-patterns':      { x: 915,  y: 475 },
-  'message-queues':             { x: 1085, y: 195 },
-  'microservices':              { x: 1085, y: 355 },
-  'logging-and-monitoring':     { x: 1085, y: 460 },
-  'event-driven-architecture':  { x: 1210, y: 195 },
-  'distributed-tracing':        { x: 1210, y: 460 },
+  'computer-architecture':      { x: 80,   y: 284 },
+  'design-requirements':        { x: 80,   y: 362 },
+  'application-architecture':   { x: 245,  y: 284 },
+  'networking-basics':          { x: 245,  y: 362 },
+  'microservices':              { x: 410,  y: 167 },
+  'nosql':                      { x: 410,  y: 245 },
+  'tcp-and-udp':                { x: 410,  y: 323 },
+  'sql':                        { x: 410,  y: 401 },
+  'proxies-and-load-balancing': { x: 410,  y: 479 },
+  'logging-and-monitoring':     { x: 575,  y: 50  },
+  'database-replication':       { x: 575,  y: 128 },
+  'acid-and-base':              { x: 575,  y: 206 },
+  'dns':                        { x: 575,  y: 284 },
+  'database-indexes':           { x: 575,  y: 362 },
+  'database-sharding':          { x: 575,  y: 440 },
+  'object-storage':             { x: 575,  y: 518 },
+  'rate-limiting':              { x: 575,  y: 596 },
+  'distributed-tracing':        { x: 740,  y: 245 },
+  'cap-theorem':                { x: 740,  y: 323 },
+  'http':                       { x: 740,  y: 401 },
+  'availability-patterns':      { x: 905,  y: 167 },
+  'consistency-patterns':       { x: 905,  y: 245 },
+  'api-paradigms':              { x: 905,  y: 323 },
+  'caching':                    { x: 905,  y: 401 },
+  'websockets':                 { x: 905,  y: 479 },
+  'message-queues':             { x: 1070, y: 206 },
+  'api-design':                 { x: 1070, y: 284 },
+  'consistent-hashing':         { x: 1070, y: 362 },
+  'cdns':                       { x: 1070, y: 440 },
+  'event-driven-architecture':  { x: 1235, y: 323 },
 }
+
+const CATEGORY_LEGEND = [
+  { color: '#f59e0b', label: 'Foundations',       blurb: 'Core machine & app concepts everything else builds on' },
+  { color: '#3b82f6', label: 'Networking',        blurb: 'How requests travel between machines' },
+  { color: '#0ea5e9', label: 'APIs',              blurb: 'Contracts clients use to talk to servers' },
+  { color: '#f97316', label: 'Caching & Proxies', blurb: 'Speeding up and routing traffic' },
+  { color: '#06b6d4', label: 'Storage',           blurb: 'Persisting and querying data' },
+  { color: '#f43f5e', label: 'Reliability',       blurb: 'Staying correct and available under failure' },
+  { color: '#8b5cf6', label: 'Messaging',         blurb: 'Decoupling services with async events' },
+  { color: '#10b981', label: 'Operations',        blurb: 'Running and observing systems in production' },
+]
 
 // Edges: [prerequisite, unlocks]
 const EDGES = [
@@ -242,7 +256,7 @@ function NodeRect({ id, hovered, onHover, path }) {
 
 function DependencyGraph({ byId }) {
   const [hovered, setHovered] = useState(null)
-  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1280, 585)
+  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1320, 650)
 
   const activeEdgeSet = useMemo(() => {
     if (!hovered) return new Set()
@@ -253,6 +267,22 @@ function DependencyGraph({ byId }) {
 
   return (
     <div className="relative w-full overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+      {/* Category legend */}
+      <div className="px-5 pt-4 pb-3 border-b border-white/10">
+        <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300 mb-2.5">Categories</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2">
+          {CATEGORY_LEGEND.map(({ color, label, blurb }) => (
+            <div key={label} className="flex items-start gap-2">
+              <div className="w-3 h-3 rounded-full mt-0.5 shrink-0" style={{ background: color }} />
+              <div>
+                <p className="text-xs font-semibold text-slate-200 leading-tight">{label}</p>
+                <p className="text-[10px] text-slate-500 leading-tight">{blurb}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <ZoomControls onZoomIn={zoomIn} onZoomOut={zoomOut} onReset={reset} isZoomed={zoom !== 1} />
       <svg
         ref={svgRef}
@@ -290,26 +320,11 @@ function DependencyGraph({ byId }) {
           ) : null
         })}
 
-        {isPanning && <rect x={pan.x} y={pan.y} width={1280 / zoom} height={585 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
+        {isPanning && <rect x={pan.x} y={pan.y} width={1320 / zoom} height={650 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
       </svg>
 
-      {/* Legend */}
+      {/* Hint row */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-5 pb-4 pt-1">
-        {[
-          { color: '#f59e0b', label: 'Foundations' },
-          { color: '#3b82f6', label: 'Networking' },
-          { color: '#0ea5e9', label: 'APIs' },
-          { color: '#f97316', label: 'Caching & Proxies' },
-          { color: '#06b6d4', label: 'Storage' },
-          { color: '#f43f5e', label: 'Reliability' },
-          { color: '#8b5cf6', label: 'Messaging' },
-          { color: '#10b981', label: 'Operations' },
-        ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-            <span className="text-[10px] text-slate-500">{label}</span>
-          </div>
-        ))}
         <div className="ml-auto flex items-center gap-1.5">
           <div className="w-5 h-px border-t border-dashed border-violet-500/50" />
           <span className="text-[10px] text-slate-600">hover to trace dependencies</span>

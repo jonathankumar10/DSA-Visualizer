@@ -1,19 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import app from '../../lib/firebase'
-
-// Stable per-browser UUID for rate limiting (never tied to auth)
-function getUid() {
-  const key = 'algviz-uid'
-  let uid = localStorage.getItem(key)
-  if (!uid) {
-    uid = crypto.randomUUID()
-    localStorage.setItem(key, uid)
-  }
-  return uid
-}
+import { getUid } from '../../lib/chatShared'
+import ChatMessageBubble from './ChatMessageBubble'
 
 const functions = getFunctions(app)
 const chatFn   = httpsCallable(functions, 'chat')
@@ -35,73 +25,12 @@ function TypingDots() {
   )
 }
 
-// ── Lightweight markdown renderer (bold + inline code only) ──────────────────
-
-function renderMarkdown(text) {
-  // Split on **bold** and `code` tokens
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
-    }
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="rounded bg-white/10 px-1 py-0.5 text-[11px] font-mono">{part.slice(1, -1)}</code>
-    }
-    return part
-  })
-}
-
 // ── Path detection ────────────────────────────────────────────────────────────
 
 const PATH_RE = /\/(algorithms|system-design)\/[\w-]+/g
 
 function extractPaths(text) {
   return [...new Set(text.match(PATH_RE) || [])]
-}
-
-function pathLabel(path) {
-  const slug = path.split('/').pop().replace(/-/g, ' ')
-  return slug.replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
-// ── Message bubble ────────────────────────────────────────────────────────────
-
-function Message({ role, content, onLinkClick }) {
-  const isUser = role === 'user'
-  const paths  = isUser ? [] : extractPaths(content)
-
-  return (
-    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} gap-1.5`}>
-      <div
-        className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-          isUser
-            ? 'bg-blue-600 text-white rounded-br-sm'
-            : 'bg-slate-800 text-slate-200 border-l-2 border-blue-500/50 rounded-bl-sm'
-        }`}
-      >
-        {isUser ? content : renderMarkdown(content)}
-      </div>
-
-      {paths.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 max-w-[85%]">
-          {paths.map((path) => (
-            <Link
-              key={path}
-              to={path}
-              onClick={onLinkClick}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600/20 border border-blue-500/40 hover:bg-blue-600/35 hover:border-blue-500/70 px-3 py-1 text-xs font-medium text-blue-300 transition-colors"
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-              </svg>
-              {pathLabel(path)}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  )
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -225,7 +154,13 @@ export default function ChatBot() {
               )}
 
               {messages.map((m, i) => (
-                <Message key={i} role={m.role} content={m.content} onLinkClick={() => setIsOpen(false)} />
+                <ChatMessageBubble
+                  key={i}
+                  role={m.role}
+                  content={m.content}
+                  links={m.role === 'user' ? [] : extractPaths(m.content)}
+                  onLinkClick={() => setIsOpen(false)}
+                />
               ))}
 
               {isLoading && (

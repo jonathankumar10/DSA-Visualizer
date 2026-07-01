@@ -56,37 +56,42 @@ const SHORT_LABELS = {
   'ai-observability':         'Observability',
 }
 
-// cx/cy = center of each node box
+// cx/cy = center of each node box. Tiers are by dependency depth (longest
+// path from a root) so a node sits right after its prerequisites, then
+// ordered within a tier (barycenter sweep) so connected/same-category nodes
+// land close together vertically.
 const NODES = [
-  // Layer 0 — History
-  { id: 'ai-history',               cx: 65,   cy: 210 },
-  // Layer 1 — Core ML
-  { id: 'neural-networks',          cx: 200,  cy: 145 },
-  { id: 'training-and-loss',        cx: 200,  cy: 280 },
-  // Layer 2 — Transformer
-  { id: 'transformer-architecture', cx: 340,  cy: 210 },
-  // Layer 3 — LLM Internals
-  { id: 'attention-mechanism',      cx: 480,  cy: 90  },
-  { id: 'tokenization',             cx: 480,  cy: 175 },
-  { id: 'context-windows',          cx: 480,  cy: 260 },
-  { id: 'llm-inference',            cx: 480,  cy: 345 },
-  // Layer 4 — Outputs + Workflows
-  { id: 'multimodal-models',        cx: 625,  cy: 90  },
-  { id: 'embeddings',               cx: 625,  cy: 185 },
-  { id: 'prompt-engineering',       cx: 625,  cy: 275 },
-  { id: 'fine-tuning',              cx: 625,  cy: 365 },
-  // Layer 5 — Applied Workflows
-  { id: 'rag',                      cx: 770,  cy: 148 },
-  { id: 'function-calling',         cx: 770,  cy: 250 },
-  { id: 'guardrails',               cx: 770,  cy: 352 },
-  // Layer 6 — Agents
-  { id: 'ai-agents',                cx: 915,  cy: 175 },
-  { id: 'multi-agent-systems',      cx: 915,  cy: 310 },
-  // Layer 7 — Production
-  { id: 'ai-engineer',              cx: 1060, cy: 230 },
-  // Layer 8 — Evaluation
-  { id: 'llm-evaluation',           cx: 1200, cy: 155 },
-  { id: 'ai-observability',         cx: 1200, cy: 310 },
+  // Tier 0 — History
+  { id: 'ai-history',               cx: 65,   cy: 220 },
+  // Tier 1 — Core ML
+  { id: 'training-and-loss',        cx: 215,  cy: 178 },
+  { id: 'neural-networks',          cx: 215,  cy: 263 },
+  // Tier 2 — Transformer / early fine-tuning
+  { id: 'fine-tuning',              cx: 365,  cy: 178 },
+  { id: 'transformer-architecture', cx: 365,  cy: 263 },
+  // Tier 3 — LLM Internals
+  { id: 'attention-mechanism',      cx: 515,  cy: 50  },
+  { id: 'context-windows',          cx: 515,  cy: 135 },
+  { id: 'llm-inference',            cx: 515,  cy: 220 },
+  { id: 'tokenization',             cx: 515,  cy: 305 },
+  { id: 'embeddings',               cx: 515,  cy: 390 },
+  // Tier 4 — Outputs + Workflows
+  { id: 'multimodal-models',        cx: 665,  cy: 135 },
+  { id: 'prompt-engineering',       cx: 665,  cy: 220 },
+  { id: 'rag',                      cx: 665,  cy: 305 },
+  // Tier 5 — Applied Workflows
+  { id: 'function-calling',         cx: 815,  cy: 178 },
+  { id: 'guardrails',               cx: 815,  cy: 263 },
+  // Tier 6 — Agents
+  { id: 'ai-agents',                cx: 965,  cy: 220 },
+  // Tier 7 — Multi-agent
+  { id: 'multi-agent-systems',      cx: 1115, cy: 220 },
+  // Tier 8 — Production
+  { id: 'ai-engineer',              cx: 1265, cy: 220 },
+  // Tier 9 — Evaluation
+  { id: 'llm-evaluation',           cx: 1415, cy: 220 },
+  // Tier 10 — Observability
+  { id: 'ai-observability',         cx: 1565, cy: 220 },
 ]
 
 const EDGES = [
@@ -200,7 +205,7 @@ function NodeRect({ id, hovered, onHover }) {
 
 function DependencyGraph() {
   const [hovered, setHovered] = useState(null)
-  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1265, 410)
+  const { svgRef, zoom, pan, dragging, isPanning, viewBox, onMouseDown, onClickCapture, zoomIn, zoomOut, reset } = useZoomPan(1645, 440)
 
   const activeEdgeSet = useMemo(() => {
     if (!hovered) return new Set()
@@ -241,7 +246,7 @@ function DependencyGraph() {
             <NodeRect key={id} id={id} hovered={hovered} onHover={setHovered} />
           ))}
         </g>
-        {isPanning && <rect x={pan.x} y={pan.y} width={1265 / zoom} height={410 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
+        {isPanning && <rect x={pan.x} y={pan.y} width={1645 / zoom} height={440 / zoom} fill="transparent" style={{ cursor: 'grabbing' }} />}
       </svg>
     </div>
   )

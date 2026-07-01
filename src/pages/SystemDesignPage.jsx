@@ -2,6 +2,7 @@ import React, { Suspense, useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SYSTEM_DESIGN, TYPE_COLOR, TYPE_LABEL } from '../constants/systemDesignRegistry'
+import MockInterview from '../components/system-design/MockInterview'
 
 const DIAGRAMS               = import.meta.glob('../content/system-design/**/Diagram.jsx')
 const CONCEPT_ILLUSTRATIONS  = import.meta.glob('../content/system-design/**/ConceptIllustration.jsx')
@@ -1612,6 +1613,9 @@ export default function SystemDesignPage() {
           </div>
         </div>
       )}
+
+      {/* Mock interview */}
+      {item.type === 'design' && item.interviewEnabled && <MockInterview design={item} />}
 
       {/* Tags */}
       {item.tags?.length > 0 && (

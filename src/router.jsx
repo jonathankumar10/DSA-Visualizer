@@ -1,16 +1,24 @@
+/* eslint-disable react-refresh/only-export-components -- route config intentionally
+   pairs lazy() page components with the non-component `router` export; this file
+   isn't a Fast Refresh boundary. */
+import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import Layout from './components/layout/Layout'
-import Home from './pages/Home'
-import AlgorithmsIndex from './pages/AlgorithmsIndex'
-import AlgorithmPage from './pages/AlgorithmPage'
-import PatternsIndex from './pages/PatternsIndex'
-import PatternPage from './pages/PatternPage'
-import SystemDesignIndex from './pages/SystemDesignIndex'
-import SystemDesignPage from './pages/SystemDesignPage'
-import OODIndex from './pages/OODIndex'
-import OODPage from './pages/OODPage'
-import AIIndex from './pages/AIIndex'
-import AIPage from './pages/AIPage'
+
+// Route-level code splitting — each page (and the registry it pulls in)
+// only loads when its route is visited, instead of all bundling into
+// the initial chunk. Layout wraps <Outlet /> in the Suspense boundary.
+const Home              = lazy(() => import('./pages/Home'))
+const AlgorithmsIndex   = lazy(() => import('./pages/AlgorithmsIndex'))
+const AlgorithmPage     = lazy(() => import('./pages/AlgorithmPage'))
+const PatternsIndex     = lazy(() => import('./pages/PatternsIndex'))
+const PatternPage       = lazy(() => import('./pages/PatternPage'))
+const SystemDesignIndex = lazy(() => import('./pages/SystemDesignIndex'))
+const SystemDesignPage  = lazy(() => import('./pages/SystemDesignPage'))
+const OODIndex           = lazy(() => import('./pages/OODIndex'))
+const OODPage            = lazy(() => import('./pages/OODPage'))
+const AIIndex            = lazy(() => import('./pages/AIIndex'))
+const AIPage             = lazy(() => import('./pages/AIPage'))
 
 export const router = createBrowserRouter([
   {

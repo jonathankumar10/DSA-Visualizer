@@ -1,7 +1,11 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
 import Navbar from './Navbar'
 import ChatBot from '../ui/ChatBot'
+
+function PageFallback() {
+  return <div className="py-24 text-center text-slate-500 text-sm">Loading…</div>
+}
 
 export default function Layout() {
   const glowRef = useRef(null)
@@ -21,7 +25,9 @@ export default function Layout() {
       <div ref={glowRef} className="cursor-glow" />
       <Navbar />
       <main className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <Outlet />
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
       <ChatBot />
     </div>

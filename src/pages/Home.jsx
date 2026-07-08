@@ -119,7 +119,7 @@ export default function Home() {
         >
           The complete SWE{' '}
           <span className="bg-gradient-to-r from-white via-blue-300 to-blue-500 bg-clip-text text-transparent">
-            interview playbook
+           playbook
           </span>
         </motion.h1>
 

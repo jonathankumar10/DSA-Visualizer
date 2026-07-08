@@ -79,6 +79,12 @@ export function buildChatSystemSteps() {
       connections: { 'chatSvc-pushSvc': 'request', 'pushSvc-userB': 'response' },
       message: 'User B is offline — push notification via APNs/FCM',
       detail: 'If User B has no active WebSocket connection, the Chat Server calls the Push Notification Service, which dispatches to APNs (iOS) or FCM (Android). The push notification contains a "you have a new message" alert, not the message content — the full message is fetched when B opens the app and reconnects.',
+      banner: {
+        icon: '🔔',
+        color: 'amber',
+        title: 'Offline Fallback Active',
+        text: 'User B has no WebSocket connection — push notification dispatched to APNs/FCM. Full message delivered on reconnect.',
+      },
     },
     {
       type: 'reconnect-sync',
@@ -93,6 +99,12 @@ export function buildChatSystemSteps() {
       connections: { 'chatSvc-mq': 'request', 'chatSvc-presence': 'request' },
       message: 'Group chat: fan-out to N members',
       detail: 'When a message is sent to a group, the Chat Service looks up all group members in the Presence Service and publishes one message per member to the queue. This "fan-out on write" is expensive at scale — WhatsApp caps groups at 256; Slack uses coarser presence and lazy fan-out. For massive groups, fan-out on read (pull model) may be more efficient.',
+      banner: {
+        icon: '👥',
+        color: 'violet',
+        title: 'Group Fan-Out',
+        text: 'One message → N presence lookups → N queue writes. Fan-out cost grows linearly with group size — this is why large groups have member caps.',
+      },
     },
   ]
 }

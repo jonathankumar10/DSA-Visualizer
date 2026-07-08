@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { buildFileStorageSteps } from './steps'
 import { useStepRunner } from '../../../../hooks/useStepRunner'
 import StepControls from '../../../../components/ui/StepControls'
+import StepBanner from '../../../../components/ui/StepBanner'
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 // Left:         client (Device 1), syncClient (Sync Client)
@@ -256,8 +257,6 @@ export default function FileStorageDiagram() {
     return s
   }, [steps, index])
 
-  const showDeltaBanner    = step.type === 'delta-sync'
-  const showConflictBanner = step.type === 'conflict'
 
   return (
     <div className="space-y-4">
@@ -312,38 +311,7 @@ export default function FileStorageDiagram() {
               ))}
             </div>
 
-            <AnimatePresence>
-              {showDeltaBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-violet-500/40 bg-violet-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">⚡</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-violet-400">Delta Sync Active</p>
-                    <p className="text-sm text-white">Only changed chunks are uploaded. Bandwidth is proportional to the edit, not the file size — editing 1 KB of a 500 MB file uploads 1 KB.</p>
-                  </div>
-                </motion.div>
-              )}
-              {showConflictBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-rose-500/40 bg-rose-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">⚠️</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-rose-400">Conflict Detected</p>
-                    <p className="text-sm text-white">Two offline devices created divergent versions. A conflict copy is saved — the user resolves manually. Auto-merge is unsafe for binary files.</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <StepBanner banner={step.banner} />
           </div>
         </div>
 

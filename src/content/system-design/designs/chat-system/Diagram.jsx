@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { buildChatSystemSteps } from './steps'
 import { useStepRunner } from '../../../../hooks/useStepRunner'
 import StepControls from '../../../../components/ui/StepControls'
+import StepBanner from '../../../../components/ui/StepBanner'
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 // Left column:  userA
@@ -265,8 +266,6 @@ export default function ChatSystemDiagram() {
     return s
   }, [steps, index])
 
-  const showOfflineBanner = step.type === 'offline-push'
-  const showGroupBanner   = step.type === 'group-fanout'
 
   return (
     <div className="space-y-4">
@@ -323,38 +322,7 @@ export default function ChatSystemDiagram() {
               ))}
             </div>
 
-            <AnimatePresence>
-              {showOfflineBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">🔔</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400">Offline Fallback Active</p>
-                    <p className="text-sm text-white">User B has no WebSocket connection — push notification dispatched to APNs/FCM. Full message delivered on reconnect.</p>
-                  </div>
-                </motion.div>
-              )}
-              {showGroupBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-violet-500/40 bg-violet-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">👥</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-violet-400">Group Fan-Out</p>
-                    <p className="text-sm text-white">One message → N presence lookups → N queue writes. Fan-out cost grows linearly with group size — this is why large groups have member caps.</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <StepBanner banner={step.banner} />
           </div>
         </div>
 

@@ -79,6 +79,12 @@ export function buildFileStorageSteps() {
       connections: { 'syncClient-apiSvc': 'request', 'apiSvc-chunkStore': 'request' },
       message: 'Delta sync — only changed chunks are re-uploaded',
       detail: 'User edits the last paragraph of a 500 MB document. Only the final chunk(s) change — all other chunk hashes stay the same. The sync client uploads just the changed chunks (a few MB) and commits a new version pointing to the same old chunks + the new ones. This is delta sync: bandwidth proportional to the change, not the file size.',
+      banner: {
+        icon: '⚡',
+        color: 'violet',
+        title: 'Delta Sync Active',
+        text: 'Only changed chunks are uploaded. Bandwidth is proportional to the edit, not the file size — editing 1 KB of a 500 MB file uploads 1 KB.',
+      },
     },
     {
       type: 'conflict',
@@ -86,6 +92,12 @@ export function buildFileStorageSteps() {
       connections: { 'client-apiSvc': 'request', 'device2-apiSvc': 'request', 'apiSvc-metaDB': 'request' },
       message: 'Conflict: two devices edited the same file offline',
       detail: 'Device 1 and Device 2 both modify "report.docx" while offline. When they reconnect, the first sync wins — "report.docx" gets its changes. The second device\'s version is saved as "report (Device 2\'s conflicted copy 2024-01-15).docx". The user resolves manually. Automatic merge is only reliable for plain text with line-level diffing; binary files cannot be merged safely.',
+      banner: {
+        icon: '⚠️',
+        color: 'rose',
+        title: 'Conflict Detected',
+        text: 'Two offline devices created divergent versions. A conflict copy is saved — the user resolves manually. Auto-merge is unsafe for binary files.',
+      },
     },
   ]
 }

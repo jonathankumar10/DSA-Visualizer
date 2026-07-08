@@ -79,6 +79,12 @@ export function buildNotificationSystemSteps() {
       connections: { 'pushWorker-mq': 'request', 'pushWorker-apns': 'request' },
       message: 'Retry on failure — exponential backoff + dead-letter queue',
       detail: 'If APNs returns a 5xx error or times out, the worker retries with exponential backoff (1s, 2s, 4s, 8s...). After max retries, the message moves to a dead-letter queue (DLQ) for manual inspection. Idempotency is critical: each notification has a unique notification_id used as an idempotency key — retries cannot produce duplicate sends.',
+      banner: {
+        icon: '🔁',
+        color: 'amber',
+        title: 'Retry — Exponential Backoff',
+        text: 'Provider returned 5xx. Worker retries at 1s, 2s, 4s, 8s. After max retries the message enters the dead-letter queue. Idempotency key prevents duplicate sends on retry.',
+      },
     },
     {
       type: 'rate-limit',
@@ -86,6 +92,12 @@ export function buildNotificationSystemSteps() {
       connections: { 'notifSvc-prefStore': 'request', 'notifSvc-mq': 'request' },
       message: 'Rate limiting and deduplication — no notification storms',
       detail: 'If 10,000 events trigger simultaneous notifications for the same user, the Notification Service collapses them into one summary. A Redis SET keyed by user_id + notification_type with a 60s TTL acts as the deduplication window — second identical notification in 60s is dropped. Per-user rate limits (e.g. max 10 push/hour) prevent overwhelming users and damaging engagement metrics.',
+      banner: {
+        icon: '🛡️',
+        color: 'violet',
+        title: 'Rate Limit + Dedup Active',
+        text: '10,000 events collapsed into one summary notification. Redis dedup key: user_id + type + 60s TTL. Per-user rate cap prevents notification fatigue.',
+      },
     },
   ]
 }

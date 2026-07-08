@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { buildNotificationSystemSteps } from './steps'
 import { useStepRunner } from '../../../../hooks/useStepRunner'
 import StepControls from '../../../../components/ui/StepControls'
+import StepBanner from '../../../../components/ui/StepBanner'
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 // Left:         apiServer (upstream service)
@@ -300,8 +301,6 @@ export default function NotificationSystemDiagram() {
     return s
   }, [steps, index])
 
-  const showRetryBanner   = step.type === 'retry'
-  const showRateBanner    = step.type === 'rate-limit'
 
   return (
     <div className="space-y-4">
@@ -359,38 +358,7 @@ export default function NotificationSystemDiagram() {
               ))}
             </div>
 
-            <AnimatePresence>
-              {showRetryBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">🔁</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400">Retry — Exponential Backoff</p>
-                    <p className="text-sm text-white">Provider returned 5xx. Worker retries at 1s, 2s, 4s, 8s. After max retries the message enters the dead-letter queue. Idempotency key prevents duplicate sends on retry.</p>
-                  </div>
-                </motion.div>
-              )}
-              {showRateBanner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                  className="relative mt-3 flex items-center gap-3 rounded-xl border border-violet-500/40 bg-violet-500/[0.07] px-4 py-3"
-                >
-                  <span className="text-xl select-none">🛡️</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-violet-400">Rate Limit + Dedup Active</p>
-                    <p className="text-sm text-white">10,000 events collapsed into one summary notification. Redis dedup key: user_id + type + 60s TTL. Per-user rate cap prevents notification fatigue.</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <StepBanner banner={step.banner} />
           </div>
         </div>
 

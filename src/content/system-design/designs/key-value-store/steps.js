@@ -86,6 +86,12 @@ export function buildKeyValueStoreSteps() {
       connections: { 'coordinator-nodeA': 'request', 'coordinator-nodeB': 'request' },
       message: 'Node C is down — sloppy quorum + hinted handoff',
       detail: 'Node C is unavailable. Rather than fail the write, the coordinator uses a sloppy quorum: it writes to Node A and Node B (the next healthy nodes on the ring) with a hint: "this write belongs to Node C." When C recovers, hinted handoff delivers the buffered writes. This ensures the system remains writable even during partial failures — Dynamo\'s "always writable" design.',
+      banner: {
+        icon: '💀',
+        color: 'red',
+        title: 'Node C Unavailable — Sloppy Quorum Active',
+        text: 'Write proceeds to Nodes A and B. A hint is stored: "deliver to Node C when it recovers." The system stays writable despite the failure.',
+      },
     },
     {
       type: 'vector-clocks',
@@ -93,6 +99,12 @@ export function buildKeyValueStoreSteps() {
       connections: { 'nodeA-coordinator': 'response', 'nodeB-coordinator': 'response' },
       message: 'Conflict resolution with vector clocks',
       detail: 'Two concurrent writes (from different clients before syncing) produce divergent versions: Node A has [A:2, B:1] and Node B has [A:1, B:2]. Neither version causally dominates the other — this is a true conflict. The coordinator returns both versions to the client; the client resolves (last-write-wins, or application-level merge) and re-writes. DynamoDB\'s conditional writes prevent this by requiring a known version to update.',
+      banner: {
+        icon: '⚡',
+        color: 'amber',
+        title: 'Version Conflict — Vector Clocks Diverged',
+        text: 'Concurrent writes produced incomparable versions. Both are returned to the client for application-level resolution — the system cannot decide which is "correct."',
+      },
     },
   ]
 }

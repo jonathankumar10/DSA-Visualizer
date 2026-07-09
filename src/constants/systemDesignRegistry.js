@@ -2,6 +2,11 @@
 import computerArchitecture    from '../content/system-design/concepts/computer-architecture/index.js'
 import applicationArchitecture from '../content/system-design/concepts/application-architecture/index.js'
 import designRequirements      from '../content/system-design/concepts/design-requirements/index.js'
+import reshaded                from '../content/system-design/concepts/reshaded/index.js'
+import abstractionsInSystemDesign from '../content/system-design/concepts/abstractions-in-system-design/index.js'
+import consistencyModelsSpectrum  from '../content/system-design/concepts/consistency-models-spectrum/index.js'
+import failureModelsSpectrum      from '../content/system-design/concepts/failure-models-spectrum/index.js'
+import rpc                        from '../content/system-design/concepts/rpc/index.js'
 
 // ── Networking ────────────────────────────────────────────────────────────────
 import networkingBasics        from '../content/system-design/concepts/networking-basics/index.js'
@@ -68,6 +73,11 @@ export const SYSTEM_DESIGN = [
   computerArchitecture,
   applicationArchitecture,
   designRequirements,
+  reshaded,
+  abstractionsInSystemDesign,
+  consistencyModelsSpectrum,
+  failureModelsSpectrum,
+  rpc,
   // Networking
   networkingBasics,
   tcpAndUdp,
@@ -134,6 +144,7 @@ export const SD_CATEGORY_LABELS = {
   'hardware':       'Hardware',
   'architecture':   'Architecture',
   'requirements':   'Requirements',
+  'framework':      'Interview Framework',
   'networking':     'Networking',
   'apis':           'APIs',
   'caching':        'Caching',

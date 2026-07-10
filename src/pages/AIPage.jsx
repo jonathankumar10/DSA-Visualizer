@@ -2,6 +2,10 @@ import React, { Suspense } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AI_ITEMS, AI_COLORS, AI_CATEGORY_LABELS, LIVE_CODING_AI_GUIDE } from '../constants/aiRegistry'
+import DetailSidebar from '../components/layout/DetailSidebar'
+import { groupByCategory } from '../lib/groupByCategory'
+
+const SIDEBAR_GROUPS = groupByCategory(AI_ITEMS, AI_CATEGORY_LABELS, '/ai')
 
 const AI_ANIMATIONS = import.meta.glob('../content/ai/*/Animation.jsx')
 
@@ -59,12 +63,14 @@ export default function AIPage() {
   const nextItem = index < AI_ITEMS.length - 1 ? AI_ITEMS[index + 1] : null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className="space-y-8"
-    >
+    <div className="lg:flex lg:items-start lg:gap-8">
+      <DetailSidebar groups={SIDEBAR_GROUPS} activeId={item.id} title="AI" />
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="flex-1 min-w-0 space-y-8"
+      >
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-500">
         <Link to="/" className="hover:text-slate-300 transition-colors">Home</Link>
@@ -99,7 +105,8 @@ export default function AIPage() {
 
       {/* Next / Previous */}
       <AdjacentNav prevItem={prevItem} nextItem={nextItem} basePath="/ai" />
-    </motion.div>
+      </motion.div>
+    </div>
   )
 }
 

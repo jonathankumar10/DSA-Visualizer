@@ -1,8 +1,12 @@
 import React, { Suspense, useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SYSTEM_DESIGN, TYPE_COLOR, TYPE_LABEL } from '../constants/systemDesignRegistry'
+import { SYSTEM_DESIGN, TYPE_COLOR, TYPE_LABEL, SD_CATEGORY_LABELS } from '../constants/systemDesignRegistry'
 import MockInterview from '../components/system-design/MockInterview'
+import DetailSidebar from '../components/layout/DetailSidebar'
+import { groupByCategory } from '../lib/groupByCategory'
+
+const SIDEBAR_GROUPS = groupByCategory(SYSTEM_DESIGN, SD_CATEGORY_LABELS, '/system-design')
 
 const DIAGRAMS               = import.meta.glob('../content/system-design/**/Diagram.jsx')
 const CONCEPT_ILLUSTRATIONS  = import.meta.glob('../content/system-design/**/ConceptIllustration.jsx')
@@ -1460,12 +1464,14 @@ export default function SystemDesignPage() {
   const nextItem = index < SYSTEM_DESIGN.length - 1 ? SYSTEM_DESIGN[index + 1] : null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className="space-y-8"
-    >
+    <div className="lg:flex lg:items-start lg:gap-8">
+      <DetailSidebar groups={SIDEBAR_GROUPS} activeId={item.id} title="System Design" />
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="flex-1 min-w-0 space-y-8"
+      >
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-500">
         <Link to="/" className="hover:text-slate-300 transition-colors">Home</Link>
@@ -1633,6 +1639,7 @@ export default function SystemDesignPage() {
 
       {/* Next / Previous */}
       <AdjacentNav prevItem={prevItem} nextItem={nextItem} />
-    </motion.div>
+      </motion.div>
+    </div>
   )
 }

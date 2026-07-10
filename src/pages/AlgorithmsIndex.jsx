@@ -3,30 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AlgoCard from '../components/ui/AlgoCard'
 import ZoomControls from '../components/ui/ZoomControls'
 import { useZoomPan } from '../hooks/useZoomPan'
-import { ALGORITHMS } from '../constants/algorithmRegistry'
+import { ALGORITHMS, CATEGORY_LABELS } from '../constants/algorithmRegistry'
 
 // ── Labels ────────────────────────────────────────────────────────────────────
-
-const CATEGORY_LABELS = {
-  'arrays-hashing':      'Arrays & Hashing',
-  'two-pointers':        'Two Pointers',
-  'stack':               'Stack',
-  'binary-search':       'Binary Search',
-  'sliding-window':      'Sliding Window',
-  'linked-list':         'Linked List',
-  'trees':               'Trees',
-  'tries':               'Tries',
-  'backtracking':        'Backtracking',
-  'heap-priority-queue': 'Heap / Priority Queue',
-  'graphs':              'Graphs',
-  'advanced-graphs':     'Advanced Graphs',
-  '1d-dp':               '1-D DP',
-  '2d-dp':               '2-D DP',
-  'greedy':              'Greedy',
-  'intervals':           'Intervals',
-  'bit-manipulation':    'Bit Manipulation',
-  'math-geometry':       'Math & Geometry',
-}
 
 const SHORT_LABELS = {
   'arrays-hashing':      'Arrays & Hash',

@@ -40,3 +40,25 @@ export const DIFFICULTY_COLOR = {
   Medium: 'text-amber-400  bg-amber-400/10',
   Hard:   'text-rose-400   bg-rose-400/10',
 }
+
+// category slug → display label
+export const CATEGORY_LABELS = {
+  'arrays-hashing':      'Arrays & Hashing',
+  'two-pointers':        'Two Pointers',
+  'stack':               'Stack',
+  'binary-search':       'Binary Search',
+  'sliding-window':      'Sliding Window',
+  'linked-list':         'Linked List',
+  'trees':               'Trees',
+  'tries':               'Tries',
+  'backtracking':        'Backtracking',
+  'heap-priority-queue': 'Heap / Priority Queue',
+  'graphs':              'Graphs',
+  'advanced-graphs':     'Advanced Graphs',
+  '1d-dp':               '1-D DP',
+  '2d-dp':               '2-D DP',
+  'greedy':              'Greedy',
+  'intervals':           'Intervals',
+  'bit-manipulation':    'Bit Manipulation',
+  'math-geometry':       'Math & Geometry',
+}

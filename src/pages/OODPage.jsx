@@ -2,6 +2,10 @@ import React, { Suspense } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { OOD_ITEMS, OOD_COLORS, OOD_CATEGORY_LABELS } from '../constants/oodRegistry'
+import DetailSidebar from '../components/layout/DetailSidebar'
+import { groupByCategory } from '../lib/groupByCategory'
+
+const SIDEBAR_GROUPS = groupByCategory(OOD_ITEMS, OOD_CATEGORY_LABELS, '/ood')
 
 // Lazy-load per-pattern animations from content/ood/*/Animation.jsx
 const OOD_ANIMATIONS = import.meta.glob('../content/ood/*/Animation.jsx')
@@ -66,12 +70,14 @@ export default function OODPage() {
   const nextItem = index < OOD_ITEMS.length - 1 ? OOD_ITEMS[index + 1] : null
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className="space-y-8"
-    >
+    <div className="lg:flex lg:items-start lg:gap-8">
+      <DetailSidebar groups={SIDEBAR_GROUPS} activeId={item.id} title="OOD" />
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="flex-1 min-w-0 space-y-8"
+      >
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-slate-500">
         <Link to="/" className="hover:text-slate-300 transition-colors">Home</Link>
@@ -106,7 +112,8 @@ export default function OODPage() {
 
       {/* Next / Previous */}
       <AdjacentNav prevItem={prevItem} nextItem={nextItem} basePath="/ood" />
-    </motion.div>
+      </motion.div>
+    </div>
   )
 }
 

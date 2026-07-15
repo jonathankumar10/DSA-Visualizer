@@ -7,6 +7,7 @@ import abstractionsInSystemDesign from '../content/system-design/concepts/abstra
 import consistencyModelsSpectrum  from '../content/system-design/concepts/consistency-models-spectrum/index.js'
 import failureModelsSpectrum      from '../content/system-design/concepts/failure-models-spectrum/index.js'
 import rpc                        from '../content/system-design/concepts/rpc/index.js'
+import buildingBlocksOverview     from '../content/system-design/concepts/building-blocks-overview/index.js'
 
 // ── Networking ────────────────────────────────────────────────────────────────
 import networkingBasics        from '../content/system-design/concepts/networking-basics/index.js'
@@ -43,6 +44,7 @@ import availabilityPatterns    from '../content/system-design/concepts/availabil
 
 // ── Scalability ───────────────────────────────────────────────────────────────
 import rateLimiting            from '../content/system-design/concepts/rate-limiting/index.js'
+import sequencer               from '../content/system-design/concepts/sequencer/index.js'
 
 // ── Messaging ─────────────────────────────────────────────────────────────────
 import messageQueues           from '../content/system-design/concepts/message-queues/index.js'
@@ -65,6 +67,16 @@ import videoStreaming          from '../content/system-design/designs/video-stre
 import socialMediaFeed         from '../content/system-design/designs/social-media-feed/index.js'
 import fileStorage             from '../content/system-design/designs/file-storage/index.js'
 import searchAutocomplete      from '../content/system-design/designs/search-autocomplete/index.js'
+import errorMonitoringSystem   from '../content/system-design/designs/error-monitoring-system/index.js'
+import clientSideErrorMonitoring from '../content/system-design/designs/client-side-error-monitoring/index.js'
+import distributedCache        from '../content/system-design/designs/distributed-cache/index.js'
+import distributedMessageQueue from '../content/system-design/designs/distributed-message-queue/index.js'
+import pubSub                  from '../content/system-design/designs/pub-sub/index.js'
+import blobStore               from '../content/system-design/designs/blob-store/index.js'
+import distributedSearch       from '../content/system-design/designs/distributed-search/index.js'
+import distributedLoggingService from '../content/system-design/designs/distributed-logging-service/index.js'
+import distributedTaskScheduler from '../content/system-design/designs/distributed-task-scheduler/index.js'
+import shardedCounters         from '../content/system-design/designs/sharded-counters/index.js'
 
 // Ordered following the NeetCode System Design for Beginners curriculum.
 // Add new topics here — one import + one array entry.
@@ -78,6 +90,7 @@ export const SYSTEM_DESIGN = [
   consistencyModelsSpectrum,
   failureModelsSpectrum,
   rpc,
+  buildingBlocksOverview,
   // Networking
   networkingBasics,
   tcpAndUdp,
@@ -107,6 +120,7 @@ export const SYSTEM_DESIGN = [
   availabilityPatterns,
   // Scalability
   rateLimiting,
+  sequencer,
   // Messaging
   messageQueues,
   // Observability
@@ -125,6 +139,16 @@ export const SYSTEM_DESIGN = [
   socialMediaFeed,
   fileStorage,
   searchAutocomplete,
+  errorMonitoringSystem,
+  clientSideErrorMonitoring,
+  distributedCache,
+  distributedMessageQueue,
+  pubSub,
+  blobStore,
+  distributedSearch,
+  distributedLoggingService,
+  distributedTaskScheduler,
+  shardedCounters,
 ]
 
 // type → display label

@@ -45,6 +45,7 @@ const SECTIONS = [
     text:  'text-cyan-400',
     badge: 'bg-cyan-500/15 text-cyan-300',
     subsections: [
+      { label: 'Overview',                ids: ['building-blocks-overview'] },
       { label: 'Networking',              ids: ['networking-basics', 'tcp-and-udp', 'dns'] },
       { label: 'APIs',                    ids: ['http', 'websockets', 'api-paradigms', 'api-design'] },
       { label: 'Caching & Delivery',      ids: ['caching', 'cdns', 'proxies-and-load-balancing'] },

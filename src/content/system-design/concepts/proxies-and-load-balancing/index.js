@@ -14,6 +14,7 @@ export default {
     'L4 vs L7 load balancing: Layer 4 (transport) routes by IP address and TCP port — fast, low CPU overhead, no HTTP awareness. Layer 7 (application) reads the HTTP request line, headers, and body — enables content-based routing (/api/* to API servers, /static/* to CDN origin), A/B testing by cookie, and canary deployments. AWS ALB, nginx, and HAProxy operate at L7.',
     'SSL termination: the load balancer decrypts HTTPS at the edge and forwards plain HTTP to backend servers. Benefits: one certificate to manage, backends avoid TLS overhead, L7 routing can inspect headers. The backend-to-LB connection is on a trusted private network. If end-to-end encryption is required, use SSL passthrough (L4) or re-encrypt to backends.',
     'Active-active vs active-passive: active-active runs all servers simultaneously, maximizing throughput and providing instant failover — requires stateless servers with shared state in Redis or a database. Active-passive keeps one server idle as a hot standby — simpler for stateful workloads (primary database + replica). For stateless app servers, always prefer active-active.',
+    'Global vs local load balancing: local load balancing is everything above — an L4/L7 LB distributing traffic across a server pool inside one data center or region. Global load balancing happens a tier above that, before a request ever reaches a region: DNS-based GSLB (geo-DNS) or anycast IP routes each user to their nearest or lowest-latency healthy region based on geography, latency, or region health. AWS Route 53, Cloudflare Load Balancing, and GCP\'s Global Load Balancer operate at this tier. Most systems at scale use both — global picks the region, local picks the server within it.',
   ],
   keyPoints: [
     'Forward proxies sit in front of clients — used for privacy, filtering, and corporate security',
@@ -21,5 +22,6 @@ export default {
     'Load balancers distribute requests across a server pool: round-robin, least-connections, or IP hash',
     'Health checks automatically remove failed servers from the pool',
     'L4 load balancers route by IP/TCP; L7 load balancers route by HTTP path, headers, or cookies',
+    'Global load balancing (DNS/anycast) picks a region; local load balancing (L4/L7) picks a server within it',
   ],
 }
